@@ -429,75 +429,104 @@ const RightSidebar = () => {
   const isSubredditPage = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
 
   return (
-    <aside className="hidden xl:flex flex-col w-[312px] gap-4 ml-6 py-6 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto no-scrollbar">
-      {isSubredditPage && (
-        <div className="bg-card border border-border rounded-[24px] overflow-hidden shadow-sm">
-          <div className="px-5 py-4 border-b border-border bg-muted/50">
-            <h4 className="text-[14px] font-bold text-foreground uppercase tracking-wider">About Community</h4>
-          </div>
-          <div className="p-5 flex flex-col gap-4">
-            <p className="text-[14px] text-foreground leading-normal">
-              A community dedicated to discussions, news, and updates. Welcome!
-            </p>
-            <div className="flex gap-6">
-              <div className="flex flex-col">
-                <span className="text-[16px] font-bold">1.2m</span>
-                <span className="text-[12px] text-muted-foreground font-medium">Members</span>
+    <aside id="right-sidebar" className="hidden xl:flex flex-col w-[312px] shrink-0 border-l border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-colors duration-400">
+      <div className="flex flex-col p-4 space-y-6">
+        {/* About Community Section (Full Width, No Card) */}
+        {isSubredditPage && (
+          <div className="flex flex-col space-y-3">
+            <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest px-2">About Community</h3>
+            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4">
+              <p className="text-[14px] text-foreground leading-normal">
+                A community dedicated to discussions, news, and updates. Welcome!
+              </p>
+              <div className="flex gap-6">
+                <div className="flex flex-col">
+                  <span className="text-[16px] font-bold">1.2m</span>
+                  <span className="text-[12px] text-muted-foreground font-medium">Members</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[16px] font-bold flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div> 4.5k
+                  </span>
+                  <span className="text-[12px] text-muted-foreground font-medium">Online</span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[16px] font-bold flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div> 4.5k
-                </span>
-                <span className="text-[12px] text-muted-foreground font-medium">Online</span>
-              </div>
+              <Button className="w-full rounded-full font-bold h-10 shadow-sm">Create Post</Button>
             </div>
-            <Button className="w-full rounded-full font-bold h-10 shadow-sm">Create Post</Button>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="bg-card border border-border rounded-[24px] p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110 duration-500"></div>
-        <div className="flex gap-4">
-          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary shrink-0">
-            <ShieldCheck size={24} />
+        {/* Recent Posts Section */}
+        <div className="flex flex-col space-y-3">
+          <div className="flex justify-between items-center px-2">
+            <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">Recent Posts</h3>
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-transparent h-auto p-0 font-bold text-[12px]">Clear</Button>
           </div>
-          <div className="flex flex-col">
-            <h4 className="text-[15px] font-bold text-foreground">Reddit Premium</h4>
-            <p className="text-[13px] text-muted-foreground font-medium leading-snug mt-0.5">
-              The best Reddit experience, with Ad-free and more!
-            </p>
+          <div className="flex flex-col space-y-1">
+            {mockPosts.slice(0, 4).map((post) => (
+              <Link key={post.id} to={`/post/${post.id}`} className="px-2 py-2.5 hover:bg-muted rounded-[12px] transition-colors flex flex-col gap-1 group">
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                  <Avatar className="w-4 h-4">
+                    <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${post.sub}&backgroundColor=ff4500`} />
+                    <AvatarFallback>r/</AvatarFallback>
+                  </Avatar>
+                  <span className="font-bold text-foreground/80 group-hover:underline">r/{post.sub}</span>
+                  <span>•</span>
+                  <span>3d ago</span>
+                </div>
+                <h4 className="text-[13px] font-semibold leading-snug text-foreground group-hover:underline line-clamp-2">
+                  {post.title}
+                </h4>
+                <div className="text-[11px] text-muted-foreground font-medium">
+                  {post.upvotes} upvotes • {post.comments} comments
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
-        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full font-bold h-10 shadow-sm">Try Now</Button>
-      </div>
 
-      <div className="bg-card border border-border rounded-[24px] overflow-hidden shadow-sm">
-        <div className="px-5 py-4 border-b border-border bg-muted/50">
-          <h4 className="text-[14px] font-bold text-foreground uppercase tracking-wider">Top Communities</h4>
+        {/* Top Communities Section */}
+        <div className="flex flex-col space-y-3">
+          <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest px-2">Top Communities</h3>
+          <div className="flex flex-col space-y-1">
+            {mockCommunities.slice(0, 5).map((community, i) => (
+              <Link key={community.id} to={`/r/${community.id}`} className="flex items-center justify-between px-2 py-2 hover:bg-muted rounded-[12px] transition-colors">
+                <div className="flex items-center gap-3">
+                  <span className="text-[12px] font-bold text-muted-foreground w-4">{i + 1}</span>
+                  <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm", community.icon)}>r/</div>
+                  <span className="text-[13px] font-bold text-foreground">r/{community.name}</span>
+                </div>
+                <Button variant="outline" size="sm" className="rounded-full h-7 px-3 font-bold border-primary text-primary hover:bg-primary/5 text-[11px]">Join</Button>
+              </Link>
+            ))}
+            <Button variant="ghost" className="w-full text-primary font-bold text-[12px] py-2 rounded-[12px] h-auto hover:bg-muted mt-1">View All</Button>
+          </div>
         </div>
-        <div className="flex flex-col">
-          {mockCommunities.slice(0, 5).map((community, i) => (
-            <Link key={community.id} to={`/r/${community.id}`} className="flex items-center justify-between px-5 py-3 hover:bg-muted transition-colors">
-              <div className="flex items-center gap-3">
-                <span className="text-[14px] font-bold text-muted-foreground w-4">{i + 1}</span>
-                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", community.icon)}>r/</div>
-                <span className="text-[14px] font-bold text-foreground">r/{community.name}</span>
-              </div>
-              <Button variant="outline" size="sm" className="rounded-full h-8 px-4 font-bold border-primary text-primary hover:bg-primary/5">Join</Button>
-            </Link>
+
+        {/* Premium Promo Section */}
+        <div className="bg-primary/5 border border-primary/10 rounded-[16px] p-4 flex flex-col gap-3 relative overflow-hidden group">
+          <div className="flex gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary shrink-0">
+              <ShieldCheck size={24} />
+            </div>
+            <div className="flex flex-col">
+              <h4 className="text-[14px] font-bold text-foreground">Reddit Premium</h4>
+              <p className="text-[12px] text-muted-foreground font-medium leading-snug mt-0.5">
+                The best Reddit experience, with Ad-free and more!
+              </p>
+            </div>
+          </div>
+          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full font-bold h-9 text-[13px]">Try Now</Button>
+        </div>
+
+        {/* Footer */}
+        <div className="px-2 pt-4 flex flex-wrap gap-x-3 gap-y-1">
+          {["User Agreement", "Privacy Policy", "Content Policy", "Moderator Code"].map((link) => (
+            <Link key={link} to="#" className="text-[11px] font-medium text-muted-foreground hover:underline">{link}</Link>
           ))}
-          <Button variant="ghost" className="w-full text-primary font-bold text-[14px] py-4 rounded-none h-auto hover:bg-muted">View All</Button>
+          <hr className="w-full my-3 border-border" />
+          <p className="text-[11px] font-medium text-muted-foreground">Reddit, Inc. © 2026. All rights reserved.</p>
         </div>
-      </div>
-
-      <div className="px-4 py-2 flex flex-wrap gap-x-4 gap-y-1">
-        <Link to="#" className="text-[12px] font-medium text-muted-foreground hover:underline">User Agreement</Link>
-        <Link to="#" className="text-[12px] font-medium text-muted-foreground hover:underline">Privacy Policy</Link>
-        <Link to="#" className="text-[12px] font-medium text-muted-foreground hover:underline">Content Policy</Link>
-        <Link to="#" className="text-[12px] font-medium text-muted-foreground hover:underline">Moderator Code of Conduct</Link>
-        <hr className="w-full my-2 border-border" />
-        <p className="text-[12px] font-medium text-muted-foreground">Reddit, Inc. © 2026. All rights reserved.</p>
       </div>
     </aside>
   );
