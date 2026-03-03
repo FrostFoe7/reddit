@@ -5,6 +5,10 @@ import { PostPage } from '@/pages/PostPage';
 import { SubredditPage } from '@/pages/SubredditPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { CreatePostPage } from '@/pages/CreatePostPage';
+import { SearchPage } from '@/pages/SearchPage';
+import { NotificationsPage } from '@/pages/NotificationsPage';
+import { MessagesPage } from '@/pages/MessagesPage';
+import { SettingsPage } from '@/pages/SettingsPage';
 import { NotFound } from '@/pages/NotFound';
 
 function App() {
@@ -17,6 +21,10 @@ function App() {
           <Route path="/r/:name" element={<SubredditPage />} />
           <Route path="/u/:username" element={<ProfilePage />} />
           <Route path="/create" element={<CreatePostPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </MainLayout>

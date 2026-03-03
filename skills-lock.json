@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "brand-color-psychology": {
+      "source": "mike-coulbourn/claude-vibes",
+      "sourceType": "github",
+      "computedHash": "c1f02c1417e30a9ed2814657a48aae49dce828b2d865f9a2a8a0ed173d20f731"
+    },
+    "color-palette": {
+      "source": "jezweb/claude-skills",
+      "sourceType": "github",
+      "computedHash": "8f2df57d728683e7389e5867e1dee1a1155991f06645d1866eb11ca69cfc9fe0"
+    }
+  }
+}

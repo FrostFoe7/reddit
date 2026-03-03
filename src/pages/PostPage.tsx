@@ -5,7 +5,6 @@ import { CommentThread } from '@/components/post/CommentThread';
 import { mockPosts, mockComments } from '@/db/db';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-
 export const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const post = mockPosts.find(p => p.id === id);
@@ -14,8 +13,8 @@ export const PostPage: React.FC = () => {
   if (!post) {
     return (
       <div className="text-center py-24 px-4">
-        <h1 className="text-[32px] sm:text-[40px] font-bold text-text-primary tracking-tight mb-4">Post not found</h1>
-        <Link to="/" className="inline-block bg-text-primary text-bg-primary h-14 px-8 rounded-full font-bold text-[16px] leading-[56px] hover:opacity-80 transition-opacity shadow-sm">
+        <h1 className="text-[32px] sm:text-[40px] font-bold text-foreground tracking-tight mb-4">Post not found</h1>
+        <Link to="/" className="inline-block bg-primary text-primary-foreground h-14 px-8 rounded-full font-bold text-[16px] leading-[56px] hover:opacity-80 transition-opacity shadow-sm">
           Back to Home
         </Link>
       </div>
@@ -26,13 +25,13 @@ export const PostPage: React.FC = () => {
     <div id="view-post" className="view-section active">
       <PostCard post={post} isDetail />
       
-      <div className="bg-card sm:border border-border-subtle rounded-t-[32px] sm:rounded-[32px] p-0 sm:p-8 sm:shadow-ios-subtle dark:shadow-none mb-14 sm:mb-0 relative z-10">
+      <div className="bg-card sm:border border-border rounded-t-[32px] sm:rounded-[32px] p-0 sm:p-8 sm:shadow-ios-subtle dark:shadow-none mb-14 sm:mb-0 relative z-10">
         <div className="hidden sm:flex items-center gap-4 mb-8">
-          <Avatar className="h-11 w-11 shrink-0 shadow-sm border border-border-subtle">
+          <Avatar className="h-11 w-11 shrink-0 shadow-sm border border-border">
             <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=ff4500" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
-          <div className="flex-1 bg-bg-primary border border-border-strong rounded-full h-12 px-5 flex items-center text-[15px] text-text-secondary cursor-text hover:border-accent-primary transition-colors">
+          <div className="flex-1 bg-background border border-border rounded-full h-12 px-5 flex items-center text-[15px] text-muted-foreground cursor-text hover:border-primary transition-colors">
             Add a comment...
           </div>
         </div>
@@ -42,7 +41,7 @@ export const PostPage: React.FC = () => {
             <CommentThread key={comment.id} comment={comment} />
           ))}
           {comments.length === 0 && (
-            <div className="text-center py-10 text-text-secondary font-medium">
+            <div className="text-center py-10 text-muted-foreground font-medium">
               No comments yet. Be the first to share what you think!
             </div>
           )}
@@ -50,8 +49,8 @@ export const PostPage: React.FC = () => {
       </div>
       
       {/* Mobile Comment Input */}
-      <div className="sm:hidden fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] inset-x-0 bg-glass backdrop-blur-2xl border-t border-border-subtle p-3.5 z-40 flex items-center gap-3">
-        <div className="flex-1 bg-card border border-border-strong shadow-sm rounded-full h-11 px-5 flex items-center text-[15px] text-text-secondary">
+      <div className="sm:hidden fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] inset-x-0 bg-glass backdrop-blur-2xl border-t border-border p-3.5 z-40 flex items-center gap-3">
+        <div className="flex-1 bg-card border border-border shadow-sm rounded-full h-11 px-5 flex items-center text-[15px] text-muted-foreground">
           Add a comment...
         </div>
       </div>

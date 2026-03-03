@@ -4,13 +4,46 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  /* ========================================
+     BRAND COLOR SCALE (Reddit Orange)
+     ======================================== */
+  --color-primary-50: #fff5f2;
+  --color-primary-100: #ffebe6;
+  --color-primary-200: #ffd6cc;
+  --color-primary-300: #ffb3a3;
+  --color-primary-400: #ff8066;
+  --color-primary-500: #ff4500; /* Reddit Brand Orange */
+  --color-primary-600: #e63e00;
+  --color-primary-700: #bf3600;
+  --color-primary-800: #992d00;
+  --color-primary-900: #7a2400;
+  --color-primary-950: #4d1300;
+
+  /* ========================================
+     NEUTRAL COLORS (Tailwind Slate/Grayish for Reddit)
+     ======================================== */
+  --color-neutral-50: #f8f9fa;
+  --color-neutral-100: #edeff1;
+  --color-neutral-200: #dae0e6;
+  --color-neutral-300: #bcc2c6;
+  --color-neutral-400: #878a8c;
+  --color-neutral-500: #7c7c7c;
+  --color-neutral-600: #4a4d4e;
+  --color-neutral-700: #343536;
+  --color-neutral-800: #1a1a1b;
+  --color-neutral-900: #030303;
+  --color-neutral-950: #000000;
+
+  /* ========================================
+     SEMANTIC COLOR TOKENS (Mapping to shadcn)
+     ======================================== */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
+  --color-primary: var(--primary-color);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -23,174 +56,109 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Reddit Specific Colors from index.html */
+  /* Reddit Specific Aliases for backward compatibility/clarity */
   --color-reddit-orange: #ff4500;
-  --color-bg-primary: var(--bg-primary);
-  --color-bg-secondary: var(--bg-secondary);
-  --color-bg-tertiary: var(--bg-tertiary);
-  --color-card-bg: var(--card-bg);
-  --color-glass-bg: var(--glass-bg);
-  --color-bg-overlay: var(--bg-overlay);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-border-subtle: var(--border-subtle);
-  --color-border-strong: var(--border-strong);
-  --color-hover-bg: var(--hover-bg);
-  --color-accent-primary: var(--accent-primary);
-  --color-vote-up: var(--vote-up);
-
-  /* Spacing */
-  --spacing-4_5: 1.125rem;
-  --spacing-5_5: 1.375rem;
-  --spacing-safe-top: env(safe-area-inset-top);
-  --spacing-safe-bottom: env(safe-area-inset-bottom);
-  --spacing-safe-left: env(safe-area-inset-left);
-  --spacing-safe-right: env(safe-area-inset-right);
+  --color-vote-up: #ff4500;
+  --color-vote-down: #7193ff;
+  --color-link: #0079d3;
 
   /* Shadows */
   --shadow-ios-subtle: 0 2px 10px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.03);
   --shadow-ios-glass: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
   --shadow-ios-float: 0 20px 48px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.06);
 
-  /* Animation */
-  --ease-ios-spring: cubic-bezier(0.28, 0.84, 0.42, 1);
+  /* Radius */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
 @layer base {
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    /* Reddit Light Mode Palette */
+    --background: #dae0e6; /* Reddit background gray */
+    --foreground: #1c1c1c; /* Primary text black */
+    --card: #ffffff; /* Card white */
+    --card-foreground: #1c1c1c;
+    --popover: #ffffff;
+    --popover-foreground: #1c1c1c;
+    --primary-color: #ff4500;
+    --primary-foreground: #ffffff;
+    --secondary: #edeff1;
+    --secondary-foreground: #1c1c1c;
+    --muted: #f6f7f8;
+    --muted-foreground: #787c7e;
+    --accent: #edeff1;
+    --accent-foreground: #1c1c1c;
+    --destructive: #ff585b;
+    --destructive-foreground: #ffffff;
+    --border: #edeff1;
+    --input: #edeff1;
+    --ring: #ff4500;
+    --radius: 0.5rem;
 
-    /* Reddit Specific Variables */
-    --bg-primary: #f2f2f7; 
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #e5e5ea;
-    --card-bg: #ffffff;
-    --glass-bg: rgba(255, 255, 255, 0.75);
-    --bg-overlay: rgba(0, 0, 0, 0.35);
-    --text-primary: #000000;
-    --text-secondary: #8e8e93;
-    --border-subtle: rgba(60, 60, 67, 0.1);
-    --border-strong: rgba(60, 60, 67, 0.18);
-    --hover-bg: rgba(0, 0, 0, 0.04);
-    --accent-primary: #007aff;
+    /* View-specific aliases used in existing code */
+    --bg-primary: var(--background);
+    --bg-secondary: var(--card);
+    --bg-tertiary: #edeff1;
+    --card-bg: var(--card);
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --bg-overlay: rgba(0, 0, 0, 0.4);
+    --text-primary: var(--foreground);
+    --text-secondary: var(--muted-foreground);
+    --border-subtle: #edeff1;
+    --border-strong: #dae0e6;
+    --hover-bg: rgba(0, 0, 0, 0.05);
+    --accent-primary: #0079d3;
     --vote-up: #ff4500;
   }
 
   .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    /* Reddit Dark Mode Palette */
+    --background: #030303; /* Pure black background */
+    --foreground: #d7dadc; /* Primary text gray */
+    --card: #1a1a1b; /* Card dark gray */
+    --card-foreground: #d7dadc;
+    --popover: #1a1a1b;
+    --popover-foreground: #d7dadc;
+    --primary-color: #ff4500;
+    --primary-foreground: #ffffff;
+    --secondary: #272729;
+    --secondary-foreground: #d7dadc;
+    --muted: #151516;
+    --muted-foreground: #818384;
+    --accent: #272729;
+    --accent-foreground: #d7dadc;
+    --destructive: #ff585b;
+    --destructive-foreground: #ffffff;
+    --border: #343536;
+    --input: #343536;
+    --ring: #ff4500;
 
-    /* Reddit Specific Variables Dark */
-    --bg-primary: #000000;
-    --bg-secondary: #1c1c1e;
-    --bg-tertiary: #2c2c2e;
-    --card-bg: #1c1c1e;
-    --glass-bg: rgba(28, 28, 30, 0.75);
-    --bg-overlay: rgba(0, 0, 0, 0.65);
-    --text-primary: #ffffff;
-    --text-secondary: #ebebf599;
-    --border-subtle: rgba(84, 84, 88, 0.3);
-    --border-strong: rgba(84, 84, 88, 0.5);
+    /* View-specific aliases used in existing code */
+    --bg-primary: var(--background);
+    --bg-secondary: var(--card);
+    --bg-tertiary: #272729;
+    --card-bg: var(--card);
+    --glass-bg: rgba(26, 26, 27, 0.8);
+    --bg-overlay: rgba(0, 0, 0, 0.6);
+    --text-primary: var(--foreground);
+    --text-secondary: var(--muted-foreground);
+    --border-subtle: #343536;
+    --border-strong: #1a1a1b;
     --hover-bg: rgba(255, 255, 255, 0.08);
-    --accent-primary: #0a84ff;
+    --accent-primary: #d7dadc;
+    --vote-up: #ff4500;
   }
 
   * {
     @apply border-border outline-ring/50;
-    -webkit-tap-highlight-color: transparent;
   }
   
-  html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
   body {
-    @apply bg-background text-foreground font-sans;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    overflow-y: scroll;
-    transition: background-color 0.4s ease, color 0.4s ease;
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }
 
@@ -202,22 +170,25 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  
+  .bg-glass {
+    @apply bg-card/80 backdrop-blur-md;
+  }
 }
 
-/* Custom styles from index.html */
+/* Custom styles */
 ::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { 
-  background-color: var(--border-strong); 
+  background-color: var(--border); 
   border-radius: 99px; 
-  border: 3px solid var(--bg-primary); 
+  border: 3px solid var(--background); 
 }
-::-webkit-scrollbar-thumb:hover { background-color: var(--text-secondary); }
+::-webkit-scrollbar-thumb:hover { background-color: var(--muted-foreground); }
 
-/* Comment Thread Connectors */
 .thread-line { 
   width: 2px; 
-  background-color: var(--border-subtle); 
+  background-color: var(--border); 
   flex-grow: 1; 
   border-radius: 2px; 
   margin-top: 6px; 
@@ -225,5 +196,4 @@
   cursor: pointer; 
   min-height: 24px;
 }
-
-.collapsed-thread .thread-content { display: none; }
+.thread-line:hover { background-color: var(--muted-foreground); }
