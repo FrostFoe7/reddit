@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
   TrendingUp, 
-  MessageSquare, 
   Plus, 
   Bell, 
   Search, 
@@ -11,13 +10,23 @@ import {
   Compass,
   Settings,
   LogOut,
-  Bookmark,
   Moon,
   Sun,
   ChevronDown,
   Star,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  Newspaper,
+  Gamepad2,
+  Info,
+  Megaphone,
+  LifeBuoy,
+  BookOpen,
+  Briefcase,
+  Mic2,
+  Users,
+  MessageSquare,
+  PieChart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +37,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -117,20 +132,12 @@ const Navbar = () => {
                   <span className="text-[14px] font-medium text-foreground truncate">{p.title}</span>
                 </Link>
               ))}
-              
-              {filteredCommunities.length === 0 && filteredPosts.length === 0 && (
-                <div className="p-6 text-center text-[14px] text-muted-foreground">No results for "{searchQuery}"</div>
-              )}
             </div>
           )}
         </form>
       </div>
       
       <div className="flex items-center gap-2 shrink-0 h-full">
-        <Button variant="ghost" size="icon" className="md:hidden rounded-full h-11 w-11" onClick={() => navigate('/search')}>
-          <Search size={20} />
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full h-11 w-11 relative">
@@ -206,11 +213,6 @@ const Navbar = () => {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="rounded-[14px] focus:bg-muted p-3">
-              <Link to="/u/User123?tab=saved" className="flex items-center gap-3.5 font-medium text-[15px]">
-                <Bookmark size={22} className="text-muted-foreground" /> Saved
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild className="rounded-[14px] focus:bg-muted p-3">
               <Link to="/settings" className="flex items-center gap-3.5 font-medium text-[15px]">
                 <Settings size={22} className="text-muted-foreground" /> Settings
               </Link>
@@ -218,10 +220,7 @@ const Navbar = () => {
             <DropdownMenuSeparator className="bg-border" />
             <DropdownMenuItem 
               className="rounded-[14px] focus:bg-muted p-3 flex items-center justify-between cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                setTheme(theme === 'dark' ? 'light' : 'dark');
-              }}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               <div className="flex items-center gap-3.5 font-medium text-[15px]">
                 {theme === 'dark' ? <Sun size={22} className="text-muted-foreground" /> : <Moon size={22} className="text-muted-foreground" />} 
@@ -229,7 +228,7 @@ const Navbar = () => {
               </div>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem className="rounded-[14px] focus:bg-muted p-3 text-destructive hover:text-destructive">
+            <DropdownMenuItem className="rounded-[14px] focus:bg-muted p-3 text-destructive">
               <div className="flex items-center gap-3.5 font-medium text-[15px]">
                 <LogOut size={22} /> Log Out
               </div>
@@ -241,99 +240,253 @@ const Navbar = () => {
   );
 };
 
-const SidebarItem = ({ to, icon: Icon, label, badge, active }: { to: string, icon: any, label: string, badge?: string | number, active?: boolean }) => (
+const SidebarNavItem = ({ to, icon: Icon, label, badge, active, className }: { to: string, icon: any, label: string, badge?: string | number, active?: boolean, className?: string }) => (
   <Link 
     to={to} 
     className={cn(
-      "flex items-center justify-between px-4 py-3 rounded-[16px] font-semibold transition-colors group",
-      active ? "bg-muted text-foreground" : "text-foreground hover:bg-muted"
+      "flex items-center justify-between px-4 py-2 rounded-[8px] transition-colors group",
+      active ? "bg-muted text-foreground" : "text-foreground hover:bg-muted",
+      className
     )}
   >
-    <div className="flex items-center gap-3.5">
-      <Icon size={22} className={cn(!active && "text-muted-foreground group-hover:text-foreground transition-colors")} />
-      <span className="text-[16px]">{label}</span>
+    <div className="flex items-center gap-3">
+      <div className="flex items-center justify-center w-8 h-8 shrink-0">
+        <Icon size={20} className={cn(!active && "text-foreground group-hover:text-foreground")} strokeWidth={active ? 2.5 : 2} />
+      </div>
+      <span className={cn("text-[14px] font-medium truncate", active && "font-bold")}>{label}</span>
     </div>
-    {badge && <Badge className="bg-primary text-primary-foreground text-[12px] font-bold px-2 py-0.5 rounded-[6px] border-none">{badge}</Badge>}
+    {badge && <Badge className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0 rounded-[4px] border-none">{badge}</Badge>}
   </Link>
 );
 
 const LeftSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
   return (
-    <aside id="left-sidebar" className="hidden md:flex md:w-[220px] lg:w-[260px] shrink-0 flex-col border-r border-border sticky top-[calc(60px+env(safe-area-inset-top))] h-[calc(100vh-(60px+env(safe-area-inset-top)))] overflow-y-auto pb-8 no-scrollbar transition-colors duration-400">
-      <nav className="flex flex-col p-4 space-y-6 mt-2">
-        <div className="space-y-1">
-          <SidebarItem to="/" icon={Home} label="Home" active={location.pathname === '/'} />
-          <SidebarItem to="/search?q=popular" icon={TrendingUp} label="Popular" active={location.search.includes('popular')} />
-          <SidebarItem to="/messages" icon={MessageSquare} label="Messages" badge={2} active={location.pathname === '/messages'} />
+    <aside id="left-sidebar" className="hidden md:flex md:w-[240px] lg:w-[270px] shrink-0 flex-col border-r border-border sticky top-[calc(60px+env(safe-area-inset-top))] h-[calc(100vh-(60px+env(safe-area-inset-top)))] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-colors duration-400">
+      <nav className="flex flex-col p-2 space-y-1" aria-label="Primary">
+        <div className="flex flex-col space-y-0.5">
+          <SidebarNavItem to="/" icon={Home} label="Home" active={location.pathname === '/' && !location.search.includes('feed=news')} />
+          <SidebarNavItem to="/r/popular" icon={TrendingUp} label="Popular" active={location.pathname.includes('/r/popular')} />
+          <SidebarNavItem to="/?feed=news" icon={Newspaper} label="News" active={location.search.includes('feed=news')} />
+          <SidebarNavItem to="/explore" icon={Compass} label="Explore" active={location.pathname === '/explore'} />
         </div>
-        <div className="h-px bg-border mx-4"></div>
-        <div>
-          <div className="flex items-center justify-between w-full px-4 py-2 text-muted-foreground mb-2">
-            <span className="text-[12px] font-bold tracking-wider uppercase">Communities</span>
-          </div>
-          <div className="space-y-1">
-            {mockCommunities.map(community => (
-              <Link 
-                key={community.id}
-                to={`/r/${community.id}`} 
-                className="flex items-center gap-3.5 px-4 py-3 hover:bg-muted rounded-[16px] text-foreground font-medium transition-colors"
-              >
-                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-white shadow-sm border border-border/20", community.icon)}>r/</div>
-                <span className="text-[16px]">{community.name}</span>
-              </Link>
-            ))}
-          </div>
+
+        <hr className="my-3 border-border mx-2" />
+
+        <Accordion type="multiple" defaultValue={["recent", "communities", "games", "resources"]} className="w-full space-y-1">
+          <AccordionItem value="recent" className="border-none">
+            <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-[8px] no-underline hover:no-underline text-[12px] font-bold tracking-widest text-muted-foreground uppercase transition-none">
+              RECENT
+            </AccordionTrigger>
+            <AccordionContent className="pt-1 pb-2">
+              <div className="flex flex-col space-y-0.5">
+                <SidebarNavItem to="/r/Backend" icon={() => (
+                  <Avatar className="w-6 h-6"><AvatarImage src="https://styles.redditmedia.com/t5_2sr2v/styles/communityIcon_inx7byubklb91.png" /><AvatarFallback>B</AvatarFallback></Avatar>
+                )} label="r/Backend" />
+                <SidebarNavItem to="/r/Dhaka" icon={() => (
+                  <Avatar className="w-6 h-6"><AvatarImage src="https://styles.redditmedia.com/t5_2s6vl/styles/communityIcon_pjea2f9av9341.png" /><AvatarFallback>D</AvatarFallback></Avatar>
+                )} label="r/Dhaka" />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="communities" className="border-none">
+            <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-[8px] no-underline hover:no-underline text-[12px] font-bold tracking-widest text-muted-foreground uppercase transition-none">
+              COMMUNITIES
+            </AccordionTrigger>
+            <AccordionContent className="pt-1 pb-2">
+              <div className="flex flex-col space-y-0.5">
+                <button 
+                  onClick={() => navigate('/create')}
+                  className="flex items-center gap-3 px-4 py-2 rounded-[8px] hover:bg-muted transition-colors text-foreground group w-full text-left"
+                >
+                  <div className="flex items-center justify-center w-8 h-8 shrink-0 bg-muted rounded-full group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700">
+                    <Plus size={18} />
+                  </div>
+                  <span className="text-[14px] font-medium">Create a community</span>
+                </button>
+                <Link 
+                  to="/user/communities"
+                  className="flex items-center gap-3 px-4 py-2 rounded-[8px] hover:bg-muted transition-colors text-foreground group w-full"
+                >
+                  <div className="flex items-center justify-center w-8 h-8 shrink-0">
+                    <Settings size={18} className="text-muted-foreground group-hover:text-foreground" />
+                  </div>
+                  <span className="text-[14px] font-medium">Manage Communities</span>
+                </Link>
+                {mockCommunities.map(community => (
+                  <SidebarNavItem 
+                    key={community.id}
+                    to={`/r/${community.id}`} 
+                    icon={() => (
+                      <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", community.icon)}>r/</div>
+                    )}
+                    label={community.name}
+                  />
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="games" className="border-none">
+            <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-[8px] no-underline hover:no-underline text-[12px] font-bold tracking-widest text-muted-foreground uppercase transition-none">
+              GAMES
+            </AccordionTrigger>
+            <AccordionContent className="pt-1 pb-2">
+              <div className="flex flex-col space-y-0.5">
+                <SidebarNavItem to="/r/GamesOnReddit" icon={Gamepad2} label="Discover Games" />
+                <SidebarNavItem to="/post/game1" icon={() => (
+                  <Avatar className="w-6 h-6"><AvatarImage src="https://styles.redditmedia.com/t5_g4t9vd/styles/communityIcon_jejg2erkc48g1.png" /></Avatar>
+                )} label="BattleBirds" />
+                <SidebarNavItem to="/post/game2" icon={() => (
+                  <Avatar className="w-6 h-6"><AvatarImage src="https://styles.redditmedia.com/t5_gikv8d/styles/communityIcon_nz4nl06rg4hg1.png" /></Avatar>
+                )} label="Soul Thieves" />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="resources" className="border-none">
+            <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-[8px] no-underline hover:no-underline text-[12px] font-bold tracking-widest text-muted-foreground uppercase transition-none">
+              RESOURCES
+            </AccordionTrigger>
+            <AccordionContent className="pt-1 pb-2">
+              <div className="flex flex-col space-y-0.5">
+                <SidebarNavItem to="https://www.redditinc.com" icon={Info} label="About Reddit" />
+                <SidebarNavItem to="https://ads.reddit.com" icon={Megaphone} label="Advertise" />
+                <SidebarNavItem to="/reddit-pro" icon={PieChart} label="Reddit Pro" />
+                <Badge variant="outline" className="ml-12 w-fit text-[10px] font-bold text-primary border-primary bg-primary/5 px-1 py-0 h-4">BETA</Badge>
+                <SidebarNavItem to="https://support.reddithelp.com" icon={LifeBuoy} label="Help" />
+                <SidebarNavItem to="https://redditblog.com" icon={BookOpen} label="Blog" />
+                <SidebarNavItem to="https://www.redditinc.com/careers" icon={Briefcase} label="Careers" />
+                <SidebarNavItem to="https://www.redditinc.com/press" icon={Mic2} label="Press" />
+                <hr className="my-2 border-border mx-4" />
+                <SidebarNavItem to="/best/communities" icon={Users} label="Communities" />
+                <SidebarNavItem to="/posts/2026/global" icon={Star} label="Best of Reddit" />
+                <SidebarNavItem to="/policies/content-policy" icon={BookOpen} label="Content Policy" />
+                <SidebarNavItem to="/policies/privacy-policy" icon={ShieldCheck} label="Privacy Policy" />
+                <SidebarNavItem to="/policies/user-agreement" icon={BookOpen} label="User Agreement" />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        <div className="mt-auto pt-8 pb-4 px-4">
+          <p className="text-[10px] text-muted-foreground">Reddit, Inc. © 2026. All rights reserved.</p>
         </div>
       </nav>
     </aside>
   );
 };
 
-const BottomNav = () => {
+const RightSidebar = () => {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
+  const isSubredditPage = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
 
   return (
-    <nav id="bottom-nav" className="md:hidden fixed bottom-0 inset-x-0 bg-glass backdrop-blur-3xl border-t border-border flex justify-around items-center h-[calc(4rem+env(safe-area-inset-bottom))] pb-safe-bottom z-50 transition-transform duration-300 px-2 shadow-[0_-4px_24px_rgba(0,0,0,0.02)]">
-      <Link to="/" className={cn("flex flex-col items-center justify-center w-12 h-12 transition-colors", isActive('/') ? "text-foreground" : "text-muted-foreground")}>
-        <Home size={26} fill={isActive('/') ? "currentColor" : "none"} />
-      </Link>
-      <Link to="/search?q=explore" className={cn("flex flex-col items-center justify-center w-12 h-12 transition-colors", location.search.includes('explore') ? "text-foreground" : "text-muted-foreground")}>
-        <Compass size={26} />
-      </Link>
-      <Link to="/create" className="flex flex-col items-center justify-center w-12 h-12 text-muted-foreground">
-        <div className="bg-muted rounded-full p-2.5 border border-border shadow-sm">
-          <Plus size={20} className="text-foreground" />
+    <aside className="hidden xl:flex flex-col w-[312px] gap-4 ml-6 py-6 sticky top-[calc(60px+env(safe-area-inset-top))] h-[calc(100vh-(60px+env(safe-area-inset-top)))] overflow-y-auto no-scrollbar">
+      {isSubredditPage && (
+        <div className="bg-card border border-border rounded-[24px] overflow-hidden shadow-sm">
+          <div className="px-5 py-4 border-b border-border bg-muted/50">
+            <h4 className="text-[14px] font-bold text-foreground uppercase tracking-wider">About Community</h4>
+          </div>
+          <div className="p-5 flex flex-col gap-4">
+            <p className="text-[14px] text-foreground leading-normal">
+              A community dedicated to discussions, news, and updates. Welcome!
+            </p>
+            <div className="flex gap-6">
+              <div className="flex flex-col">
+                <span className="text-[16px] font-bold">1.2m</span>
+                <span className="text-[12px] text-muted-foreground font-medium">Members</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[16px] font-bold flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div> 4.5k
+                </span>
+                <span className="text-[12px] text-muted-foreground font-medium">Online</span>
+              </div>
+            </div>
+            <Button className="w-full rounded-full font-bold h-10 shadow-sm">Create Post</Button>
+          </div>
         </div>
-      </Link>
-      <Link to="/messages" className={cn("flex flex-col items-center justify-center w-12 h-12 transition-colors relative", isActive('/messages') ? "text-foreground" : "text-muted-foreground")}>
-        <MessageSquare size={26} />
-        <span className="absolute top-[8px] right-[8px] w-2.5 h-2.5 bg-primary rounded-full border-[2px] border-card"></span>
-      </Link>
-      <Link to="/notifications" className={cn("flex flex-col items-center justify-center w-12 h-12 transition-colors", isActive('/notifications') ? "text-foreground" : "text-muted-foreground")}>
-        <Bell size={26} />
-      </Link>
-    </nav>
+      )}
+
+      <div className="bg-card border border-border rounded-[24px] p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110 duration-500"></div>
+        <div className="flex gap-4">
+          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary shrink-0">
+            <ShieldCheck size={24} />
+          </div>
+          <div className="flex flex-col">
+            <h4 className="text-[15px] font-bold text-foreground">Reddit Premium</h4>
+            <p className="text-[13px] text-muted-foreground font-medium leading-snug mt-0.5">
+              The best Reddit experience, with Ad-free and more!
+            </p>
+          </div>
+        </div>
+        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full font-bold h-10 shadow-sm">Try Now</Button>
+      </div>
+
+      <div className="bg-card border border-border rounded-[24px] overflow-hidden shadow-sm">
+        <div className="px-5 py-4 border-b border-border bg-muted/50">
+          <h4 className="text-[14px] font-bold text-foreground uppercase tracking-wider">Top Communities</h4>
+        </div>
+        <div className="flex flex-col">
+          {mockCommunities.slice(0, 5).map((community, i) => (
+            <Link key={community.id} to={`/r/${community.id}`} className="flex items-center justify-between px-5 py-3 hover:bg-muted transition-colors">
+              <div className="flex items-center gap-3">
+                <span className="text-[14px] font-bold text-muted-foreground w-4">{i + 1}</span>
+                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", community.icon)}>r/</div>
+                <span className="text-[14px] font-bold text-foreground">r/{community.name}</span>
+              </div>
+              <Button variant="outline" size="sm" className="rounded-full h-8 px-4 font-bold border-primary text-primary hover:bg-primary/5">Join</Button>
+            </Link>
+          ))}
+          <Button variant="ghost" className="w-full text-primary font-bold text-[14px] py-4 rounded-none h-auto hover:bg-muted">View All</Button>
+        </div>
+      </div>
+
+      <div className="px-4 py-2 flex flex-wrap gap-x-4 gap-y-1">
+        <Link to="#" className="text-[12px] font-medium text-muted-foreground hover:underline">User Agreement</Link>
+        <Link to="#" className="text-[12px] font-medium text-muted-foreground hover:underline">Privacy Policy</Link>
+        <Link to="#" className="text-[12px] font-medium text-muted-foreground hover:underline">Content Policy</Link>
+        <Link to="#" className="text-[12px] font-medium text-muted-foreground hover:underline">Moderator Code of Conduct</Link>
+        <hr className="w-full my-2 border-border" />
+        <p className="text-[12px] font-medium text-muted-foreground">Reddit, Inc. © 2026. All rights reserved.</p>
+      </div>
+    </aside>
   );
 };
 
-const RightSidebar = () => {
+const BottomNav = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   return (
-    <aside id="right-sidebar" className="hidden lg:block lg:w-[300px] xl:w-[320px] shrink-0 pt-6 px-6 space-y-6 sticky top-[calc(60px+env(safe-area-inset-top))] h-[calc(100vh-(60px+env(safe-area-inset-top)))] overflow-y-auto no-scrollbar transition-colors duration-400">
-      <div className="bg-card border border-border rounded-[24px] p-6 flex gap-4 sidebar-card shadow-ios-subtle">
-        <ShieldCheck className="text-primary shrink-0 drop-shadow-sm" size={40} />
-        <div className="flex flex-col justify-center">
-          <h4 className="text-[16px] font-bold text-foreground tracking-tight mb-1">Reddit Premium</h4>
-          <Button className="mt-3 bg-primary text-primary-foreground text-[14px] font-bold w-full py-2.5 rounded-full hover:opacity-90 transition-opacity shadow-sm border-none">
-            Try Now
-          </Button>
-        </div>
+    <nav className="fixed bottom-0 inset-x-0 bg-glass backdrop-blur-3xl border-t border-border flex items-center justify-around h-[calc(60px+env(safe-area-inset-bottom))] pb-env(safe-area-inset-bottom) md:hidden z-50">
+      <Button variant="ghost" size="icon" className={cn("flex flex-col gap-1 h-auto py-1", location.pathname === '/' && "text-primary")} onClick={() => navigate('/')}>
+        <Home size={24} />
+        <span className="text-[10px] font-bold">Home</span>
+      </Button>
+      <Button variant="ghost" size="icon" className={cn("flex flex-col gap-1 h-auto py-1", location.pathname === '/explore' && "text-primary")} onClick={() => navigate('/explore')}>
+        <Compass size={24} />
+        <span className="text-[10px] font-bold">Explore</span>
+      </Button>
+      <div className="relative -top-3">
+        <Button className="w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:scale-105 active:scale-95 transition-all" onClick={() => navigate('/create')}>
+          <Plus size={32} />
+        </Button>
       </div>
-      <div className="text-[13px] font-medium text-muted-foreground p-2 pt-4 border-t border-border">
-        Reddit Inc © 2026. All rights reserved.
-      </div>
-    </aside>
+      <Button variant="ghost" size="icon" className={cn("flex flex-col gap-1 h-auto py-1", location.pathname === '/messages' && "text-primary")} onClick={() => navigate('/messages')}>
+        <MessageSquare size={24} />
+        <span className="text-[10px] font-bold">Chat</span>
+      </Button>
+      <Button variant="ghost" size="icon" className={cn("flex flex-col gap-1 h-auto py-1", location.pathname === '/notifications' && "text-primary")} onClick={() => navigate('/notifications')}>
+        <Bell size={24} />
+        <span className="text-[10px] font-bold">Inbox</span>
+      </Button>
+    </nav>
   );
 };
 
