@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
@@ -79,10 +79,6 @@ const Navbar = () => {
       setIsSearchFocused(false);
     }
   };
-
-  useEffect(() => {
-    setIsSearchFocused(false);
-  }, [location]);
 
   return (
     <header className="fixed top-0 inset-x-0 h-14 bg-background border-b border-border flex items-center justify-between px-4 z-50">
@@ -284,7 +280,7 @@ const Navbar = () => {
   );
 };
 
-const SidebarNavItem = ({ to, icon: Icon, label, badge, active, className }: { to: string, icon: any, label: string, badge?: string | number, active?: boolean, className?: string }) => (
+const SidebarNavItem = ({ to, icon: Icon, label, badge, active, className }: { to: string, icon: React.ElementType, label: string, badge?: string | number, active?: boolean, className?: string }) => (
   <Link 
     to={to} 
     className={cn(
