@@ -5,12 +5,30 @@ import { mockPosts, mockComments } from '@/db/db';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MoreHorizontal, MessageSquare } from 'lucide-react';
+import { 
+  MoreHorizontal, 
+  MessageSquare, 
+  Share2, 
+  Flag, 
+  Ban, 
+  UserPlus, 
+  Mail
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useOverlays } from '@/components/common/GlobalOverlays';
+import { toast } from 'sonner';
 
 export const ProfilePage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'posts';
+  const { openShare, openReport } = useOverlays();
 
   const userPosts = mockPosts.filter(p => p.author === username);
   const userComments = mockComments.filter(c => c.author === username);
@@ -19,17 +37,49 @@ export const ProfilePage: React.FC = () => {
     <div id="view-profile" className="view-section active">
       <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 -mt-2 sm:mt-0 relative shadow-sm">
         <div className="h-32 sm:h-40 bg-gradient-to-r from-orange-400 to-red-500 relative">
-           <Button variant="ghost" size="icon" className="absolute top-4 right-4 w-11 h-11 bg-black/30 hover:bg-black/50 rounded-full text-white backdrop-blur-xl shadow-sm">
-            <MoreHorizontal size={22} />
-           </Button>
+           <div className="absolute top-4 right-4 flex gap-2">
+             <DropdownMenu>
+               <DropdownMenuTrigger asChild>
+                 <Button variant="ghost" size="icon" className="w-11 h-11 bg-black/30 hover:bg-black/50 rounded-full text-white backdrop-blur-xl shadow-sm transition-colors">
+                  <MoreHorizontal size={22} />
+                 </Button>
+               </DropdownMenuTrigger>
+               <DropdownMenuContent align="end" className="w-[220px] rounded-[20px] p-1.5 bg-glass backdrop-blur-2xl shadow-ios-float border-border">
+                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between" onClick={() => openShare(window.location.href)}>
+                   Share Profile <Share2 size={18} className="text-muted-foreground" />
+                 </DropdownMenuItem>
+                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between" onClick={() => toast.success("Following user")}>
+                   Follow <UserPlus size={18} className="text-muted-foreground" />
+                 </DropdownMenuItem>
+                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between">
+                   Send Message <Mail size={18} className="text-muted-foreground" />
+                 </DropdownMenuItem>
+                 <DropdownMenuSeparator className="bg-border my-1 mx-2" />
+                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive" onClick={() => toast.error("User blocked")}>
+                   Block User <Ban size={18} />
+                 </DropdownMenuItem>
+                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive" onClick={() => openReport(`user_${username}`)}>
+                   Report <Flag size={18} />
+                 </DropdownMenuItem>
+               </DropdownMenuContent>
+             </DropdownMenu>
+           </div>
         </div>
         <div className="px-5 sm:px-8 pb-8 relative flex flex-col items-center sm:items-start text-center sm:text-left">
           <Avatar className="w-[104px] h-[104px] sm:w-[120px] sm:h-[120px] border-4 border-card -mt-[52px] sm:-mt-[60px] shadow-md mb-4">
             <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=ff4500`} />
             <AvatarFallback>{username?.[0]}</AvatarFallback>
           </Avatar>
-          <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground leading-tight tracking-tight mb-1">{username}</h1>
-          <p className="text-[15px] text-muted-foreground font-medium mb-5">u/{username} • <span className="text-primary font-bold">Premium</span></p>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between w-full mb-5">
+            <div>
+              <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground leading-tight tracking-tight mb-1">{username}</h1>
+              <p className="text-[15px] text-muted-foreground font-medium">u/{username} • <span className="text-primary font-bold">Premium</span></p>
+            </div>
+            <div className="flex gap-3 mt-4 sm:mt-0">
+              <Button className="rounded-full px-6 font-bold bg-primary text-primary-foreground hover:opacity-90">Follow</Button>
+              <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-border hover:bg-muted"><Mail size={20} /></Button>
+            </div>
+          </div>
           <div className="flex gap-8 text-[15px] justify-center sm:justify-start w-full">
             <div className="flex flex-col">
               <span className="font-bold text-foreground text-[18px]">1,245</span> 

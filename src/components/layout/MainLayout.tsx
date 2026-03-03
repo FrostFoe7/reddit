@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
   TrendingUp, 
@@ -16,7 +16,8 @@ import {
   Sun,
   ChevronDown,
   Star,
-  ShieldCheck
+  ShieldCheck,
+  CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,16 +30,41 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { mockCommunities } from '@/db/db';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { mockCommunities, mockNotifications, mockPosts } from '@/db/db';
 import { cn } from '@/lib/utils';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { OverlayProvider } from '@/components/common/GlobalOverlays';
 import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
+  const [searchQuery, setSearchInput] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const filteredCommunities = searchQuery.length > 0 
+    ? mockCommunities.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3)
+    : [];
   
+  const filteredPosts = searchQuery.length > 0
+    ? mockPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3)
+    : [];
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setIsSearchFocused(false);
+    }
+  };
+
+  useEffect(() => {
+    setIsSearchFocused(false);
+  }, [location]);
+
   return (
     <header id="navbar" className="fixed top-0 inset-x-0 pt-safe-top h-[calc(60px+env(safe-area-inset-top))] bg-glass backdrop-blur-2xl border-b border-border flex items-center justify-between px-4 sm:px-6 z-50 transition-colors duration-400">
       <div className="flex items-center gap-4 shrink-0 h-full">
@@ -52,33 +78,95 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <div className="flex-1 max-w-2xl mx-4 lg:mx-10 hidden md:flex justify-center relative group h-full items-center">
-        <div className="relative flex items-center w-full bg-muted border border-transparent rounded-full overflow-hidden transition-all duration-300 h-11 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-within:bg-card focus-within:border-primary focus-within:shadow-sm z-20">
-          <div className="pl-4 pr-2 text-muted-foreground"><Search size={20} /></div>
-          <Input 
-            type="text" 
-            placeholder="Search Reddit" 
-            className="w-full bg-transparent border-none shadow-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground h-full px-2 outline-none text-[15px] font-medium"
-          />
-        </div>
+      <div className="flex-1 max-w-2xl mx-4 lg:mx-10 hidden md:flex justify-center relative h-full items-center">
+        <form onSubmit={handleSearchSubmit} className="w-full relative z-20">
+          <div className={cn(
+            "relative flex items-center w-full bg-muted border border-transparent rounded-full overflow-hidden transition-all duration-300 h-11 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-within:bg-card focus-within:border-primary focus-within:shadow-sm",
+            isSearchFocused && "rounded-b-none"
+          )}>
+            <div className="pl-4 pr-2 text-muted-foreground"><Search size={20} /></div>
+            <Input 
+              type="text" 
+              placeholder="Search Reddit" 
+              value={searchQuery}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+              className="w-full bg-transparent border-none shadow-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground h-full px-2 outline-none text-[15px] font-medium"
+            />
+          </div>
+          
+          {isSearchFocused && (searchQuery.length > 0) && (
+            <div className="absolute top-full left-0 right-0 bg-card border border-t-0 border-border rounded-b-[24px] shadow-ios-glass overflow-hidden flex flex-col pt-2 pb-3 animate-in fade-in slide-in-from-top-1 duration-200">
+              {filteredCommunities.length > 0 && (
+                <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider">Communities</div>
+              )}
+              {filteredCommunities.map(c => (
+                <Link key={c.id} to={`/r/${c.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors">
+                  <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", c.icon)}>r/</div>
+                  <span className="text-[15px] font-medium text-foreground">r/{c.name}</span>
+                </Link>
+              ))}
+              
+              {filteredPosts.length > 0 && (
+                <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider mt-2">Posts</div>
+              )}
+              {filteredPosts.map(p => (
+                <Link key={p.id} to={`/post/${p.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground"><Search size={16} /></div>
+                  <span className="text-[14px] font-medium text-foreground truncate">{p.title}</span>
+                </Link>
+              ))}
+              
+              {filteredCommunities.length === 0 && filteredPosts.length === 0 && (
+                <div className="p-6 text-center text-[14px] text-muted-foreground">No results for "{searchQuery}"</div>
+              )}
+            </div>
+          )}
+        </form>
       </div>
       
       <div className="flex items-center gap-2 shrink-0 h-full">
-        <Button variant="ghost" size="icon" className="md:hidden rounded-full h-11 w-11">
+        <Button variant="ghost" size="icon" className="md:hidden rounded-full h-11 w-11" onClick={() => navigate('/search')}>
           <Search size={20} />
         </Button>
 
-        <div className="hidden sm:block">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full h-11 w-11 relative">
-                <Bell size={22} />
-                <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-primary rounded-full border-[2.5px] border-card"></span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-full h-11 w-11 relative">
+              <Bell size={22} />
+              <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-primary rounded-full border-[2.5px] border-card"></span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[360px] rounded-[24px] p-0 bg-glass backdrop-blur-3xl border-border shadow-ios-glass overflow-hidden flex flex-col max-h-[480px]">
+            <div className="p-5 border-b border-border flex justify-between items-center bg-muted/30 sticky top-0 z-10">
+              <h3 className="font-bold text-[18px] text-foreground tracking-tight">Notifications</h3>
+              <Button variant="ghost" size="sm" className="text-[13px] font-semibold text-muted-foreground hover:text-foreground h-auto p-0" onClick={() => toast.success("Marked all as read")}>
+                <CheckCircle2 size={16} className="mr-1" /> Read All
               </Button>
-            </TooltipTrigger>
-            <TooltipContent>Notifications</TooltipContent>
-          </Tooltip>
-        </div>
+            </div>
+            <div className="overflow-y-auto divide-y divide-border no-scrollbar">
+              {mockNotifications.map(n => (
+                <div key={n.id} className={cn("p-4 flex gap-3 hover:bg-muted transition-colors cursor-pointer", !n.isRead && "bg-primary/5")}>
+                  <Avatar className="h-10 w-10 shrink-0 border border-border">
+                    <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${n.user || n.sub}`} />
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col min-w-0">
+                    <p className="text-[14px] text-foreground leading-tight line-clamp-2 mb-1">
+                      <span className="font-bold">{n.user || `r/${n.sub}`}</span> {n.text}
+                    </p>
+                    <span className="text-[12px] text-muted-foreground font-medium">{n.time}</span>
+                  </div>
+                  {!n.isRead && <div className="w-2 h-2 bg-primary rounded-full shrink-0 mt-1.5 ml-auto"></div>}
+                </div>
+              ))}
+            </div>
+            <Link to="/notifications" className="block w-full text-center p-3.5 bg-muted/50 hover:bg-muted text-[14px] font-semibold text-primary transition-colors border-t border-border">
+              View All Notifications
+            </Link>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <Link to="/create" className="hidden sm:flex items-center gap-2 hover:bg-muted h-11 px-4.5 rounded-full transition-colors text-foreground font-semibold text-[15px]">
           <Plus size={20} />
@@ -130,7 +218,10 @@ const Navbar = () => {
             <DropdownMenuSeparator className="bg-border" />
             <DropdownMenuItem 
               className="rounded-[14px] focus:bg-muted p-3 flex items-center justify-between cursor-pointer"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={(e) => {
+                e.preventDefault();
+                setTheme(theme === 'dark' ? 'light' : 'dark');
+              }}
             >
               <div className="flex items-center gap-3.5 font-medium text-[15px]">
                 {theme === 'dark' ? <Sun size={22} className="text-muted-foreground" /> : <Moon size={22} className="text-muted-foreground" />} 

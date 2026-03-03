@@ -6,11 +6,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Link as LinkIcon, Twitter, MessageCircle, MoreHorizontal, CheckCircle2, AlertCircle, Info } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { X, Link as LinkIcon, Twitter, MessageCircle, MoreHorizontal } from 'lucide-react';
 import { toast } from "sonner";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/label";
-import { Label } from "@/components/ui/label";
 
 interface OverlayContextType {
   openShare: (url: string) => void;

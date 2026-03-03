@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTheme } from 'next-themes';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 
 export const SettingsPage: React.FC = () => {
   const { theme, setTheme } = useTheme();

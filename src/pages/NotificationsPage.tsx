@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { mockNotifications } from '@/db/db';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageSquare, TrendingUp, MoreHorizontal, Bell } from 'lucide-react';
+import { MessageSquare, TrendingUp, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const NotificationsPage: React.FC = () => {
