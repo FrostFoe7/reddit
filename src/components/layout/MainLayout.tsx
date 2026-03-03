@@ -12,10 +12,8 @@ import {
   LogOut,
   Moon,
   Sun,
-  ChevronDown,
   Star,
   ShieldCheck,
-  CheckCircle2,
   Newspaper,
   Gamepad2,
   Info,
@@ -26,7 +24,10 @@ import {
   Mic2,
   Users,
   MessageSquare,
-  PieChart
+  PieChart,
+  Menu,
+  SquarePlus,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,13 +46,12 @@ import {
 } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { mockCommunities, mockNotifications, mockPosts } from '@/db/db';
 import { cn } from '@/lib/utils';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { OverlayProvider } from '@/components/common/GlobalOverlays';
 import { Toaster } from '@/components/ui/sonner';
-import { toast } from 'sonner';
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -59,6 +59,10 @@ const Navbar = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Scoped search logic
+  const isSubreddit = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
+  const subName = isSubreddit ? location.pathname.split('/')[2] : null;
 
   const filteredCommunities = searchQuery.length > 0 
     ? mockCommunities.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3)
@@ -81,160 +85,200 @@ const Navbar = () => {
   }, [location]);
 
   return (
-    <header id="navbar" className="fixed top-0 inset-x-0 pt-safe-top h-[calc(60px+env(safe-area-inset-top))] bg-glass backdrop-blur-2xl border-b border-border flex items-center justify-between px-4 sm:px-6 z-50 transition-colors duration-400">
-      <div className="flex items-center gap-4 shrink-0 h-full">
-        <Link to="/" className="flex items-center gap-2.5 focus:outline-none group hover:scale-105 transition-transform" aria-label="Reddit Home">
-          <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-            <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" className="fill-primary-foreground w-6 h-6">
-              <path d="M16.67,10A1.46,1.46,0,0,0,14.2,9a7.12,7.12,0,0,0-3.85-1.23L11,4.65,13.14,5.1a1,1,0,1,0,.13-2L11,2.62a.25.25,0,0,0-.3.1l-.86,3.97a7.12,7.12,0,0,0-3.86,1.23A1.46,1.46,0,1,0,3.33,10a1.45,1.45,0,0,0,.1.53,4.16,4.16,0,0,0,0,.47c0,2.85,3,5.16,6.57,5.16s6.57-2.31,6.57-5.16a4.16,4.16,0,0,0,0-.47A1.45,1.45,0,0,0,16.67,10ZM7.09,12.11a1.28,1.28,0,1,1,1.27-1.27A1.28,1.28,0,0,1,7.09,12.11ZM12.91,15a5.52,5.52,0,0,1-2.91-.84,5.52,5.52,0,0,1-2.91.84,1.28,1.28,0,0,1,0-2.55,5.43,5.43,0,0,1,2.91-.84,5.43,5.43,0,0,1,2.91.84,1.28,1.28,0,0,1,0,2.55Zm-.12-2.89a1.28,1.28,0,1,1,1.27-1.27A1.28,1.28,0,0,1,12.79,12.11Z" />
-            </svg>
-          </div>
-          <span className="hidden lg:block text-[22px] font-bold tracking-tight text-foreground mt-0.5">reddit</span>
+    <header className="fixed top-0 inset-x-0 h-14 bg-background border-b border-border flex items-center justify-between px-4 z-50">
+      {/* Left: Hamburger & Logo */}
+      <div className="flex items-center gap-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden rounded-full h-10 w-10">
+                <Menu size={20} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Open navigation</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <Link to="/" className="flex items-center gap-2 pr-4 group" aria-label="Reddit Home">
+          <svg className="h-[22px] text-primary fill-current" viewBox="0 0 514 149" xmlns="http://www.w3.org/2000/svg">
+            <path d="m71.62,45.92l-12.01,28.56c-1.51-.76-5.11-1.61-8.51-1.61s-6.81.85-10.12,2.46c-6.53,3.31-11.35,9.93-11.35,19.48v52.3H-.26V45.35h29.04v14.28h.57c6.81-9.08,17.21-15.79,30.74-15.79,4.92,0,9.65.95,11.54,2.08Z" />
+            <path d="m65.84,96.52c0-29.41,20.15-52.68,50.32-52.68,27.33,0,46.91,19.96,46.91,48.05,0,4.92-.47,9.55-1.51,14h-68.48c3.12,10.69,12.39,19.01,26.29,19.01,7.66,0,18.54-2.74,24.4-7.28l9.27,22.32c-8.61,5.86-21.75,8.7-33.29,8.7-32.25,0-53.91-20.81-53.91-52.11Zm26.67-9.36h43.03c0-13.05-8.89-19.96-19.77-19.96-12.3,0-20.62,7.94-23.27,19.96Z" />
+            <path d="m419.53-.37c10.03,0,18.25,8.23,18.25,18.25s-8.23,18.25-18.25,18.25-18.25-8.23-18.25-18.25S409.51-.37,419.53-.37Zm14.94,147.49h-29.89V45.35h29.89v101.77Z" />
+            <path d="m246,1.47l-.09,53.53h-.57c-8.23-7.85-17.12-11.07-28.75-11.07-28.66,0-47.67,23.08-47.67,52.3s17.78,52.4,46.72,52.4c12.11,0,23.55-4.16,30.93-13.62h.85v12.11h28.47V1.47h-29.89Zm1.42,121.39h-.99l-6.67-6.93c-4.34,4.33-10.28,6.93-17.22,6.93-14.64,0-24.88-11.58-24.88-26.6s10.24-26.6,24.88-26.6,24.88,11.58,24.88,26.6v26.6Z" />
+            <path d="m360.15,1.47l-.09,53.53h-.57c-8.23-7.85-17.12-11.07-28.75-11.07-28.66,0-47.67,23.08-47.67,52.3s17.78,52.4,46.72,52.4c12.11,0,23.55-4.16,30.93-13.62h.85v12.11h28.47V1.47h-29.89Zm1.28,121.39h-.99l-6.67-6.93c-4.34,4.33-10.28,6.93-17.22,6.93-14.64,0-24.88-11.58-24.88-26.6s10.24-26.6,24.88-26.6,24.88,11.58,24.88,26.6v26.6Z" />
+            <path d="m492.44,45.35h21.85v25.44h-21.85v76.33h-29.89v-76.33h-21.75v-25.44h21.75v-27.66h29.89v27.66Z" />
+          </svg>
         </Link>
       </div>
 
-      <div className="flex-1 max-w-2xl mx-4 lg:mx-10 hidden md:flex justify-center relative h-full items-center">
-        <form onSubmit={handleSearchSubmit} className="w-full relative z-20">
+      {/* Middle: Search Bar */}
+      <div className="flex-1 max-w-[750px] mx-4 hidden md:block">
+        <form onSubmit={handleSearchSubmit} className="relative group/search">
           <div className={cn(
-            "relative flex items-center w-full bg-muted border border-transparent rounded-full overflow-hidden transition-all duration-300 h-11 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus-within:bg-card focus-within:border-primary focus-within:shadow-sm",
+            "flex items-center w-full bg-secondary-background hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full h-10 px-4 transition-colors border border-transparent focus-within:bg-background focus-within:border-border focus-within:shadow-sm",
             isSearchFocused && "rounded-b-none"
           )}>
-            <div className="pl-4 pr-2 text-muted-foreground"><Search size={20} /></div>
+            <Search size={18} className="text-muted-foreground mr-2 shrink-0" />
+            
+            {subName && !searchQuery && (
+              <Badge variant="secondary" className="mr-2 h-7 gap-1.5 pl-1.5 pr-1 font-semibold text-[12px] bg-background border-border">
+                <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[8px] text-white">r/</div>
+                r/{subName}
+                <X size={14} className="cursor-pointer hover:text-foreground" onClick={() => navigate('/')} />
+              </Badge>
+            )}
+
             <Input 
               type="text" 
-              placeholder="Search Reddit" 
+              placeholder={subName ? `Search in r/${subName}` : "Search Reddit"} 
               value={searchQuery}
               onChange={(e) => setSearchInput(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-              className="w-full bg-transparent border-none shadow-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground h-full px-2 outline-none text-[15px] font-medium"
+              className="bg-transparent border-none shadow-none focus-visible:ring-0 h-full p-0 text-[14px] font-medium placeholder:text-muted-foreground"
             />
+            
+            {searchQuery && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 rounded-full ml-1" 
+                onClick={() => setSearchInput('')}
+              >
+                <X size={14} />
+              </Button>
+            )}
           </div>
-          
-          {isSearchFocused && (searchQuery.length > 0) && (
-            <div className="absolute top-full left-0 right-0 bg-card border border-t-0 border-border rounded-b-[24px] shadow-ios-glass overflow-hidden flex flex-col pt-2 pb-3 animate-in fade-in slide-in-from-top-1 duration-200">
-              {filteredCommunities.length > 0 && (
-                <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider">Communities</div>
-              )}
+
+          {/* Autocomplete Dropdown */}
+          {isSearchFocused && searchQuery.length > 0 && (
+            <div className="absolute top-full left-0 right-0 bg-background border border-t-0 border-border rounded-b-[20px] shadow-lg z-50 overflow-hidden py-2">
               {filteredCommunities.map(c => (
-                <Link key={c.id} to={`/r/${c.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors">
-                  <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", c.icon)}>r/</div>
-                  <span className="text-[15px] font-medium text-foreground">r/{c.name}</span>
+                <Link key={c.id} to={`/r/${c.id}`} className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors">
+                  <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white", c.icon)}>r/</div>
+                  <span className="text-[14px] font-medium">r/{c.name}</span>
                 </Link>
               ))}
-              
-              {filteredPosts.length > 0 && (
-                <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider mt-2">Posts</div>
-              )}
               {filteredPosts.map(p => (
-                <Link key={p.id} to={`/post/${p.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground"><Search size={16} /></div>
-                  <span className="text-[14px] font-medium text-foreground truncate">{p.title}</span>
+                <Link key={p.id} to={`/post/${p.id}`} className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors">
+                  <Search size={16} className="text-muted-foreground" />
+                  <span className="text-[14px] font-medium truncate">{p.title}</span>
                 </Link>
               ))}
             </div>
           )}
         </form>
       </div>
-      
-      <div className="flex items-center gap-2 shrink-0 h-full">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full h-11 w-11 relative">
-              <Bell size={22} />
-              <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-primary rounded-full border-[2.5px] border-card"></span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[360px] rounded-[24px] p-0 bg-glass backdrop-blur-3xl border-border shadow-ios-glass overflow-hidden flex flex-col max-h-[480px]">
-            <div className="p-5 border-b border-border flex justify-between items-center bg-muted/30 sticky top-0 z-10">
-              <h3 className="font-bold text-[18px] text-foreground tracking-tight">Notifications</h3>
-              <Button variant="ghost" size="sm" className="text-[13px] font-semibold text-muted-foreground hover:text-foreground h-auto p-0" onClick={() => toast.success("Marked all as read")}>
-                <CheckCircle2 size={16} className="mr-1" /> Read All
+
+      {/* Right: Actions */}
+      <div className="flex items-center gap-1">
+        <TooltipProvider>
+          {/* Advertise */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hidden sm:flex">
+                <Megaphone size={20} />
               </Button>
-            </div>
-            <div className="overflow-y-auto divide-y divide-border no-scrollbar">
-              {mockNotifications.map(n => (
-                <div key={n.id} className={cn("p-4 flex gap-3 hover:bg-muted transition-colors cursor-pointer", !n.isRead && "bg-primary/5")}>
-                  <Avatar className="h-10 w-10 shrink-0 border border-border">
-                    <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${n.user || n.sub}`} />
+            </TooltipTrigger>
+            <TooltipContent>Advertise</TooltipContent>
+          </Tooltip>
+
+          {/* Chat */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 relative">
+                <MessageSquare size={20} />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background"></span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Chat</TooltipContent>
+          </Tooltip>
+
+          {/* Create */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10" onClick={() => navigate('/create')}>
+                <SquarePlus size={20} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Create Post</TooltipContent>
+          </Tooltip>
+
+          {/* Notifications */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 relative">
+                <Bell size={20} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 rounded-[16px] p-0 overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/30 flex justify-between items-center">
+                <span className="font-bold text-[14px]">Notifications</span>
+                <Button variant="ghost" size="sm" className="h-auto p-0 text-[12px] font-bold text-primary">Read All</Button>
+              </div>
+              <div className="max-h-[400px] overflow-y-auto">
+                {mockNotifications.map(n => (
+                  <div key={n.id} className="p-3 flex gap-3 hover:bg-muted cursor-pointer transition-colors border-b border-border last:border-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${n.user || n.sub}`} />
+                      <AvatarFallback>U</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col min-w-0">
+                      <p className="text-[13px] leading-tight"><span className="font-bold">{n.user || n.sub}</span> {n.text}</p>
+                      <span className="text-[11px] text-muted-foreground mt-1">{n.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* User Profile */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-10 w-10 p-0 rounded-full hover:bg-muted ml-1">
+                <div className="relative">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png" />
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
-                  <div className="flex flex-col min-w-0">
-                    <p className="text-[14px] text-foreground leading-tight line-clamp-2 mb-1">
-                      <span className="font-bold">{n.user || `r/${n.sub}`}</span> {n.text}
-                    </p>
-                    <span className="text-[12px] text-muted-foreground font-medium">{n.time}</span>
-                  </div>
-                  {!n.isRead && <div className="w-2 h-2 bg-primary rounded-full shrink-0 mt-1.5 ml-auto"></div>}
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background"></span>
                 </div>
-              ))}
-            </div>
-            <Link to="/notifications" className="block w-full text-center p-3.5 bg-muted/50 hover:bg-muted text-[14px] font-semibold text-primary transition-colors border-t border-border">
-              View All Notifications
-            </Link>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <Link to="/create" className="hidden sm:flex items-center gap-2 hover:bg-muted h-11 px-4.5 rounded-full transition-colors text-foreground font-semibold text-[15px]">
-          <Plus size={20} />
-          <span className="hidden lg:block">Create</span>
-        </Link>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2.5 h-11 p-1 hover:bg-muted border border-transparent hover:border-border rounded-full transition-all focus:outline-none pr-3.5 ml-1">
-              <Avatar className="h-9 w-9 border border-border">
-                <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=ff4500" />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-              <div className="hidden lg:flex flex-col items-start leading-tight">
-                <span className="text-[14px] font-semibold text-foreground tracking-tight">User123</span>
-                <span className="text-[12px] font-medium text-muted-foreground flex items-center gap-1">
-                  <Star size={10} className="text-primary fill-primary" /> 1.2k
-                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 rounded-[16px] p-2 mt-1">
+              <div className="flex items-center gap-3 p-2 mb-2 border-b border-border pb-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png" />
+                </Avatar>
+                <div className="flex flex-col">
+                  <span className="font-bold text-[14px]">User123</span>
+                  <span className="text-[12px] text-muted-foreground font-medium flex items-center gap-1">
+                    <Star size={10} className="text-primary fill-current" /> 1.2k karma
+                  </span>
+                </div>
               </div>
-              <ChevronDown size={14} className="text-muted-foreground hidden lg:block ml-1" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[260px] rounded-[24px] p-2 bg-glass backdrop-blur-3xl border-border shadow-ios-glass">
-            <div className="p-3 flex items-center gap-3.5 border-b border-border mb-1">
-              <Avatar className="h-12 w-12 border border-border">
-                <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=ff4500" />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col">
-                <span className="text-[17px] font-bold text-foreground tracking-tight">User123</span>
-                <span className="text-[14px] text-muted-foreground font-medium">u/User123</span>
-              </div>
-            </div>
-            <DropdownMenuItem asChild className="rounded-[14px] focus:bg-muted p-3">
-              <Link to="/u/User123" className="flex items-center gap-3.5 font-medium text-[15px]">
-                <User size={22} className="text-muted-foreground" /> View Profile
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild className="rounded-[14px] focus:bg-muted p-3">
-              <Link to="/settings" className="flex items-center gap-3.5 font-medium text-[15px]">
-                <Settings size={22} className="text-muted-foreground" /> Settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem 
-              className="rounded-[14px] focus:bg-muted p-3 flex items-center justify-between cursor-pointer"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            >
-              <div className="flex items-center gap-3.5 font-medium text-[15px]">
-                {theme === 'dark' ? <Sun size={22} className="text-muted-foreground" /> : <Moon size={22} className="text-muted-foreground" />} 
-                {theme === 'dark' ? 'Light' : 'Dark'} Mode
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem className="rounded-[14px] focus:bg-muted p-3 text-destructive">
-              <div className="flex items-center gap-3.5 font-medium text-[15px]">
-                <LogOut size={22} /> Log Out
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuItem onClick={() => navigate('/u/User123')} className="rounded-[8px] py-2.5 font-medium">
+                <User size={18} className="mr-3 text-muted-foreground" /> View Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/settings')} className="rounded-[8px] py-2.5 font-medium">
+                <Settings size={18} className="mr-3 text-muted-foreground" /> Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="rounded-[8px] py-2.5 font-medium"
+              >
+                {theme === 'dark' ? <Sun size={18} className="mr-3" /> : <Moon size={18} className="mr-3" />}
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="rounded-[8px] py-2.5 font-medium text-destructive">
+                <LogOut size={18} className="mr-3" /> Log Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TooltipProvider>
       </div>
     </header>
   );
@@ -264,7 +308,7 @@ const LeftSidebar = () => {
   const navigate = useNavigate();
 
   return (
-    <aside id="left-sidebar" className="hidden md:flex md:w-[240px] lg:w-[270px] shrink-0 flex-col border-r border-border sticky top-[calc(60px+env(safe-area-inset-top))] h-[calc(100vh-(60px+env(safe-area-inset-top)))] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-colors duration-400">
+    <aside id="left-sidebar" className="hidden md:flex md:w-[240px] lg:w-[270px] shrink-0 flex-col border-r border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-colors duration-400">
       <nav className="flex flex-col p-2 space-y-1" aria-label="Primary">
         <div className="flex flex-col space-y-0.5">
           <SidebarNavItem to="/" icon={Home} label="Home" active={location.pathname === '/' && !location.search.includes('feed=news')} />
@@ -385,7 +429,7 @@ const RightSidebar = () => {
   const isSubredditPage = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
 
   return (
-    <aside className="hidden xl:flex flex-col w-[312px] gap-4 ml-6 py-6 sticky top-[calc(60px+env(safe-area-inset-top))] h-[calc(100vh-(60px+env(safe-area-inset-top)))] overflow-y-auto no-scrollbar">
+    <aside className="hidden xl:flex flex-col w-[312px] gap-4 ml-6 py-6 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto no-scrollbar">
       {isSubredditPage && (
         <div className="bg-card border border-border rounded-[24px] overflow-hidden shadow-sm">
           <div className="px-5 py-4 border-b border-border bg-muted/50">
@@ -464,7 +508,7 @@ const BottomNav = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 bg-glass backdrop-blur-3xl border-t border-border flex items-center justify-around h-[calc(60px+env(safe-area-inset-bottom))] pb-env(safe-area-inset-bottom) md:hidden z-50">
+    <nav className="fixed bottom-0 inset-x-0 bg-glass backdrop-blur-3xl border-t border-border flex items-center justify-around h-14 pb-env(safe-area-inset-bottom) md:hidden z-50">
       <Button variant="ghost" size="icon" className={cn("flex flex-col gap-1 h-auto py-1", location.pathname === '/' && "text-primary")} onClick={() => navigate('/')}>
         <Home size={24} />
         <span className="text-[10px] font-bold">Home</span>
@@ -497,9 +541,9 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
         <TooltipProvider>
           <div className="min-h-screen flex flex-col pl-safe-left pr-safe-right bg-background text-foreground transition-colors duration-400">
             <Navbar />
-            <div className="flex justify-center w-full max-w-[1400px] mx-auto pt-[calc(60px+env(safe-area-inset-top))] flex-1">
+            <div className="flex justify-center w-full max-w-[1400px] mx-auto pt-14 flex-1">
               <LeftSidebar />
-              <main className="flex-1 w-full max-w-[760px] px-0 sm:px-6 pt-0 sm:pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-24 relative min-h-[85vh]">
+              <main className="flex-1 w-full max-w-[760px] px-0 sm:px-6 pt-0 sm:pt-6 pb-24 relative min-h-[85vh]">
                 {children}
               </main>
               <RightSidebar />
