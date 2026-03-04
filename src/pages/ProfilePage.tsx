@@ -5,6 +5,7 @@ import { useUser, usePosts, useComments } from "@/hooks";
 import { PostCard } from "@/components/post/PostCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   MoreHorizontal,
@@ -169,24 +170,27 @@ export const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex gap-10 text-[15px] justify-center sm:justify-start w-full border-t border-border/50 pt-5">
-            <div className="flex flex-col items-center sm:items-start">
-              <span className="font-bold text-foreground text-[20px] tracking-tight">
-                {user?.karma || 0}
-              </span>
-              <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">
-                Karma
-              </span>
-            </div>
-            <div className="flex flex-col items-center sm:items-start">
-              <span className="font-bold text-foreground text-[20px] tracking-tight">
-                {user?.cake_day
-                  ? new Date(user.cake_day).toLocaleDateString()
-                  : "Aug 12, 2023"}
-              </span>
-              <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">
-                Cake day
-              </span>
+          <div className="w-full pt-5">
+            <Separator className="mb-5 opacity-50" />
+            <div className="flex gap-10 text-[15px] justify-center sm:justify-start">
+              <div className="flex flex-col items-center sm:items-start">
+                <span className="font-bold text-foreground text-[20px] tracking-tight">
+                  {user?.karma || 0}
+                </span>
+                <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">
+                  Karma
+                </span>
+              </div>
+              <div className="flex flex-col items-center sm:items-start">
+                <span className="font-bold text-foreground text-[20px] tracking-tight">
+                  {user?.cake_day
+                    ? new Date(user.cake_day).toLocaleDateString()
+                    : "Aug 12, 2023"}
+                </span>
+                <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">
+                  Cake day
+                </span>
+              </div>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useLocation, Link, useNavigate } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import { useCommunities, usePosts } from "@/hooks";
 import type { Community, Post } from "@/types";
 import { cn } from "@/lib/utils";
@@ -79,7 +80,7 @@ export const RightSidebar = () => {
                   Posting to Reddit
                 </h3>
               </div>
-              <ol className="flex flex-col space-y-3 pt-2">
+              <ol className="flex flex-col pt-2">
                 {[
                   "Remember the human",
                   "Behave like you would in real life",
@@ -89,12 +90,15 @@ export const RightSidebar = () => {
                 ].map((rule, i) => (
                   <li
                     key={i}
-                    className="flex gap-3 text-[14px] font-medium border-b border-border/50 pb-2 last:border-0 last:pb-0"
+                    className="flex flex-col"
                   >
-                    <span className="text-muted-foreground whitespace-nowrap font-bold opacity-50">
-                      {i + 1}.
-                    </span>
-                    <span className="text-foreground leading-snug">{rule}</span>
+                    <div className="flex gap-3 text-[14px] font-medium py-3">
+                      <span className="text-muted-foreground whitespace-nowrap font-bold opacity-50">
+                        {i + 1}.
+                      </span>
+                      <span className="text-foreground leading-snug">{rule}</span>
+                    </div>
+                    {i < 4 && <Separator className="opacity-50" />}
                   </li>
                 ))}
               </ol>
@@ -138,19 +142,23 @@ export const RightSidebar = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-y border-border/50 py-3">
-                <div className="flex flex-col">
-                  <span className="text-[16px] font-bold">1,245</span>
-                  <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">
-                    Karma
-                  </span>
+              <div className="flex flex-col gap-3">
+                <Separator className="opacity-50" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-[16px] font-bold">1,245</span>
+                    <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">
+                      Karma
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[16px] font-bold">Aug 12, 2023</span>
+                    <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">
+                      Cake Day
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[16px] font-bold">Aug 12, 2023</span>
-                  <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">
-                    Cake Day
-                  </span>
-                </div>
+                <Separator className="opacity-50" />
               </div>
 
               <div className="flex flex-col gap-2">
@@ -239,22 +247,28 @@ export const RightSidebar = () => {
                 {contextDesc ||
                   "A community for creators, developers, entrepreneurs, and makers to openly share their journey."}
               </p>
-              <div className="flex gap-6 border-y border-border/50 py-3">
-                <div className="flex flex-col">
-                  <span className="text-[16px] font-bold">
-                    {contextMembers}
-                  </span>
-                  <span className="text-[12px] text-muted-foreground font-medium">
-                    Members
-                  </span>
+              
+              <div className="flex flex-col gap-3">
+                <Separator className="opacity-50" />
+                <div className="flex gap-6 py-1">
+                  <div className="flex flex-col">
+                    <span className="text-[16px] font-bold">
+                      {contextMembers}
+                    </span>
+                    <span className="text-[12px] text-muted-foreground font-medium">
+                      Members
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[16px] font-bold">4.5k</span>
+                    <span className="text-[12px] text-muted-foreground font-medium">
+                      Online
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[16px] font-bold">4.5k</span>
-                  <span className="text-[12px] text-muted-foreground font-medium">
-                    Online
-                  </span>
-                </div>
+                <Separator className="opacity-50" />
               </div>
+
               <div className="flex flex-col gap-2">
                 <Button
                   onClick={() => handleAction("Join")}
@@ -455,24 +469,27 @@ export const RightSidebar = () => {
           </>
         )}
 
-        <div className="px-2 pt-4 flex flex-wrap gap-x-3 gap-y-1 border-t border-border mt-4">
-          {[
-            "User Agreement",
-            "Privacy Policy",
-            "Content Policy",
-            "Moderator Code",
-          ].map((link) => (
-            <button
-              key={link}
-              onClick={() => handleExternal(link)}
-              className="text-[11px] font-bold text-muted-foreground hover:text-primary hover:underline transition-colors"
-            >
-              {link}
-            </button>
-          ))}
-          <p className="text-[11px] font-bold text-muted-foreground mt-3 w-full opacity-50">
-            Reddit, Inc. © 2026. All rights reserved.
-          </p>
+        <div className="flex flex-col gap-4 mt-4">
+          <Separator />
+          <div className="px-2 flex flex-wrap gap-x-3 gap-y-1">
+            {[
+              "User Agreement",
+              "Privacy Policy",
+              "Content Policy",
+              "Moderator Code",
+            ].map((link) => (
+              <button
+                key={link}
+                onClick={() => handleExternal(link)}
+                className="text-[11px] font-bold text-muted-foreground hover:text-primary hover:underline transition-colors"
+              >
+                {link}
+              </button>
+            ))}
+            <p className="text-[11px] font-bold text-muted-foreground mt-3 w-full opacity-50">
+              Reddit, Inc. © 2026. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
     </aside>

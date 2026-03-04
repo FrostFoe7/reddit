@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   ChevronDown,
@@ -97,19 +98,22 @@ export const CreatePostPage: React.FC = () => {
 
   return (
     <div id="view-create" className="px-0 sm:px-0 max-w-[760px] mx-auto">
-      <div className="mb-4 sm:mb-6 px-4 sm:px-0 flex items-center justify-between border-b border-border pb-4">
-        <h1 className="text-[20px] sm:text-[24px] font-bold text-foreground tracking-tight">
-          Create post
-        </h1>
-        <Button
-          variant="ghost"
-          className="text-primary font-bold hover:bg-primary/10 rounded-full px-4 h-9 text-[14px]"
-        >
-          Drafts{" "}
-          <span className="ml-1.5 bg-primary/10 px-2 py-0.5 rounded-full text-[12px]">
-            0
-          </span>
-        </Button>
+      <div className="mb-4 sm:mb-6 px-4 sm:px-0 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-[20px] sm:text-[24px] font-bold text-foreground tracking-tight">
+            Create post
+          </h1>
+          <Button
+            variant="ghost"
+            className="text-primary font-bold hover:bg-primary/10 rounded-full px-4 h-9 text-[14px]"
+          >
+            Drafts{" "}
+            <span className="ml-1.5 bg-primary/10 px-2 py-0.5 rounded-full text-[12px]">
+              0
+            </span>
+          </Button>
+        </div>
+        <Separator />
       </div>
 
       <div className="flex flex-col gap-4 sm:gap-6 px-4 sm:px-0">
@@ -361,33 +365,36 @@ export const CreatePostPage: React.FC = () => {
             </div>
 
             {/* Bottom Bar */}
-            <div className="p-4 sm:p-5 bg-muted/20 border-t border-border flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <Info size={18} className="text-muted-foreground" />
-                <span className="text-[12px] sm:text-[13px] text-muted-foreground font-medium">
-                  Drafts are saved automatically
-                </span>
-              </div>
-              <div className="flex gap-3 ml-auto">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate(-1)}
-                  className="px-6 h-10 rounded-full font-bold text-[14px] border-primary text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-[0.95]"
-                >
-                  Save Draft
-                </Button>
-                <Button
-                  disabled={!title.trim()}
-                  onClick={handlePost}
-                  className={cn(
-                    "px-10 h-10 rounded-full font-bold text-[14px] shadow-md transition-all active:scale-[0.95]",
-                    title.trim()
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-muted text-muted-foreground cursor-not-allowed opacity-50",
-                  )}
-                >
-                  Post
-                </Button>
+            <div className="flex flex-col">
+              <Separator />
+              <div className="p-4 sm:p-5 bg-muted/20 flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-2">
+                  <Info size={18} className="text-muted-foreground" />
+                  <span className="text-[12px] sm:text-[13px] text-muted-foreground font-medium">
+                    Drafts are saved automatically
+                  </span>
+                </div>
+                <div className="flex gap-3 ml-auto">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate(-1)}
+                    className="px-6 h-10 rounded-full font-bold text-[14px] border-primary text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-[0.95]"
+                  >
+                    Save Draft
+                  </Button>
+                  <Button
+                    disabled={!title.trim()}
+                    onClick={handlePost}
+                    className={cn(
+                      "px-10 h-10 rounded-full font-bold text-[14px] shadow-md transition-all active:scale-[0.95]",
+                      title.trim()
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "bg-muted text-muted-foreground cursor-not-allowed opacity-50",
+                    )}
+                  >
+                    Post
+                  </Button>
+                </div>
               </div>
             </div>
           </Tabs>

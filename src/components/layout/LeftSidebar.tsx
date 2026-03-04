@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useCommunities } from "@/hooks";
 import type { Community } from "@/types";
 import { cn } from "@/lib/utils";
@@ -114,9 +115,9 @@ export const LeftSidebar = () => {
           />
         </div>
 
-        {!sidebarCollapsed && <hr className="my-3 border-border mx-2" />}
+        {!sidebarCollapsed && <Separator className="my-3 mx-2 w-auto" />}
         {sidebarCollapsed && (
-          <div className="h-px bg-border my-2 mx-auto w-10" />
+          <Separator className="my-2 mx-auto w-10" />
         )}
 
         {sidebarCollapsed ? (
@@ -141,7 +142,7 @@ export const LeftSidebar = () => {
               )}
               label="r/Dhaka"
             />
-            <div className="h-px bg-border my-2 mx-auto w-10" />
+            <Separator className="my-2 mx-auto w-10" />
             <NavItem to="/create" icon={Plus} label="Create Community" />
           </div>
         ) : (
@@ -326,7 +327,7 @@ export const LeftSidebar = () => {
                   >
                     <NavItem to="#" icon={Mic2} label="Press" />
                   </button>
-                  <hr className="my-2 border-border mx-4" />
+                  <Separator className="my-2 mx-4 w-auto" />
                   <NavItem to="/explore" icon={Users} label="Communities" />
                   <button
                     onClick={() => handleExternalClick("Best of Reddit")}

@@ -3,6 +3,7 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePost, useComments } from "@/hooks";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { PostCard } from "@/components/post/PostCard";
 import { CommentThread } from "@/components/post/CommentThread";
 import { CommentComposer } from "@/components/post/CommentComposer";
@@ -70,12 +71,13 @@ export const PostPage: React.FC = () => {
             <CommentComposer />
           </div>
 
-          <div className="mt-6 border-b border-border/50">
+          <div className="mt-6 px-4 sm:px-0">
             <CommentControls className="mb-4" />
+            <Separator />
           </div>
 
           <div className="space-y-1 sm:space-y-4 pb-20 pt-2">
-            {topLevelComments.map((comment: any) => (
+            {topLevelComments.map((comment: Comment) => (
               <CommentThread
                 key={comment.id}
                 comment={comment}
