@@ -1,0 +1,249 @@
+import { useState, type FormEvent } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { 
+  Search, 
+  Bell, 
+  MessageSquare, 
+  SquarePlus, 
+  Megaphone, 
+  Menu, 
+  X, 
+  User, 
+  Settings, 
+  Moon, 
+  Sun, 
+  LogOut, 
+  Star 
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { mockCommunities, mockNotifications, mockPosts } from '@/db/db';
+import { cn } from '@/lib/utils';
+import { useTheme } from 'next-themes';
+
+export const Navbar = () => {
+  const { theme, setTheme } = useTheme();
+  const [searchQuery, setSearchInput] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isSubreddit = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
+  const subName = isSubreddit ? location.pathname.split('/')[2] : null;
+
+  const filteredCommunities = searchQuery.length > 0 
+    ? mockCommunities.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3)
+    : [];
+  
+  const filteredPosts = searchQuery.length > 0
+    ? mockPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3)
+    : [];
+
+  const handleSearchSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setIsSearchFocused(false);
+    }
+  };
+
+  return (
+    <header className="fixed top-0 inset-x-0 h-14 bg-background border-b border-border flex items-center justify-between px-4 z-50">
+      <div className="flex items-center gap-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden rounded-full h-10 w-10">
+                <Menu size={20} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Open navigation</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <Link to="/" className="flex items-center gap-2 pr-4 group" aria-label="Reddit Home">
+          <svg className="h-[22px] text-primary fill-current" viewBox="0 0 514 149" xmlns="http://www.w3.org/2000/svg">
+            <path d="m71.62,45.92l-12.01,28.56c-1.51-.76-5.11-1.61-8.51-1.61s-6.81.85-10.12,2.46c-6.53,3.31-11.35,9.93-11.35,19.48v52.3H-.26V45.35h29.04v14.28h.57c6.81-9.08,17.21-15.79,30.74-15.79,4.92,0,9.65.95,11.54,2.08Z" />
+            <path d="m65.84,96.52c0-29.41,20.15-52.68,50.32-52.68,27.33,0,46.91,19.96,46.91,48.05,0,4.92-.47,9.55-1.51,14h-68.48c3.12,10.69,12.39,19.01,26.29,19.01,7.66,0,18.54-2.74,24.4-7.28l9.27,22.32c-8.61,5.86-21.75,8.7-33.29,8.7-32.25,0-53.91-20.81-53.91-52.11Zm26.67-9.36h43.03c0-13.05-8.89-19.96-19.77-19.96-12.3,0-20.62,7.94-23.27,19.96Z" />
+            <path d="m419.53-.37c10.03,0,18.25,8.23,18.25,18.25s-8.23,18.25-18.25,18.25-18.25-8.23-18.25-18.25S409.51-.37,419.53-.37Zm14.94,147.49h-29.89V45.35h29.89v101.77Z" />
+            <path d="m246,1.47l-.09,53.53h-.57c-8.23-7.85-17.12-11.07-28.75-11.07-28.66,0-47.67,23.08-47.67,52.3s17.78,52.4,46.72,52.4c12.11,0,23.55-4.16,30.93-13.62h.85v12.11h28.47V1.47h-29.89Zm1.42,121.39h-.99l-6.67-6.93c-4.34,4.33-10.28,6.93-17.22,6.93-14.64,0-24.88-11.58-24.88-26.6s10.24-26.6,24.88-26.6,24.88,11.58,24.88,26.6v26.6Z" />
+            <path d="m360.15,1.47l-.09,53.53h-.57c-8.23-7.85-17.12-11.07-28.75-11.07-28.66,0-47.67,23.08-47.67,52.3s17.78,52.4,46.72,52.4c12.11,0,23.55-4.16,30.93-13.62h.85v12.11h28.47V1.47h-29.89Zm1.28,121.39h-.99l-6.67-6.93c-4.34,4.33-10.28,6.93-17.22,6.93-14.64,0-24.88-11.58-24.88-26.6s10.24-26.6,24.88-26.6,24.88,11.58,24.88,26.6v26.6Z" />
+            <path d="m492.44,45.35h21.85v25.44h-21.85v76.33h-29.89v-76.33h-21.75v-25.44h21.75v-27.66h29.89v27.66Z" />
+          </svg>
+        </Link>
+      </div>
+
+      <div className="flex-1 max-w-[750px] mx-4 hidden md:block">
+        <form onSubmit={handleSearchSubmit} className="relative group/search">
+          <div className={cn(
+            "flex items-center w-full bg-secondary-background hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full h-10 px-4 transition-colors border border-transparent focus-within:bg-background focus-within:border-border focus-within:shadow-sm",
+            isSearchFocused && "rounded-b-none"
+          )}>
+            <Search size={18} className="text-muted-foreground mr-2 shrink-0" />
+            
+            {subName && !searchQuery && (
+              <Badge variant="secondary" className="mr-2 h-7 gap-1.5 pl-1.5 pr-1 font-semibold text-[12px] bg-background border-border">
+                <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[8px] text-white">r/</div>
+                r/{subName}
+                <X size={14} className="cursor-pointer hover:text-foreground" onClick={() => navigate('/')} />
+              </Badge>
+            )}
+
+            <Input 
+              type="text" 
+              placeholder={subName ? `Search in r/${subName}` : "Search Reddit"} 
+              value={searchQuery}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+              className="bg-transparent border-none shadow-none focus-visible:ring-0 h-full p-0 text-[14px] font-medium placeholder:text-muted-foreground"
+            />
+            
+            {searchQuery && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 rounded-full ml-1" 
+                onClick={() => setSearchInput('')}
+              >
+                <X size={14} />
+              </Button>
+            )}
+          </div>
+
+          {isSearchFocused && searchQuery.length > 0 && (
+            <div className="absolute top-full left-0 right-0 bg-background border border-t-0 border-border rounded-b-[20px] shadow-lg z-50 overflow-hidden py-2">
+              {filteredCommunities.map(c => (
+                <Link key={c.id} to={`/r/${c.id}`} className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors">
+                  <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white", c.icon)}>r/</div>
+                  <span className="text-[14px] font-medium">r/{c.name}</span>
+                </Link>
+              ))}
+              {filteredPosts.map(p => (
+                <Link key={p.id} to={`/post/${p.id}`} className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors">
+                  <Search size={16} className="text-muted-foreground" />
+                  <span className="text-[14px] font-medium truncate">{p.title}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </form>
+      </div>
+
+      <div className="flex items-center gap-1">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hidden sm:flex">
+                <Megaphone size={20} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Advertise</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 relative">
+                <MessageSquare size={20} />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background"></span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Chat</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10" onClick={() => navigate('/create')}>
+                <SquarePlus size={20} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Create Post</TooltipContent>
+          </Tooltip>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 relative">
+                <Bell size={20} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 rounded-[16px] p-0 overflow-hidden">
+              <div className="p-4 border-b border-border bg-muted/30 flex justify-between items-center">
+                <span className="font-bold text-[14px]">Notifications</span>
+                <Button variant="ghost" size="sm" className="h-auto p-0 text-[12px] font-bold text-primary">Read All</Button>
+              </div>
+              <div className="max-h-[400px] overflow-y-auto">
+                {mockNotifications.map(n => (
+                  <div key={n.id} className="p-3 flex gap-3 hover:bg-muted cursor-pointer transition-colors border-b border-border last:border-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${n.user || n.sub}`} />
+                      <AvatarFallback>U</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col min-w-0">
+                      <p className="text-[13px] leading-tight"><span className="font-bold">{n.user || n.sub}</span> {n.text}</p>
+                      <span className="text-[11px] text-muted-foreground mt-1">{n.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-10 w-10 p-0 rounded-full hover:bg-muted ml-1">
+                <div className="relative">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png" />
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background"></span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 rounded-[16px] p-2 mt-1">
+              <div className="flex items-center gap-3 p-2 mb-2 border-b border-border pb-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png" />
+                </Avatar>
+                <div className="flex flex-col">
+                  <span className="font-bold text-[14px]">User123</span>
+                  <span className="text-[12px] text-muted-foreground font-medium flex items-center gap-1">
+                    <Star size={10} className="text-primary fill-current" /> 1.2k karma
+                  </span>
+                </div>
+              </div>
+              <DropdownMenuItem onClick={() => navigate('/u/User123')} className="rounded-[8px] py-2.5 font-medium">
+                <User size={18} className="mr-3 text-muted-foreground" /> View Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/settings')} className="rounded-[8px] py-2.5 font-medium">
+                <Settings size={18} className="mr-3 text-muted-foreground" /> Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="rounded-[8px] py-2.5 font-medium"
+              >
+                {theme === 'dark' ? <Sun size={18} className="mr-3" /> : <Moon size={18} className="mr-3" />}
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="rounded-[8px] py-2.5 font-medium text-destructive">
+                <LogOut size={18} className="mr-3" /> Log Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TooltipProvider>
+      </div>
+    </header>
+  );
+};

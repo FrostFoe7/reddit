@@ -1,36 +1,19 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { ArrowUp, ArrowDown, MessageSquare, MoreHorizontal, Flag, Pencil, Trash2 } from 'lucide-react';
 import type { Comment } from '@/db/db';
 import { mockComments } from '@/db/db';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { useOverlays } from '@/components/common/GlobalOverlays';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { VoteControl } from '@/components/common/VoteControl';
+import { ActionButtons } from '@/components/common/ActionButtons';
 
 interface CommentThreadProps {
   comment: Comment;
   isChild?: boolean;
 }
 
-const formatNumber = (num: number) => num > 999 ? (num / 1000).toFixed(1) + 'k' : num;
-
 export const CommentThread: React.FC<CommentThreadProps> = ({ comment, isChild = false }) => {
-  const [voteStatus, setVoteStatus] = useState<'up' | 'down' | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { openReport } = useOverlays();
-
-  const handleVote = (type: 'up' | 'down') => {
-    setVoteStatus(prev => prev === type ? null : type);
-  };
-
-  const score = comment.upvotes + (voteStatus === 'up' ? 1 : voteStatus === 'down' ? -1 : 0);
   const childComments = mockComments.filter(c => c.postId === comment.id);
 
   return (
@@ -73,55 +56,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ comment, isChild =
             <div className="text-[16px] sm:text-[15px] text-foreground leading-relaxed mb-3 font-medium">
               {comment.content}
             </div>
-            <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground font-semibold text-[14px] -ml-3 sm:-ml-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className={cn(
-                  "flex items-center gap-1.5 h-10 px-3 hover:bg-muted rounded-full transition-colors",
-                  voteStatus === 'up' && "text-vote-up bg-vote-up/10"
-                )}
-                onClick={() => handleVote('up')}
-              >
-                <ArrowUp size={20} className={cn(voteStatus === 'up' && "fill-current")} />
-                <span className={cn(
-                  voteStatus === 'up' ? "text-vote-up" : voteStatus === 'down' ? "text-vote-down" : "text-foreground"
-                )}>
-                  {formatNumber(score)}
-                </span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className={cn(
-                  "flex items-center h-10 px-3 hover:bg-muted rounded-full transition-colors",
-                  voteStatus === 'down' && "text-vote-down bg-vote-down/10"
-                )}
-                onClick={() => handleVote('down')}
-              >
-                <ArrowDown size={20} className={cn(voteStatus === 'down' && "fill-current")} />
-              </Button>
-              <Button variant="ghost" size="sm" className="flex items-center gap-2 h-10 px-4 hover:bg-muted rounded-full transition-colors">
-                <MessageSquare size={20} /> Reply
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-10 h-10 hover:bg-muted rounded-full">
-                    <MoreHorizontal size={20} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[180px] rounded-[16px] p-1.5 bg-glass backdrop-blur-2xl shadow-ios-float border-border">
-                  <DropdownMenuItem className="rounded-[10px] p-2 font-medium flex justify-between">
-                    Edit <Pencil size={16} className="text-muted-foreground" />
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="rounded-[10px] p-2 font-medium flex justify-between text-destructive focus:text-destructive" onClick={() => openReport(comment.id)}>
-                    Report <Flag size={16} />
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="rounded-[10px] p-2 font-medium flex justify-between text-destructive focus:text-destructive">
-                    Delete <Trash2 size={16} />
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="flex items-center gap-2 -ml-2">
+              <VoteControl initialScore={comment.upvotes} />
+              <ActionButtons 
+                id={comment.id} 
+                type="comment" 
+              />
             </div>
             
             <div className="reply-container">

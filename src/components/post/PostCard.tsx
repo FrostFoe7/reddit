@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  ArrowBigUp, 
-  ArrowBigDown, 
-  MessageSquare, 
-  Share2, 
-  Award, 
+  ArrowLeft,
   MoreHorizontal,
-  Flag,
-  ArrowLeft
+  Share2,
+  Flag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -21,26 +17,17 @@ import {
 import type { Post } from '@/db/db';
 import { cn } from '@/lib/utils';
 import { useOverlays } from '@/components/common/GlobalOverlays';
+import { VoteControl } from '@/components/common/VoteControl';
+import { ActionButtons } from '@/components/common/ActionButtons';
 
 interface PostCardProps {
   post: Post;
   isDetail?: boolean;
 }
 
-const formatNumber = (num: number) => num > 999 ? (num / 1000).toFixed(1) + 'k' : num;
-
 export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) => {
-  const [voteStatus, setVoteStatus] = useState<'up' | 'down' | null>(null);
   const navigate = useNavigate();
   const { openShare, openReport, openLightbox } = useOverlays();
-
-  const handleVote = (type: 'up' | 'down', e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setVoteStatus(prev => prev === type ? null : type);
-  };
-
-  const score = post.upvotes + (voteStatus === 'up' ? 1 : voteStatus === 'down' ? -1 : 0);
 
   return (
     <article 
@@ -130,7 +117,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           </div>
         )}
 
-        {/* Title */}
         <h1 className={cn(
           "font-semibold text-foreground leading-tight tracking-tight px-4 sm:px-0",
           isDetail ? "text-[22px] sm:text-[24px] mt-2 mb-3" : "text-[18px] mb-1"
@@ -138,7 +124,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           {post.title}
         </h1>
 
-        {/* Text Content */}
         {post.content && (
           <div className={cn(
             "text-[14px] leading-relaxed text-foreground px-4 sm:px-0",
@@ -148,7 +133,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           </div>
         )}
 
-        {/* Media Container */}
         {post.image && (
           <div 
             className={cn(
@@ -172,67 +156,19 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           </div>
         )}
 
-        {/* Action Row */}
         <div className={cn(
           "flex items-center gap-2 mt-3 relative z-10 px-4 sm:px-0 pb-2",
           isDetail && "border-b border-border mb-2"
         )} onClick={(e) => e.stopPropagation()}>
-          {/* Vote Pill */}
-          <div className="flex items-center bg-secondary-background rounded-full h-8 overflow-hidden border border-transparent hover:border-border transition-colors">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className={cn(
-                "h-8 w-8 rounded-none hover:text-vote-up hover:bg-muted",
-                voteStatus === 'up' && "text-vote-up bg-muted"
-              )}
-              onClick={(e) => handleVote('up', e)}
-            >
-              <ArrowBigUp size={20} className={cn(voteStatus === 'up' && "fill-current")} />
-            </Button>
-            <span className={cn(
-              "px-1 font-bold text-[12px] min-w-[20px] text-center",
-              voteStatus === 'up' ? "text-vote-up" : voteStatus === 'down' ? "text-vote-down" : "text-foreground"
-            )}>
-              {formatNumber(score)}
-            </span>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className={cn(
-                "h-8 w-8 rounded-none hover:text-vote-down hover:bg-muted",
-                voteStatus === 'down' && "text-vote-down bg-muted"
-              )}
-              onClick={(e) => handleVote('down', e)}
-            >
-              <ArrowBigDown size={20} className={cn(voteStatus === 'down' && "fill-current")} />
-            </Button>
-          </div>
-
-          {/* Comments Button */}
-          <Button 
-            variant="secondary" 
-            className="h-8 rounded-full px-3 gap-2 bg-secondary-background hover:bg-muted border border-transparent hover:border-border transition-all"
-            onClick={() => !isDetail && navigate(`/post/${post.id}`)}
-          >
-            <MessageSquare size={18} />
-            <span className="text-[12px] font-bold">{formatNumber(post.comments)}</span>
-          </Button>
-
-          {/* Award Button */}
-          <Button variant="secondary" className="h-8 rounded-full px-3 bg-secondary-background hover:bg-muted border border-transparent hover:border-border transition-all">
-            <Award size={18} />
-          </Button>
-
-          {/* Share Button */}
-          <Button 
-            variant="secondary" 
-            className="h-8 rounded-full px-3 gap-2 bg-secondary-background hover:bg-muted border border-transparent hover:border-border transition-all"
-            onClick={() => openShare(window.location.origin + `/post/${post.id}`)}
-          >
-            <Share2 size={18} />
-            <span className="text-[12px] font-bold hidden sm:inline">Share</span>
-          </Button>
+          <VoteControl initialScore={post.upvotes} />
+          
+          <ActionButtons 
+            id={post.id} 
+            type="post" 
+            commentsCount={post.comments} 
+            showShareLabel={true}
+            onCommentClick={() => !isDetail && navigate(`/post/${post.id}`)}
+          />
         </div>
       </div>
     </article>
