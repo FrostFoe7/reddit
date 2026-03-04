@@ -21,11 +21,12 @@ export const SearchBar = () => {
   const profileName = isProfile ? location.pathname.split('/')[2] : null;
 
   const [searchInContext, setSearchInContext] = useState(true);
+  const [lastPathname, setLastPathname] = useState(location.pathname);
 
-  // Reset context search when changing location
-  useEffect(() => {
+  if (location.pathname !== lastPathname) {
+    setLastPathname(location.pathname);
     setSearchInContext(true);
-  }, [location.pathname]);
+  }
 
   // Filter logic
   const filteredQueries = query.length > 0

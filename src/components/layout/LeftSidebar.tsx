@@ -36,34 +36,37 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+type NavItemProps = Omit<React.ComponentProps<typeof SidebarNavItem>, 'collapsed'>;
+
+const NavItem = (props: NavItemProps) => {
+  const { sidebarCollapsed } = useOverlays();
+  const item = (
+    <SidebarNavItem 
+      {...props} 
+      collapsed={sidebarCollapsed} 
+    />
+  );
+
+  if (sidebarCollapsed) {
+    return (
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <div>{item}</div>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="font-bold">
+          {props.label}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return item;
+};
+
 export const LeftSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { sidebarCollapsed } = useOverlays();
-
-  const NavItem = (props: any) => {
-    const item = (
-      <SidebarNavItem 
-        {...props} 
-        collapsed={sidebarCollapsed} 
-      />
-    );
-
-    if (sidebarCollapsed) {
-      return (
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            {item}
-          </TooltipTrigger>
-          <TooltipContent side="right" className="font-bold">
-            {props.label}
-          </TooltipContent>
-        </Tooltip>
-      );
-    }
-
-    return item;
-  };
 
   return (
     <aside 
