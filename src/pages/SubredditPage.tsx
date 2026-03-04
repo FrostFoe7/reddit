@@ -120,24 +120,7 @@ export const SubredditPage: React.FC = () => {
               </h2>
             </div>
             <div className="space-y-1">
-              {[
-                {
-                  title: "Be respectful to others",
-                  desc: "No harassment, hate speech, or personal attacks. We aim to keep this community a safe space for everyone.",
-                },
-                {
-                  title: "No spam or self-promotion",
-                  desc: "Do not post repetitive content or links to your own products without significant context or value.",
-                },
-                {
-                  title: "Use the correct tags",
-                  desc: "Always flair your posts correctly to help users filter content effectively.",
-                },
-                {
-                  title: "Have fun and share knowledge!",
-                  desc: "The primary goal is to learn from each other and have a great time!",
-                },
-              ].map((rule, i) => (
+              {(sub as any).rules?.length > 0 ? (sub as any).rules.map((rule: any, i: number) => (
                 <div
                   key={i}
                   className="py-5 border-b border-border/50 last:border-0 flex gap-4 sm:gap-6 group transition-colors hover:bg-muted/30 -mx-6 px-6"
@@ -150,11 +133,13 @@ export const SubredditPage: React.FC = () => {
                       {rule.title}
                     </h3>
                     <p className="text-muted-foreground text-sm leading-relaxed font-medium">
-                      {rule.desc}
+                      {rule.description}
                     </p>
                   </div>
                 </div>
-              ))}
+              )) : (
+                  <p className="text-muted-foreground font-medium">No rules defined for this community yet.</p>
+              )}
             </div>
           </div>
         </TabsContent>
@@ -165,15 +150,11 @@ export const SubredditPage: React.FC = () => {
               <Wrench size={40} className="animate-pulse" />
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-              Wiki under construction
+              Wiki
             </h2>
             <p className="text-muted-foreground leading-relaxed text-base max-w-md font-medium">
-              Welcome to the community wiki. Our moderators are currently
-              working on compiling the best resources and FAQs for you.
+              {(sub as any).wiki || "Welcome to the community wiki. Our moderators are currently working on compiling the best resources and FAQs for you."}
             </p>
-            <div className="p-4 bg-primary/5 rounded-2xl text-sm font-bold text-primary mt-8 border border-primary/10 flex items-center gap-2">
-              Check back soon for updates!
-            </div>
           </div>
         </TabsContent>
       </Tabs>

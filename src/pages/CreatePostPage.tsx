@@ -37,6 +37,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { z } from 'zod';
 import type { Community, Post } from "@/types";
+import { useAuthStore } from "@/store/useStore";
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required').max(300),
@@ -48,6 +49,7 @@ export const CreatePostPage: React.FC = () => {
   const [title, setTitle] = useState("");
   const [activeTab, setActiveTab] = useState("text");
   const [open, setOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
 
   const { data: communities } = useCommunities();
   const createPostMutation = useCreatePost();
@@ -66,6 +68,11 @@ export const CreatePostPage: React.FC = () => {
   });
 
   const handlePost = () => {
+    if (!user) {
+        navigate("/login");
+        return;
+    }
+
     const content = editor?.getHTML() || "";
     
     const validation = postSchema.safeParse({
@@ -83,18 +90,21 @@ export const CreatePostPage: React.FC = () => {
 
     createPostMutation.mutate(
       {
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 5) + "-" + Math.random().toString(36).substring(2, 5) + "-" + Math.random().toString(36).substring(2, 5),
         title,
         content,
         subreddit_id: selectedCommunity.id,
         post_type: (activeTab === "media" ? "image" : activeTab) as Post['post_type'],
-        author_id: "a7f-p9q-m2l",
+        author_id: user.id,
       },
       {
         onSuccess: () => {
           toast.success("Post submitted successfully!");
-          setTimeout(() => navigate("/"), 1500);
+          setTimeout(() => navigate("/"), 1000);
         },
+        onError: (err: any) => {
+          toast.error(err.message || "Failed to create post");
+        }
       },
     );
   };

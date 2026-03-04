@@ -7,10 +7,22 @@ $pdo = DB::connect();
 
 // Handle GET requests (Fetch posts)
 if ($method === 'GET') {
+    $user_id = $_GET['user_id'] ?? null;
     try {
-        // Use the pre-built view for complete post data including counts
-        $stmt = $pdo->prepare("SELECT * FROM post_details ORDER BY created_at DESC LIMIT 20");
-        $stmt->execute();
+        if ($user_id) {
+            // Join with post_votes to get current user's vote
+            $stmt = $pdo->prepare("
+                SELECT pd.*, COALESCE(pv.vote, 0) as user_vote
+                FROM post_details pd
+                LEFT JOIN post_votes pv ON pd.id = pv.post_id AND pv.user_id = ?
+                ORDER BY pd.created_at DESC LIMIT 20
+            ");
+            $stmt->execute([$user_id]);
+        } else {
+            // Use the pre-built view for complete post data including counts
+            $stmt = $pdo->prepare("SELECT *, 0 as user_vote FROM post_details ORDER BY created_at DESC LIMIT 20");
+            $stmt->execute();
+        }
         $posts = $stmt->fetchAll();
         
         sendResponse($posts);

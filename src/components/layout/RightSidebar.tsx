@@ -3,17 +3,24 @@ import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { useCommunities, usePosts } from "@/hooks";
+import { useCommunities, usePosts, useUserMemberships, useJoinCommunity, useLeaveCommunity, useUser, useTopCommunities } from "@/hooks";
 import type { Community, Post } from "@/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAuthStore } from "@/store/useStore";
+import dayjs from "@/lib/dayjs";
 
 export const RightSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
 
   const { data: communities = [] } = useCommunities();
+  const { data: topCommunities = [] } = useTopCommunities(5);
   const { data: posts = [] } = usePosts();
+  const { data: memberships = [] } = useUserMemberships();
+  const { mutate: joinMutate } = useJoinCommunity();
+  const { mutate: leaveMutate } = useLeaveCommunity();
 
   const isSubredditPage =
     location.pathname.startsWith("/r/") &&
@@ -22,13 +29,14 @@ export const RightSidebar = () => {
   const isProfilePage = location.pathname.startsWith("/u/");
 
   let communityContext: Community | null = null;
-  let userContext = null;
+  let profileUsername = isProfilePage ? location.pathname.split("/")[2] : null;
+  const { data: profileUser } = useUser(profileUsername || undefined);
 
   if (isSubredditPage) {
     const subName = location.pathname.split("/")[2];
     communityContext =
       communities.find(
-        (c: Community) => c.id === subName || c.name === subName,
+        (c: Community) => c.name === subName,
       ) || null;
   } else if (isPostPage) {
     const postId = location.pathname.split("/")[2];
@@ -37,11 +45,9 @@ export const RightSidebar = () => {
       const subName = post.subreddit_name || post.sub;
       communityContext =
         communities.find(
-          (c: Community) => c.id === subName || c.name === subName,
+          (c: Community) => c.name === subName,
         ) || null;
     }
-  } else if (isProfilePage) {
-    userContext = location.pathname.split("/")[2];
   }
 
   const isCreatePage = location.pathname === "/create";
@@ -59,9 +65,24 @@ export const RightSidebar = () => {
     });
   };
 
+  const handleJoinLeave = (e: React.MouseEvent, subId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+        navigate("/login");
+        return;
+    }
+    if (memberships.includes(subId)) {
+        leaveMutate(subId);
+    } else {
+        joinMutate(subId);
+    }
+  };
+
   const contextIcon = communityContext?.icon_url || communityContext?.icon;
   const contextDesc = communityContext?.description || communityContext?.desc;
-  const contextMembers = communityContext?.members || "1.2m";
+  const contextMembers = communityContext?.members || "0";
+  const isContextJoined = communityContext ? memberships.includes(communityContext.id) : false;
 
   return (
     <aside
@@ -103,42 +124,24 @@ export const RightSidebar = () => {
                 ))}
               </ol>
             </div>
-
-            <div className="text-xs text-muted-foreground px-2 leading-relaxed">
-              Please be mindful of Reddit's{" "}
-              <button
-                onClick={() => handleExternal("Content Policy")}
-                className="text-primary hover:underline font-bold"
-              >
-                Content Policy
-              </button>{" "}
-              and practice good{" "}
-              <button
-                onClick={() => handleExternal("Reddiquette")}
-                className="text-primary hover:underline font-bold"
-              >
-                reddiquette
-              </button>
-              .
-            </div>
           </div>
         )}
 
-        {isProfilePage && userContext && (
+        {isProfilePage && profileUser && (
           <div className="flex flex-col space-y-3">
             <div className="bg-secondary-background/50 rounded-2xl p-4 flex flex-col gap-4 border border-border shadow-sm">
               <div className="flex flex-col gap-1">
                 <h3 className="text-base font-bold text-foreground capitalize">
-                  {userContext}
+                  {profileUser.username}
                 </h3>
                 <p className="text-xs text-muted-foreground font-medium">
-                  u/{userContext}
+                  u/{profileUser.username}
                 </p>
               </div>
 
               <div className="flex flex-col gap-2">
                 <p className="text-sm text-foreground leading-normal italic">
-                  "Bull | Couple | Dhaka |"
+                  {profileUser.bio || "No bio yet."}
                 </p>
               </div>
 
@@ -146,13 +149,13 @@ export const RightSidebar = () => {
                 <Separator className="opacity-50" />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col">
-                    <span className="text-base font-bold">1,245</span>
+                    <span className="text-base font-bold">{profileUser.karma}</span>
                     <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                       Karma
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-base font-bold">Aug 12, 2023</span>
+                    <span className="text-base font-bold">{dayjs(profileUser.cake_day).format('MMM D, YYYY')}</span>
                     <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                       Cake Day
                     </span>
@@ -162,56 +165,24 @@ export const RightSidebar = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Button
-                  onClick={() => handleAction("Follow")}
-                  className="w-full rounded-full font-bold h-10 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Follow
-                </Button>
-                <Button
-                  onClick={() => handleAction("Chat")}
-                  variant="outline"
-                  className="w-full rounded-full font-bold h-10 border-primary text-primary hover:bg-primary/5"
-                >
-                  Chat
-                </Button>
+                {user?.id !== profileUser.id && (
+                    <>
+                        <Button
+                        onClick={() => handleAction("Follow")}
+                        className="w-full rounded-full font-bold h-10 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                        >
+                        Follow
+                        </Button>
+                        <Button
+                        onClick={() => handleAction("Chat")}
+                        variant="outline"
+                        className="w-full rounded-full font-bold h-10 border-primary text-primary hover:bg-primary/5"
+                        >
+                        Chat
+                        </Button>
+                    </>
+                )}
               </div>
-            </div>
-
-            <div className="bg-secondary-background/50 rounded-2xl p-4 flex flex-col gap-3 border border-border shadow-sm">
-              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">
-                Achievements
-              </h3>
-              <div className="flex gap-2 px-1">
-                <div
-                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl shadow-sm"
-                  title="Banana Aficionado"
-                >
-                  🍌
-                </div>
-                <div
-                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl shadow-sm"
-                  title="Detective Doggo"
-                >
-                  🐶
-                </div>
-                <div
-                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl shadow-sm"
-                  title="Banana Enthusiast"
-                >
-                  🍌
-                </div>
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-muted-foreground shadow-sm">
-                  +8
-                </div>
-              </div>
-              <Button
-                onClick={() => handleAction("View Achievements")}
-                variant="ghost"
-                className="w-full text-primary font-bold text-xs py-1 justify-start px-1 h-auto hover:bg-transparent hover:underline"
-              >
-                View your achievements
-              </Button>
             </div>
           </div>
         )}
@@ -228,7 +199,7 @@ export const RightSidebar = () => {
                 <div
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm",
-                    contextIcon,
+                    contextIcon || "bg-primary",
                   )}
                 >
                   r/
@@ -271,10 +242,16 @@ export const RightSidebar = () => {
 
               <div className="flex flex-col gap-2">
                 <Button
-                  onClick={() => handleAction("Join")}
-                  className="w-full rounded-full font-bold h-10 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={(e) => handleJoinLeave(e, communityContext!.id)}
+                  variant={isContextJoined ? "outline" : "default"}
+                  className={cn(
+                    "w-full rounded-full font-bold h-10 shadow-sm transition-all",
+                    isContextJoined 
+                        ? "border-border text-foreground hover:bg-muted" 
+                        : "bg-primary text-white hover:opacity-90"
+                  )}
                 >
-                  Join
+                  {isContextJoined ? "Joined" : "Join"}
                 </Button>
                 <Button
                   onClick={() => navigate("/create")}
@@ -288,28 +265,22 @@ export const RightSidebar = () => {
           </div>
         )}
 
-        {showCommunityInfo && (
+        {showCommunityInfo && (communityContext as any)?.rules?.length > 0 && (
           <div className="flex flex-col space-y-3">
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-2">
-              r/{communityContext?.name || "community"} Rules
+              r/{communityContext?.name} Rules
             </h3>
             <div className="space-y-1">
-              {[
-                "Be Respectful",
-                "Stay on Topic",
-                "No Self-Promotion Without Context",
-                "No Spam",
-              ].map((rule, i) => (
+              {(communityContext as any).rules.map((rule: any, i: number) => (
                 <div
                   key={i}
-                  onClick={() => handleAction(`Rule ${i + 1}`)}
                   className="flex items-start gap-3 p-2 hover:bg-muted rounded-xl cursor-pointer transition-colors group"
                 >
                   <span className="text-xs font-bold text-muted-foreground mt-0.5 opacity-50">
                     {i + 1}
                   </span>
                   <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
-                    {rule}
+                    {rule.title}
                   </span>
                 </div>
               ))}
@@ -317,7 +288,7 @@ export const RightSidebar = () => {
           </div>
         )}
 
-        {showCommunityInfo && (
+        {showCommunityInfo && (communityContext as any)?.moderators?.length > 0 && (
           <div className="flex flex-col space-y-3">
             <div className="flex justify-between items-center px-2">
               <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
@@ -333,30 +304,23 @@ export const RightSidebar = () => {
               </Button>
             </div>
             <div className="flex flex-col space-y-1 px-1">
-              {["doctor-_-atomic", "mod-person", "stuckyfeet"].map((mod) => (
+              {(communityContext as any).moderators.map((mod: any) => (
                 <Link
-                  key={mod}
-                  to={`/u/${mod}`}
+                  key={mod.id}
+                  to={`/u/${mod.username}`}
                   className="flex items-center gap-3 p-2 hover:bg-muted rounded-xl transition-colors group"
                 >
                   <Avatar className="h-7 w-7 border border-border/50">
                     <AvatarImage
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${mod}`}
+                      src={mod.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${mod.username}`}
                     />
-                    <AvatarFallback>M</AvatarFallback>
+                    <AvatarFallback>{mod.username?.[0]}</AvatarFallback>
                   </Avatar>
                   <span className="text-xs font-bold group-hover:text-primary transition-colors">
-                    u/{mod}
+                    u/{mod.username}
                   </span>
                 </Link>
               ))}
-              <Button
-                onClick={() => handleAction("View All Moderators")}
-                variant="ghost"
-                className="w-full text-primary font-bold text-xs py-2.5 rounded-xl h-auto hover:bg-primary/5 mt-1 border border-transparent hover:border-primary/20"
-              >
-                View All Moderators
-              </Button>
             </div>
           </div>
         )}
@@ -368,13 +332,6 @@ export const RightSidebar = () => {
                 <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                   Recent Posts
                 </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary hover:text-primary/80 hover:bg-transparent h-auto p-0 font-bold text-xs"
-                >
-                  Clear
-                </Button>
               </div>
               <div className="flex flex-col space-y-1">
                 {posts.slice(0, 4).map((post: Post) => (
@@ -391,7 +348,7 @@ export const RightSidebar = () => {
                         <AvatarFallback
                           className={cn(
                             "text-[10px] font-bold text-white",
-                            post.subreddit_icon || post.subIcon,
+                            post.subreddit_icon || post.subIcon || "bg-primary",
                           )}
                         >
                           r/
@@ -401,7 +358,7 @@ export const RightSidebar = () => {
                         r/{post.subreddit_name || post.sub}
                       </span>
                       <span>•</span>
-                      <span>3d ago</span>
+                      <span>{dayjs(post.created_at).fromNow()}</span>
                     </div>
                     <h4 className="text-xs font-semibold leading-snug text-foreground group-hover:underline line-clamp-2">
                       {post.title}
@@ -420,50 +377,45 @@ export const RightSidebar = () => {
                 Top Communities
               </h3>
               <div className="flex flex-col space-y-1">
-                {communities
-                  .slice(0, 5)
-                  .map((community: Community, i: number) => (
-                    <Link
-                      key={community.id}
-                      to={`/r/${community.id}`}
-                      className="flex items-center justify-between px-2 py-2 hover:bg-muted rounded-xl transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-muted-foreground w-4 opacity-50">
-                          {i + 1}
-                        </span>
-                        <div
-                          className={cn(
-                            "w-7 h-7 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm transition-transform group-hover:scale-110",
-                            community.icon_url || community.icon,
-                          )}
+                {topCommunities
+                  .map((community: Community, i: number) => {
+                    const isJoined = memberships.includes(community.id);
+                    return (
+                        <Link
+                        key={community.id}
+                        to={`/r/${community.name}`}
+                        className="flex items-center justify-between px-2 py-2 hover:bg-muted rounded-xl transition-colors group"
                         >
-                          r/
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-bold text-muted-foreground w-4 opacity-50">
+                            {i + 1}
+                            </span>
+                            <div
+                            className={cn(
+                                "w-7 h-7 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm transition-transform group-hover:scale-110",
+                                community.icon_url || community.icon || "bg-primary",
+                            )}
+                            >
+                            r/
+                            </div>
+                            <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
+                            r/{community.name}
+                            </span>
                         </div>
-                        <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
-                          r/{community.name}
-                        </span>
-                      </div>
-                      <Button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleAction("Join");
-                        }}
-                        variant="outline"
-                        size="sm"
-                        className="rounded-full h-7 px-3 font-bold border-primary text-primary hover:bg-primary/5 text-[11px] shadow-sm"
-                      >
-                        Join
-                      </Button>
-                    </Link>
-                  ))}
-                <Button
-                  onClick={() => navigate("/explore")}
-                  variant="ghost"
-                  className="w-full text-primary font-bold text-xs py-2.5 rounded-xl h-auto hover:bg-primary/5 mt-1 border border-transparent hover:border-primary/20"
-                >
-                  View All
-                </Button>
+                        <Button
+                            onClick={(e) => handleJoinLeave(e, community.id)}
+                            variant={isJoined ? "secondary" : "outline"}
+                            size="sm"
+                            className={cn(
+                                "rounded-full h-7 px-3 font-bold text-[11px] shadow-sm",
+                                !isJoined && "border-primary text-primary hover:bg-primary/5"
+                            )}
+                        >
+                            {isJoined ? "Joined" : "Join"}
+                        </Button>
+                        </Link>
+                    );
+                  })}
               </div>
             </div>
           </>

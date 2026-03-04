@@ -33,6 +33,7 @@ CREATE TABLE users (
     id VARCHAR(11) PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
     avatar_url TEXT,
     banner_url TEXT,
     bio TEXT,

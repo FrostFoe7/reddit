@@ -2,6 +2,7 @@ import type { Post, Comment } from "@/types";
 import React from "react";
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useUser, usePosts, useComments } from "@/hooks";
+import { useUIStore, useAuthStore } from "@/store/useStore";
 import { PostCard } from "@/components/post/PostCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUIStore } from "@/store/useStore";
 import { toast } from "sonner";
 
 export const ProfilePage: React.FC = () => {
@@ -33,17 +33,22 @@ export const ProfilePage: React.FC = () => {
   const defaultTab = searchParams.get("tab") || "posts";
   const { openShare, openReport } = useUIStore();
   const [isFollowing, setIsFollowing] = React.useState(false);
+  const currentUser = useAuthStore((state) => state.user);
 
   const { data: user, isLoading: userLoading } = useUser(username);
+  
+  // Fetch posts with current user's votes
   const { data: posts = [] } = usePosts();
-  // Filter posts and comments for this user
-  // In a real app, you'd have a specific API for user's content
+  
+  // Filter posts for this user
   const userPosts = posts.filter(
-    (p: Post) => (p.author_username || p.author) === username,
+    (p: Post) => (p.author_username || p.author) === username || (user && p.author_id === user.id),
   );
-  const { data: allComments = [] } = useComments(undefined); // This might need a different hook for user's comments
+  
+  // In a real app, we'd have a specific API for user's comments
+  const { data: allComments = [] } = useComments(undefined); 
   const userComments = allComments.filter(
-    (c: Comment) => (c.author_username || c.author) === username,
+    (c: Comment) => (c.author_username || c.author) === username || (user && c.author_id === user.id),
   );
 
   const toggleFollow = () => {
@@ -59,6 +64,15 @@ export const ProfilePage: React.FC = () => {
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  if (!user) {
+      return (
+        <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
+          <h1 className="text-2xl font-bold">User not found</h1>
+          <Link to="/" className="text-primary hover:underline mt-4">Go Home</Link>
+        </div>
+      );
   }
 
   return (
@@ -122,7 +136,7 @@ export const ProfilePage: React.FC = () => {
           <div className="relative -mt-[52px] sm:-mt-[60px] mb-4">
             <Avatar className="w-[104px] h-[104px] sm:w-[130px] sm:h-[130px] border-[5px] border-card shadow-lg">
               <AvatarImage
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=ff4500`}
+                src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=ff4500`}
               />
               <AvatarFallback className="text-2xl font-bold">
                 {username?.[0]}
@@ -134,10 +148,10 @@ export const ProfilePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between w-full mb-6 gap-4">
             <div className="flex flex-col gap-1">
               <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-none tracking-tight">
-                {username}
+                {user.username}
               </h1>
               <div className="flex items-center justify-center sm:justify-start gap-2 text-sm sm:text-sm text-muted-foreground font-medium">
-                <span>u/{username}</span>
+                <span>u/{user.username}</span>
                 <span>•</span>
                 {user?.is_premium && (
                   <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full text-xs">
@@ -146,28 +160,30 @@ export const ProfilePage: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="flex gap-3 mt-2 sm:mt-0">
-              <Button
-                onClick={toggleFollow}
-                variant={isFollowing ? "outline" : "default"}
-                className={cn(
-                  "rounded-full px-8 font-bold h-11 shadow-md transition-all active:scale-95",
-                  isFollowing
-                    ? "border-primary text-primary hover:bg-primary/5"
-                    : "bg-primary text-primary-foreground hover:opacity-90",
-                )}
-              >
-                {isFollowing ? "Following" : "Follow"}
-              </Button>
-              <Button
-                onClick={() => toast.info("Chat feature coming soon!")}
-                variant="outline"
-                size="icon"
-                className="rounded-full h-11 w-11 border-border hover:bg-muted shadow-sm transition-all active:scale-95"
-              >
-                <Mail size={20} />
-              </Button>
-            </div>
+            {currentUser?.id !== user.id && (
+                <div className="flex gap-3 mt-2 sm:mt-0">
+                <Button
+                    onClick={toggleFollow}
+                    variant={isFollowing ? "outline" : "default"}
+                    className={cn(
+                    "rounded-full px-8 font-bold h-11 shadow-md transition-all active:scale-95",
+                    isFollowing
+                        ? "border-primary text-primary hover:bg-primary/5"
+                        : "bg-primary text-primary-foreground hover:opacity-90",
+                    )}
+                >
+                    {isFollowing ? "Following" : "Follow"}
+                </Button>
+                <Button
+                    onClick={() => toast.info("Chat feature coming soon!")}
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full h-11 w-11 border-border hover:bg-muted shadow-sm transition-all active:scale-95"
+                >
+                    <Mail size={20} />
+                </Button>
+                </div>
+            )}
           </div>
 
           <div className="w-full pt-5">

@@ -7,13 +7,35 @@ $pdo = DB::connect();
 
 if ($method === 'GET') {
     $post_id = $_GET['postId'] ?? $_GET['post_id'] ?? null;
+    $user_id = $_GET['user_id'] ?? null;
     
     try {
         if ($post_id) {
-            $stmt = $pdo->prepare("SELECT * FROM comment_details WHERE post_id = ? ORDER BY created_at ASC");
-            $stmt->execute([$post_id]);
+            if ($user_id) {
+                $stmt = $pdo->prepare("
+                    SELECT cd.*, COALESCE(cv.vote, 0) as user_vote
+                    FROM comment_details cd
+                    LEFT JOIN comment_votes cv ON cd.id = cv.comment_id AND cv.user_id = ?
+                    WHERE cd.post_id = ? 
+                    ORDER BY cd.created_at ASC
+                ");
+                $stmt->execute([$user_id, $post_id]);
+            } else {
+                $stmt = $pdo->prepare("SELECT *, 0 as user_vote FROM comment_details WHERE post_id = ? ORDER BY created_at ASC");
+                $stmt->execute([$post_id]);
+            }
         } else {
-            $stmt = $pdo->query("SELECT * FROM comment_details ORDER BY created_at DESC LIMIT 50");
+            if ($user_id) {
+                $stmt = $pdo->prepare("
+                    SELECT cd.*, COALESCE(cv.vote, 0) as user_vote
+                    FROM comment_details cd
+                    LEFT JOIN comment_votes cv ON cd.id = cv.comment_id AND cv.user_id = ?
+                    ORDER BY cd.created_at DESC LIMIT 50
+                ");
+                $stmt->execute([$user_id]);
+            } else {
+                $stmt = $pdo->query("SELECT *, 0 as user_vote FROM comment_details ORDER BY created_at DESC LIMIT 50");
+            }
         }
         $comments = $stmt->fetchAll();
         sendResponse($comments);

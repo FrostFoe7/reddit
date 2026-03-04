@@ -41,12 +41,18 @@ function sendResponse($data, $code = 200) {
 // 5. Basic Route Mapping
 if (strpos($route, 'posts') === 0) {
     require_once __DIR__ . '/routes/posts.php';
+} elseif (strpos($route, 'auth') === 0) {
+    require_once __DIR__ . '/routes/auth.php';
 } elseif (strpos($route, 'users') === 0) {
     require_once __DIR__ . '/routes/users.php';
 } elseif (strpos($route, 'communities') === 0) {
     require_once __DIR__ . '/routes/communities.php';
+} elseif (strpos($route, 'votes') === 0) {
+    require_once __DIR__ . '/routes/votes.php';
 } elseif (strpos($route, 'comments') === 0) {
     require_once __DIR__ . '/routes/comments.php';
+} elseif (strpos($route, 'messages') === 0) {
+    require_once __DIR__ . '/routes/messages.php';
 } elseif (strpos($route, 'notifications') === 0) {
     require_once __DIR__ . '/routes/notifications.php';
 } elseif ($route === 'status') {

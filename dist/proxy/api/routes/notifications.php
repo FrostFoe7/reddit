@@ -6,13 +6,15 @@
 $pdo = DB::connect();
 
 if ($method === 'GET') {
+    $user_id = $_GET['user_id'] ?? null;
+    
+    if (!$user_id) {
+        sendResponse(['error' => 'Missing user_id'], 400);
+    }
+
     try {
-        // Fetch notifications for a mock recipient (User123)
-        // In a real app, this would use the logged-in user's ID
-        $recipient_id = '1bw-j2k-e39'; 
-        
-        $stmt = $pdo->prepare("SELECT * FROM notifications WHERE recipient_id = ? ORDER BY created_at DESC");
-        $stmt->execute([$recipient_id]);
+        $stmt = $pdo->prepare("SELECT * FROM notifications WHERE recipient_id = ? ORDER BY created_at DESC LIMIT 20");
+        $stmt->execute([$user_id]);
         $notifications = $stmt->fetchAll();
         
         sendResponse($notifications);
@@ -21,11 +23,17 @@ if ($method === 'GET') {
     }
 }
 
-if ($method === 'POST' && $route === 'notifications/mark-read') {
+if ($method === 'POST' && strpos($route, 'notifications/mark-read') === 0) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $user_id = $input['user_id'] ?? null;
+
+    if (!$user_id) {
+        sendResponse(['error' => 'Missing user_id'], 400);
+    }
+
     try {
-        $recipient_id = '1bw-j2k-e39';
         $stmt = $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE recipient_id = ?");
-        $stmt->execute([$recipient_id]);
+        $stmt->execute([$user_id]);
         
         sendResponse(['success' => true]);
     } catch (\Exception $e) {

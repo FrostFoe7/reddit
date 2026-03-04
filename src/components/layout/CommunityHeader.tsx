@@ -9,8 +9,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUIStore } from "@/store/useStore";
+import { useUIStore, useAuthStore } from "@/store/useStore";
 import { toast } from "sonner";
+import { useJoinCommunity, useLeaveCommunity, useUserMemberships } from "@/hooks";
+import { useNavigate } from "react-router-dom";
 
 interface CommunityHeaderProps {
   sub: {
@@ -25,12 +27,26 @@ interface CommunityHeaderProps {
 }
 
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
+  const navigate = useNavigate();
   const { openShare, openReport } = useUIStore();
-  const [isJoined, setIsJoined] = React.useState(false);
+  const user = useAuthStore((state) => state.user);
+  
+  const { data: memberships = [] } = useUserMemberships();
+  const { mutate: joinMutate } = useJoinCommunity();
+  const { mutate: leaveMutate } = useLeaveCommunity();
+
+  const isJoined = memberships.includes(sub.id);
 
   const toggleJoin = () => {
-    setIsJoined(!isJoined);
-    toast.success(isJoined ? `Left r/${sub.name}` : `Joined r/${sub.name}`);
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    if (isJoined) {
+      leaveMutate(sub.id);
+    } else {
+      joinMutate(sub.id);
+    }
   };
 
   const subIcon = sub.icon_url || sub.icon;
@@ -38,8 +54,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
   const subMembers = sub.members || 0;
 
   return (
-    <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 shadow-sm relative">
-      <div className={cn("h-28 sm:h-36 opacity-90 relative", subIcon)}>
+    <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 shadow-ios-subtle relative">
+      <div className={cn("h-28 sm:h-36 opacity-90 relative bg-primary/20", subIcon)}>
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>
 
@@ -97,7 +113,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
           <div
             className={cn(
               "w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-3xl font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter",
-              subIcon,
+              subIcon || "bg-primary",
             )}
           >
             r/
@@ -108,8 +124,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
             className={cn(
               "h-11 px-6 rounded-full font-bold text-sm shadow-sm transition-all active:scale-95",
               isJoined
-                ? "border-foreground text-foreground hover:bg-muted"
-                : "bg-foreground text-background hover:opacity-90",
+                ? "border-border text-foreground hover:bg-muted"
+                : "bg-primary text-white hover:opacity-90",
             )}
           >
             {isJoined ? "Joined" : "Join"}

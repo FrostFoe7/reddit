@@ -1,20 +1,26 @@
 import type { Post, Community } from "@/types";
 import React from "react";
-import { useSearchParams } from "react-router-dom";
-import { usePosts, useCommunities } from "@/hooks";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { usePosts, useCommunities, useUserMemberships, useJoinCommunity, useLeaveCommunity } from "@/hooks";
 import { PostCard } from "@/components/post/PostCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { useAuthStore } from "@/store/useStore";
 
 export const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const qLower = query.toLowerCase();
+  const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
 
   const { data: posts = [] } = usePosts();
   const { data: communities = [] } = useCommunities();
+  const { data: memberships = [] } = useUserMemberships();
+  const { mutate: joinMutate } = useJoinCommunity();
+  const { mutate: leaveMutate } = useLeaveCommunity();
 
   const filteredPosts = posts.filter(
     (p: Post) =>
@@ -28,6 +34,20 @@ export const SearchPage: React.FC = () => {
       c.name.toLowerCase().includes(qLower) ||
       (c.description || c.desc || "").toLowerCase().includes(qLower),
   );
+
+  const handleJoinLeave = (e: React.MouseEvent, subId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+        navigate("/login");
+        return;
+    }
+    if (memberships.includes(subId)) {
+        leaveMutate(subId);
+    } else {
+        joinMutate(subId);
+    }
+  };
 
   return (
     <div
@@ -63,38 +83,45 @@ export const SearchPage: React.FC = () => {
               </h3>
             </div>
             <div className="divide-y divide-border/50">
-              {filteredCommunities.map((community) => (
-                <Link
-                  key={community.id}
-                  to={`/r/${community.id}`}
-                  className="flex items-center justify-between p-4 sm:p-5 hover:bg-muted/50 transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={cn(
-                        "w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm tracking-tighter transition-transform group-hover:scale-110",
-                        community.icon_url || community.icon,
-                      )}
+              {filteredCommunities.map((community) => {
+                const isJoined = memberships.includes(community.id);
+                return (
+                    <Link
+                    key={community.id}
+                    to={`/r/${community.name}`}
+                    className="flex items-center justify-between p-4 sm:p-5 hover:bg-muted/50 transition-all group"
                     >
-                      r/
+                    <div className="flex items-center gap-4">
+                        <div
+                        className={cn(
+                            "w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm tracking-tighter transition-transform group-hover:scale-110",
+                            community.icon_url || community.icon || "bg-primary",
+                        )}
+                        >
+                        r/
+                        </div>
+                        <div className="flex flex-col">
+                        <div className="font-bold text-foreground group-hover:text-primary transition-colors text-base">
+                            r/{community.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground font-medium">
+                            {community.members || 0} members
+                        </div>
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                      <div className="font-bold text-foreground group-hover:text-primary transition-colors text-base">
-                        r/{community.name}
-                      </div>
-                      <div className="text-xs text-muted-foreground font-medium">
-                        {community.members || 0} members
-                      </div>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="rounded-full h-9 px-6 font-bold border-primary text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-95"
-                  >
-                    Join
-                  </Button>
-                </Link>
-              ))}
+                    <Button
+                        onClick={(e) => handleJoinLeave(e, community.id)}
+                        variant={isJoined ? "secondary" : "outline"}
+                        className={cn(
+                            "rounded-full h-9 px-6 font-bold shadow-sm transition-all active:scale-95",
+                            !isJoined && "border-primary text-primary hover:bg-primary/5"
+                        )}
+                    >
+                        {isJoined ? "Joined" : "Join"}
+                    </Button>
+                    </Link>
+                );
+              })}
             </div>
           </div>
         )}

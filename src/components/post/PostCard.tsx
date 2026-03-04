@@ -17,10 +17,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ActionButtons } from '@/components/common/ActionButtons';
 import { cn } from '@/lib/utils';
-import { useUIStore } from '@/store/useStore';
+import { useUIStore, useAuthStore } from '@/store/useStore';
 import { VoteControl } from '@/components/common/VoteControl';
 import dayjs from '@/lib/dayjs';
 import { motion } from 'motion/react';
+import { useVotes, useJoinCommunity, useLeaveCommunity, useUserMemberships } from '@/hooks';
 
 interface PostCardProps {
   post: Post;
@@ -30,7 +31,12 @@ interface PostCardProps {
 export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) => {
   const navigate = useNavigate();
   const { openShare, openReport, openLightbox } = useUIStore();
-  const [isJoined, setIsJoined] = React.useState(false);
+  const user = useAuthStore((state) => state.user);
+  
+  const { mutate: voteMutate } = useVotes();
+  const { mutate: joinMutate } = useJoinCommunity();
+  const { mutate: leaveMutate } = useLeaveCommunity();
+  const { data: memberships = [] } = useUserMemberships();
 
   // Normalize data between mock and backend
   const subName = post.subreddit_name || post.sub;
@@ -41,12 +47,35 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
   const postImage = post.image_url || post.image;
   const subIcon = post.subreddit_icon || post.subIcon;
 
+  const subId = post.subreddit_id || (post as any).sub_id;
+  const isJoined = subId ? memberships.includes(subId) : false;
+
   const toggleJoin = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsJoined(!isJoined);
-    import('sonner').then(({ toast }) => {
-      toast.success(isJoined ? `Left r/${subName}` : `Joined r/${subName}`);
-    });
+    if (!user) {
+        navigate("/login");
+        return;
+    }
+    if (!subId) return;
+    
+    if (isJoined) {
+        leaveMutate(subId);
+    } else {
+        joinMutate(subId);
+    }
+  };
+
+  const handleVote = (voteType: "up" | "down" | null) => {
+      if (!user) {
+          navigate("/login");
+          return;
+      }
+      const voteValue = voteType === "up" ? 1 : voteType === "down" ? -1 : 0;
+      voteMutate({
+          type: "post",
+          target_id: post.id,
+          vote: voteValue
+      });
   };
 
   return (
@@ -200,7 +229,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           "flex items-center gap-2 mt-3 relative z-10 px-4 sm:px-0 pb-2",
           isDetail && "border-b border-border mb-2"
         )} onClick={(e) => e.stopPropagation()}>
-          <VoteControl initialScore={postUpvotes} />
+          <VoteControl 
+            initialScore={postUpvotes} 
+            initialVoteStatus={post.user_vote === 1 ? "up" : post.user_vote === -1 ? "down" : null}
+            onVote={handleVote}
+          />
           
           <ActionButtons 
             id={post.id} 

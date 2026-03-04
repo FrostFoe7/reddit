@@ -25,22 +25,22 @@ TRUNCATE users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 1. Users (15 users)
-INSERT INTO users (id, username, karma, avatar_url, is_verified, bio, is_premium) VALUES 
-('u01-usr-123', 'User123', 1200, 'https://api.dicebear.com/7.x/avataaars/svg?seed=User123', FALSE, 'Just a casual redditor', FALSE),
-('u02-fro-wiz', 'frontend_wizard', 15400, 'https://api.dicebear.com/7.x/avataaars/svg?seed=frontend', TRUE, 'Building the future of the web', TRUE),
-('u03-des-guy', 'design_guy', 8900, 'https://api.dicebear.com/7.x/avataaars/svg?seed=design', TRUE, 'Pixel perfectionist', FALSE),
-('u04-rea-nin', 'react_ninja', 4500, 'https://api.dicebear.com/7.x/avataaars/svg?seed=ninja', FALSE, 'I write code and eat pizza', FALSE),
-('u05-sta-gur', 'state_guru', 22100, 'https://api.dicebear.com/7.x/avataaars/svg?seed=guru', TRUE, 'Everything is a stream', TRUE),
-('u06-cod-mon', 'code_monkey', 3200, 'https://api.dicebear.com/7.x/avataaars/svg?seed=monkey', FALSE, 'Will code for bananas', FALSE),
-('u07-sys-adm', 'sysadmin_god', 45000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=sys', TRUE, 'Have you tried turning it off and on again?', TRUE),
-('u08-dev-ops', 'devops_queen', 12000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=queen', TRUE, 'CI/CD is my love language', FALSE),
-('u09-ios-fan', 'ios_fanatic', 5600, 'https://api.dicebear.com/7.x/avataaars/svg?seed=ios', FALSE, 'Sent from my iPhone', FALSE),
-('u10-and-roi', 'android_fan', 4300, 'https://api.dicebear.com/7.x/avataaars/svg?seed=android', FALSE, 'Custom ROMs for life', FALSE),
-('u11-js-lord', 'js_lord', 88000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=js', TRUE, 'Typescript is just JS with extra steps', TRUE),
-('u12-rus-ace', 'rust_ace', 1500, 'https://api.dicebear.com/7.x/avataaars/svg?seed=rust', FALSE, 'Memory safety is important', FALSE),
-('u13-vve-dev', 'vue_dev', 2900, 'https://api.dicebear.com/7.x/avataaars/svg?seed=vue', FALSE, 'Simplicity is beauty', FALSE),
-('u14-nxt-gen', 'nextjs_pro', 7700, 'https://api.dicebear.com/7.x/avataaars/svg?seed=next', TRUE, 'App router is the future', FALSE),
-('u15-ai-hyp', 'ai_overlord', 99000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=ai', TRUE, 'Prompt engineering is a real job', TRUE);
+INSERT INTO users (id, username, password_hash, karma, avatar_url, is_verified, bio, is_premium) VALUES 
+('u01-usr-123', 'User123', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1200, 'https://api.dicebear.com/7.x/avataaars/svg?seed=User123', FALSE, 'Just a casual redditor', FALSE),
+('u02-fro-wiz', 'frontend_wizard', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 15400, 'https://api.dicebear.com/7.x/avataaars/svg?seed=frontend', TRUE, 'Building the future of the web', TRUE),
+('u03-des-guy', 'design_guy', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 8900, 'https://api.dicebear.com/7.x/avataaars/svg?seed=design', TRUE, 'Pixel perfectionist', FALSE),
+('u04-rea-nin', 'react_ninja', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 4500, 'https://api.dicebear.com/7.x/avataaars/svg?seed=ninja', FALSE, 'I write code and eat pizza', FALSE),
+('u05-sta-gur', 'state_guru', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 22100, 'https://api.dicebear.com/7.x/avataaars/svg?seed=guru', TRUE, 'Everything is a stream', TRUE),
+('u06-cod-mon', 'code_monkey', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3200, 'https://api.dicebear.com/7.x/avataaars/svg?seed=monkey', FALSE, 'Will code for bananas', FALSE),
+('u07-sys-adm', 'sysadmin_god', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 45000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=sys', TRUE, 'Have you tried turning it off and on again?', TRUE),
+('u08-dev-ops', 'devops_queen', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 12000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=queen', TRUE, 'CI/CD is my love language', FALSE),
+('u09-ios-fan', 'ios_fanatic', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 5600, 'https://api.dicebear.com/7.x/avataaars/svg?seed=ios', FALSE, 'Sent from my iPhone', FALSE),
+('u10-and-roi', 'android_fan', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 4300, 'https://api.dicebear.com/7.x/avataaars/svg?seed=android', FALSE, 'Custom ROMs for life', FALSE),
+('u11-js-lord', 'js_lord', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 88000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=js', TRUE, 'Typescript is just JS with extra steps', TRUE),
+('u12-rus-ace', 'rust_ace', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1500, 'https://api.dicebear.com/7.x/avataaars/svg?seed=rust', FALSE, 'Memory safety is important', FALSE),
+('u13-vve-dev', 'vue_dev', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2900, 'https://api.dicebear.com/7.x/avataaars/svg?seed=vue', FALSE, 'Simplicity is beauty', FALSE),
+('u14-nxt-gen', 'nextjs_pro', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 7700, 'https://api.dicebear.com/7.x/avataaars/svg?seed=next', TRUE, 'App router is the future', FALSE),
+('u15-ai-hyp', 'ai_overlord', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 99000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=ai', TRUE, 'Prompt engineering is a real job', TRUE);
 
 -- 2. Subreddits (10 communities)
 INSERT INTO subreddits (id, name, description, icon_url, owner_id, is_verified, wiki) VALUES 

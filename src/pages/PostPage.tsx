@@ -1,22 +1,51 @@
 import type { Comment } from "@/types";
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { usePost, useComments } from "@/hooks";
+import { usePost, useComments, useCreateComment } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PostCard } from "@/components/post/PostCard";
 import { CommentThread } from "@/components/post/CommentThread";
 import { CommentComposer } from "@/components/post/CommentComposer";
 import { CommentControls } from "@/components/post/CommentControls";
+import { useAuthStore } from "@/store/useStore";
+import { toast } from "sonner";
 
 export const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
+  const { mutate: createComment } = useCreateComment();
 
   const { data: post, isLoading: postLoading } = usePost(id);
   const { data: comments = [], isLoading: commentsLoading } = useComments(id);
 
   const topLevelComments = comments.filter((c: Comment) => !c.parent_id);
+
+  const handleCommentSubmit = (content: string) => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    if (!id) return;
+
+    const newComment: Partial<Comment> = {
+      id: Math.random().toString(36).substring(2, 5) + "-" + Math.random().toString(36).substring(2, 5) + "-" + Math.random().toString(36).substring(2, 5),
+      post_id: id,
+      author_id: user.id,
+      content: content,
+      parent_id: undefined
+    };
+
+    createComment(newComment, {
+      onSuccess: () => {
+        toast.success("Comment posted!");
+      },
+      onError: (err: any) => {
+        toast.error(err.message || "Failed to post comment");
+      }
+    });
+  };
 
   if (postLoading) {
     return (
@@ -68,7 +97,7 @@ export const PostPage: React.FC = () => {
           <PostCard post={post} isDetail />
 
           <div className="mt-2 sm:mt-6 px-4 sm:px-0">
-            <CommentComposer />
+            <CommentComposer onSubmit={handleCommentSubmit} />
           </div>
 
           <div className="mt-6 px-4 sm:px-0">

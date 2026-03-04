@@ -1,14 +1,11 @@
 import React from "react";
-import { ThemeProvider } from "next-themes";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "@/components/ui/sonner";
 import { Navbar } from "./Navbar";
 import { LeftSidebar } from "./LeftSidebar";
 import { RightSidebar } from "./RightSidebar";
 import { useUIStore } from "@/store/useStore";
 import { cn } from "@/lib/utils";
 
-export const MainLayoutContent = ({
+export const MainLayout = ({
   children,
 }: {
   children: React.ReactNode;
@@ -33,16 +30,5 @@ export const MainLayoutContent = ({
         <RightSidebar />
       </div>
     </div>
-  );
-};
-
-export const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <TooltipProvider>
-          <MainLayoutContent>{children}</MainLayoutContent>
-          <Toaster position="top-center" richColors />
-        </TooltipProvider>
-    </ThemeProvider>
   );
 };

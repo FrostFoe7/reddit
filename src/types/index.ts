@@ -55,6 +55,7 @@ export interface Post {
   upvotes: number;
   comment_count: number;
   comments?: number; // Fallback
+  user_vote?: number; // 1, -1, or 0
 }
 
 export interface Comment {
@@ -74,6 +75,7 @@ export interface Comment {
   author_username?: string;
   author_avatar?: string;
   upvotes: number;
+  user_vote?: number; // 1, -1, or 0
 }
 
 export interface Notification {

@@ -23,6 +23,10 @@ export const VoteControl: React.FC<VoteControlProps> = ({
     initialVoteStatus,
   );
 
+  React.useEffect(() => {
+    setVoteStatus(initialVoteStatus);
+  }, [initialVoteStatus]);
+
   const handleVote = (type: "up" | "down", e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

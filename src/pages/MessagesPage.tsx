@@ -11,38 +11,37 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useConversations, useMessages, useSendMessage } from "@/hooks";
+import { useAuthStore } from "@/store/useStore";
+import dayjs from "@/lib/dayjs";
 
 export const MessagesPage: React.FC = () => {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [messageText, setMessageText] = useState("");
+  const user = useAuthStore((state) => state.user);
 
-  const contacts = [
-    {
-      id: 1,
-      name: "Alex_Dev",
-      lastMsg: "Sure, I can send over the repo link.",
-      time: "12:30 PM",
-      unread: true,
-      avatar: "Alex",
-    },
-    {
-      id: 2,
-      name: "stuckyfeet",
-      lastMsg: "Did you see the new update?",
-      time: "10:15 AM",
-      unread: false,
-      avatar: "stucky",
-    },
-    {
-      id: 3,
-      name: "doctor-_-atomic",
-      lastMsg: "The server is back up now.",
-      time: "Yesterday",
-      unread: false,
-      avatar: "atomic",
-    },
-  ];
+  const { data: conversations = [], isLoading: convLoading } = useConversations();
+  const { data: messages = [], isLoading: msgLoading } = useMessages(selectedId);
+  const { mutate: sendMessage } = useSendMessage();
 
-  const selectedContact = contacts.find((c) => c.id === selectedId);
+  const selectedConversation = conversations.find((c: any) => c.id === selectedId);
+
+  const handleSend = () => {
+    if (!messageText.trim() || !selectedId) return;
+    sendMessage({
+        conversation_id: selectedId,
+        content: messageText
+    });
+    setMessageText("");
+  };
+
+  if (!user) {
+      return (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+              <h2 className="text-2xl font-bold">Please login to view messages</h2>
+          </div>
+      );
+  }
 
   return (
     <div id="view-messages" className="view-section active">
@@ -67,49 +66,44 @@ export const MessagesPage: React.FC = () => {
             </Button>
           </div>
           <div className="flex-1 overflow-y-auto no-scrollbar divide-y divide-border">
-            {contacts.map((contact) => (
+            {convLoading ? (
+                <div className="p-4 text-center">Loading...</div>
+            ) : conversations.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">No conversations yet</div>
+            ) : conversations.map((conv: any) => (
               <div
-                key={contact.id}
-                onClick={() => setSelectedId(contact.id)}
+                key={conv.id}
+                onClick={() => setSelectedId(conv.id)}
                 className={cn(
                   "p-5 flex gap-4 hover:bg-muted transition-colors cursor-pointer relative",
-                  selectedId === contact.id
+                  selectedId === conv.id
                     ? "bg-primary/5 sm:bg-muted"
                     : "bg-card",
-                  contact.unread &&
-                    !selectedId &&
-                    "after:content-[''] after:absolute after:left-0 after:top-0 after:bottom-0 after:w-1 after:bg-primary",
                 )}
               >
                 <Avatar className="w-12 h-12 shrink-0 border border-border">
                   <AvatarImage
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contact.avatar}`}
+                    src={conv.contact_avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${conv.contact_name}`}
                   />
-                  <AvatarFallback>{contact.name[0]}</AvatarFallback>
+                  <AvatarFallback>{conv.contact_name?.[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0 flex flex-col justify-center">
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-base font-bold text-foreground truncate">
-                      {contact.name}
+                      {conv.contact_name}
                     </span>
                     <span className="text-xs text-muted-foreground whitespace-nowrap ml-2 font-medium">
-                      {contact.time}
+                      {conv.time ? dayjs(conv.time).format('h:mm A') : ''}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <p
                       className={cn(
-                        "text-sm truncate font-medium",
-                        contact.unread
-                          ? "text-foreground font-bold"
-                          : "text-muted-foreground",
+                        "text-sm truncate font-medium text-muted-foreground",
                       )}
                     >
-                      {contact.lastMsg}
+                      {conv.last_msg || "No messages yet"}
                     </p>
-                    {contact.unread && (
-                      <div className="w-2 h-2 bg-primary rounded-full shrink-0 ml-2"></div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -139,13 +133,13 @@ export const MessagesPage: React.FC = () => {
                   </Button>
                   <Avatar className="w-8 h-8 sm:w-10 sm:h-10 border border-border">
                     <AvatarImage
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedContact?.avatar}`}
+                      src={selectedConversation?.contact_avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedConversation?.contact_name}`}
                     />
-                    <AvatarFallback>{selectedContact?.name[0]}</AvatarFallback>
+                    <AvatarFallback>{selectedConversation?.contact_name?.[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
                     <span className="text-sm sm:text-base font-bold text-foreground leading-tight">
-                      {selectedContact?.name}
+                      {selectedConversation?.contact_name}
                     </span>
                     <span className="text-xs text-green-500 font-bold flex items-center gap-1">
                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>{" "}
@@ -160,54 +154,38 @@ export const MessagesPage: React.FC = () => {
 
               {/* Chat Messages */}
               <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-muted/5">
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <Avatar className="w-16 h-16 mb-3 border-2 border-border shadow-sm">
-                    <AvatarImage
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedContact?.avatar}`}
-                    />
-                  </Avatar>
-                  <h3 className="font-bold text-lg">
-                    {selectedContact?.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground max-w-[200px] mt-1">
-                    You've been friends on Reddit for 2 years
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="mt-4 rounded-full h-8 text-xs font-bold border-primary text-primary hover:bg-primary/5"
-                  >
-                    View Profile
-                  </Button>
-                </div>
-
-                <div className="flex justify-start">
-                  <div className="bg-card border border-border rounded-[18px] rounded-bl-none px-4 py-2.5 max-w-[80%] shadow-sm">
-                    <p className="text-sm leading-relaxed text-foreground">
-                      {selectedContact?.lastMsg}
-                    </p>
-                    <span className="text-[11px] text-muted-foreground mt-1 block font-medium opacity-70">
-                      12:30 PM
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <div className="bg-primary text-primary-foreground rounded-[18px] rounded-br-none px-4 py-2.5 max-w-[80%] shadow-md">
-                    <p className="text-sm leading-relaxed">
-                      Hey! Thanks for getting back to me. I'll check it out
-                      right away.
-                    </p>
-                    <span className="text-[11px] text-primary-foreground/70 mt-1 block font-medium">
-                      12:35 PM
-                    </span>
-                  </div>
-                </div>
+                {msgLoading ? (
+                    <div className="text-center">Loading messages...</div>
+                ) : messages.map((msg: any) => (
+                    <div key={msg.id} className={cn("flex", msg.sender_id === user.id ? "justify-end" : "justify-start")}>
+                        <div className={cn(
+                            "max-w-[80%] px-4 py-2.5 rounded-[18px] shadow-sm",
+                            msg.sender_id === user.id 
+                                ? "bg-primary text-primary-foreground rounded-br-none shadow-md" 
+                                : "bg-card border border-border rounded-bl-none shadow-sm"
+                        )}>
+                            <p className="text-sm leading-relaxed">
+                                {msg.content}
+                            </p>
+                            <span className={cn(
+                                "text-[11px] mt-1 block font-medium opacity-70",
+                                msg.sender_id === user.id ? "text-primary-foreground/70" : "text-muted-foreground"
+                            )}>
+                                {dayjs(msg.created_at).format('h:mm A')}
+                            </span>
+                        </div>
+                    </div>
+                ))}
               </div>
 
               {/* Chat Input */}
               <div className="p-3 sm:p-4 bg-card border-t border-border">
-                <div className="flex items-center gap-2 bg-muted/50 rounded-3xl px-3 py-1.5 border border-border focus-within:border-primary/50 transition-colors">
+                <form 
+                    onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+                    className="flex items-center gap-2 bg-muted/50 rounded-3xl px-3 py-1.5 border border-border focus-within:border-primary/50 transition-colors"
+                >
                   <Button
+                    type="button"
                     variant="ghost"
                     size="icon"
                     className="rounded-full h-9 w-9 shrink-0 text-muted-foreground hover:text-primary"
@@ -216,10 +194,13 @@ export const MessagesPage: React.FC = () => {
                   </Button>
                   <input
                     type="text"
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
                     placeholder="Message..."
                     className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-1.5 px-1 outline-none text-foreground placeholder:text-muted-foreground"
                   />
                   <Button
+                    type="button"
                     variant="ghost"
                     size="icon"
                     className="rounded-full h-9 w-9 shrink-0 text-muted-foreground hover:text-primary"
@@ -227,12 +208,14 @@ export const MessagesPage: React.FC = () => {
                     <Smile size={20} />
                   </Button>
                   <Button
+                    type="submit"
                     size="icon"
+                    disabled={!messageText.trim()}
                     className="rounded-full h-9 w-9 shrink-0 bg-primary text-primary-foreground shadow-sm"
                   >
                     <Send size={18} />
                   </Button>
-                </div>
+                </form>
               </div>
             </>
           ) : (

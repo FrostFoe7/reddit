@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { VoteControl } from "@/components/common/VoteControl";
 import { ActionButtons } from "@/components/common/ActionButtons";
+import { useVotes } from "@/hooks";
+import { useAuthStore } from "@/store/useStore";
+import { useNavigate } from "react-router-dom";
 
 interface CommentThreadProps {
   comment: Comment;
@@ -18,6 +21,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   isChild = false,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { mutate: voteMutate } = useVotes();
+  const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
 
   // Find replies to this comment
   const childComments = allComments.filter((c) => c.parent_id === comment.id);
@@ -31,6 +37,19 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       : undefined);
   const upvotes = comment.upvotes ?? 0;
   const time = comment.created_at || comment.time;
+
+  const handleVote = (voteType: "up" | "down" | null) => {
+    if (!user) {
+        navigate("/login");
+        return;
+    }
+    const voteValue = voteType === "up" ? 1 : voteType === "down" ? -1 : 0;
+    voteMutate({
+        type: "comment",
+        target_id: comment.id,
+        vote: voteValue
+    });
+  };
 
   return (
     <div
@@ -91,7 +110,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               {comment.content}
             </div>
             <div className="flex items-center gap-2 -ml-2">
-              <VoteControl initialScore={upvotes} />
+              <VoteControl 
+                initialScore={upvotes} 
+                initialVoteStatus={comment.user_vote === 1 ? "up" : comment.user_vote === -1 ? "down" : null}
+                onVote={handleVote}
+              />
               <ActionButtons id={comment.id} type="comment" />
             </div>
 
