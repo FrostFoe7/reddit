@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:backend": "sudo service mysql start && php -S localhost:8000 -t public/proxy",
+    "dev:backend": "sudo service mysql start && /usr/bin/php8.3 -S localhost:8000 -t public/proxy public/proxy/router.php",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
