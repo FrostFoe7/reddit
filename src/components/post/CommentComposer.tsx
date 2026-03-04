@@ -45,7 +45,7 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
   return (
     <div
       className={cn(
-        "border border-border rounded-[24px] bg-card transition-all duration-300 shadow-sm overflow-hidden",
+        "border border-border rounded-3xl bg-card transition-all duration-300 shadow-sm overflow-hidden",
         isFocused
           ? "border-primary/50 ring-1 ring-primary/10 shadow-md"
           : "hover:border-neutral-400 dark:hover:border-neutral-600",
@@ -57,7 +57,7 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onFocus={() => setIsFocused(true)}
-        className="w-full min-h-[56px] px-5 py-4 bg-transparent border-none focus:ring-0 resize-none text-[15px] text-foreground placeholder:text-muted-foreground leading-relaxed"
+        className="w-full min-h-14 px-5 py-4 bg-transparent border-none focus:ring-0 resize-none text-sm text-foreground placeholder:text-muted-foreground leading-relaxed"
         placeholder={placeholder}
       />
 
@@ -111,7 +111,7 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              className="rounded-full font-bold text-[13px] h-9 px-4 hover:bg-muted"
+              className="rounded-full font-bold text-xs h-9 px-4 hover:bg-muted"
               onClick={() => {
                 setContent("");
                 setIsFocused(false);
@@ -125,7 +125,7 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
             size="sm"
             disabled={!content.trim()}
             className={cn(
-              "rounded-full font-bold text-[13px] px-6 h-9 transition-all shadow-sm",
+              "rounded-full font-bold text-xs px-6 h-9 transition-all shadow-sm",
               content.trim()
                 ? "bg-primary text-primary-foreground hover:opacity-90 active:scale-95"
                 : "bg-muted text-muted-foreground opacity-50 cursor-not-allowed",

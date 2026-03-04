@@ -81,7 +81,7 @@ export const LeftSidebar = () => {
       id="left-sidebar"
       className={cn(
         "hidden md:flex shrink-0 flex-col border-r border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-all duration-300",
-        sidebarCollapsed ? "w-[80px]" : "md:w-[240px] lg:w-[270px]",
+        sidebarCollapsed ? "w-20" : "md:w-60 lg:w-[270px]",
       )}
     >
       <nav className="flex flex-col p-2 space-y-1" aria-label="Primary">
@@ -152,7 +152,7 @@ export const LeftSidebar = () => {
             className="w-full space-y-1"
           >
             <AccordionItem value="recent" className="border-none">
-              <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-[8px] no-underline hover:no-underline text-[12px] font-bold tracking-widest text-muted-foreground uppercase transition-none">
+              <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-lg no-underline hover:no-underline text-xs font-bold tracking-widest text-muted-foreground uppercase transition-none">
                 RECENT
               </AccordionTrigger>
               <AccordionContent className="pt-1 pb-2">
@@ -182,19 +182,19 @@ export const LeftSidebar = () => {
             </AccordionItem>
 
             <AccordionItem value="communities" className="border-none">
-              <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-[8px] no-underline hover:no-underline text-[12px] font-bold tracking-widest text-muted-foreground uppercase transition-none">
+              <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-lg no-underline hover:no-underline text-xs font-bold tracking-widest text-muted-foreground uppercase transition-none">
                 COMMUNITIES
               </AccordionTrigger>
               <AccordionContent className="pt-1 pb-2">
                 <div className="flex flex-col space-y-0.5">
                   <button
                     onClick={() => navigate("/create")}
-                    className="flex items-center gap-3 px-4 py-2 rounded-[8px] hover:bg-muted transition-colors text-foreground group w-full text-left"
+                    className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-muted transition-colors text-foreground group w-full text-left"
                   >
                     <div className="flex items-center justify-center w-8 h-8 shrink-0 bg-muted rounded-full group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700">
                       <Plus size={18} />
                     </div>
-                    <span className="text-[14px] font-medium">
+                    <span className="text-sm font-medium">
                       Create a community
                     </span>
                   </button>
@@ -205,7 +205,7 @@ export const LeftSidebar = () => {
                           "Community management interface is coming soon!",
                       })
                     }
-                    className="flex items-center gap-3 px-4 py-2 rounded-[8px] hover:bg-muted transition-colors text-foreground group w-full"
+                    className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-muted transition-colors text-foreground group w-full"
                   >
                     <div className="flex items-center justify-center w-8 h-8 shrink-0">
                       <Settings
@@ -213,7 +213,7 @@ export const LeftSidebar = () => {
                         className="text-muted-foreground group-hover:text-foreground"
                       />
                     </div>
-                    <span className="text-[14px] font-medium text-left">
+                    <span className="text-sm font-medium text-left">
                       Manage Communities
                     </span>
                   </button>
@@ -239,7 +239,7 @@ export const LeftSidebar = () => {
             </AccordionItem>
 
             <AccordionItem value="games" className="border-none">
-              <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-[8px] no-underline hover:no-underline text-[12px] font-bold tracking-widest text-muted-foreground uppercase transition-none">
+              <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-lg no-underline hover:no-underline text-xs font-bold tracking-widest text-muted-foreground uppercase transition-none">
                 GAMES
               </AccordionTrigger>
               <AccordionContent className="pt-1 pb-2">
@@ -272,7 +272,7 @@ export const LeftSidebar = () => {
             </AccordionItem>
 
             <AccordionItem value="resources" className="border-none">
-              <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-[8px] no-underline hover:no-underline text-[12px] font-bold tracking-widest text-muted-foreground uppercase transition-none">
+              <AccordionTrigger className="py-2 px-4 hover:bg-muted rounded-lg no-underline hover:no-underline text-xs font-bold tracking-widest text-muted-foreground uppercase transition-none">
                 RESOURCES
               </AccordionTrigger>
               <AccordionContent className="pt-1 pb-2">

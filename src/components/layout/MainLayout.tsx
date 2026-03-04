@@ -28,7 +28,7 @@ export const MainLayoutContent = ({
               : "max-w-[calc(1400px-270px-312px)]",
           )}
         >
-          <div className="w-full max-w-[760px]">{children}</div>
+          <div className="w-full max-w-3xl">{children}</div>
         </main>
         <RightSidebar />
       </div>

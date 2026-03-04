@@ -22,7 +22,7 @@ export const SortBar: React.FC<SortBarProps> = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 px-4 sm:px-0 text-[15px] font-semibold text-muted-foreground overflow-x-auto no-scrollbar",
+        "flex items-center gap-2 px-4 sm:px-0 text-sm font-semibold text-muted-foreground overflow-x-auto no-scrollbar",
         className,
       )}
     >

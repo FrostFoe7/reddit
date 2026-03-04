@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { z } from 'zod';
+import type { Community, Post } from "@/types";
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required').max(300),
@@ -50,7 +51,7 @@ export const CreatePostPage: React.FC = () => {
 
   const { data: communities } = useCommunities();
   const createPostMutation = useCreatePost();
-  const [selectedCommunity, setSelectedCommunity] = useState<any | null>(null);
+  const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
 
   const navigate = useNavigate();
 
@@ -59,7 +60,7 @@ export const CreatePostPage: React.FC = () => {
     content: '',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm dark:prose-invert focus:outline-none max-w-none min-h-[180px] p-4 text-[15px]',
+        class: 'prose prose-sm dark:prose-invert focus:outline-none max-w-none min-h-[180px] p-4 text-sm',
       },
     },
   });
@@ -78,13 +79,15 @@ export const CreatePostPage: React.FC = () => {
       return;
     }
 
+    if (!selectedCommunity) return;
+
     createPostMutation.mutate(
       {
         id: Math.random().toString(36).substr(2, 9),
         title,
         content,
         subreddit_id: selectedCommunity.id,
-        post_type: (activeTab === "media" ? "image" : activeTab) as any,
+        post_type: (activeTab === "media" ? "image" : activeTab) as Post['post_type'],
         author_id: "a7f-p9q-m2l",
       },
       {
@@ -97,18 +100,18 @@ export const CreatePostPage: React.FC = () => {
   };
 
   return (
-    <div id="view-create" className="px-0 sm:px-0 max-w-[760px] mx-auto">
+    <div id="view-create" className="px-0 sm:px-0 max-w-3xl mx-auto">
       <div className="mb-4 sm:mb-6 px-4 sm:px-0 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-[20px] sm:text-[24px] font-bold text-foreground tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
             Create post
           </h1>
           <Button
             variant="ghost"
-            className="text-primary font-bold hover:bg-primary/10 rounded-full px-4 h-9 text-[14px]"
+            className="text-primary font-bold hover:bg-primary/10 rounded-full px-4 h-9 text-sm"
           >
             Drafts{" "}
-            <span className="ml-1.5 bg-primary/10 px-2 py-0.5 rounded-full text-[12px]">
+            <span className="ml-1.5 bg-primary/10 px-2 py-0.5 rounded-full text-xs">
               0
             </span>
           </Button>
@@ -125,7 +128,7 @@ export const CreatePostPage: React.FC = () => {
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className="flex items-center justify-between w-full sm:w-[320px] bg-card border border-border rounded-[20px] px-4 py-6 h-12 transition-all hover:border-primary group shadow-sm active:scale-[0.98]"
+                className="flex items-center justify-between w-full sm:w-80 bg-card border border-border rounded-[20px] px-4 py-6 h-12 transition-all hover:border-primary group shadow-sm active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   {selectedCommunity ? (
@@ -144,7 +147,7 @@ export const CreatePostPage: React.FC = () => {
                   )}
                   <span
                     className={cn(
-                      "text-[14px] font-bold transition-colors",
+                      "text-sm font-bold transition-colors",
                       selectedCommunity
                         ? "text-foreground"
                         : "text-muted-foreground group-hover:text-foreground",
@@ -172,7 +175,7 @@ export const CreatePostPage: React.FC = () => {
                   className="h-11 font-medium border-none focus:ring-0"
                 />
                 <CommandList className="max-h-[300px] no-scrollbar">
-                  <CommandEmpty className="p-4 text-[14px] text-muted-foreground font-medium text-center">
+                  <CommandEmpty className="p-4 text-sm text-muted-foreground font-medium text-center">
                     No community found.
                   </CommandEmpty>
                   <CommandGroup
@@ -187,7 +190,7 @@ export const CreatePostPage: React.FC = () => {
                           setSelectedCommunity(community);
                           setOpen(false);
                         }}
-                        className="rounded-[12px] px-3 py-2.5 flex items-center gap-3 cursor-pointer aria-selected:bg-primary/10 aria-selected:text-primary transition-colors"
+                        className="rounded-xl px-3 py-2.5 flex items-center gap-3 cursor-pointer aria-selected:bg-primary/10 aria-selected:text-primary transition-colors"
                       >
                         <div
                           className={cn(
@@ -198,10 +201,10 @@ export const CreatePostPage: React.FC = () => {
                           r/
                         </div>
                         <div className="flex flex-col flex-1 min-w-0">
-                          <span className="font-bold text-[14px] truncate">
+                          <span className="font-bold text-sm truncate">
                             r/{community.name}
                           </span>
-                          <span className="text-[12px] text-muted-foreground truncate">
+                          <span className="text-xs text-muted-foreground truncate">
                             {community.members || 0} members
                           </span>
                         </div>
@@ -218,7 +221,7 @@ export const CreatePostPage: React.FC = () => {
         </div>
 
         {/* Post Type Tabs */}
-        <div className="bg-card border border-border rounded-[16px] sm:rounded-[20px] shadow-sm overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl sm:rounded-[20px] shadow-sm overflow-hidden">
           <Tabs
             defaultValue="text"
             className="w-full"
@@ -227,21 +230,21 @@ export const CreatePostPage: React.FC = () => {
             <TabsList variant="line" className="w-full grid grid-cols-4">
               <TabsTrigger
                 value="text"
-                className="flex items-center justify-center gap-2 font-bold text-[14px]"
+                className="flex items-center justify-center gap-2 font-bold text-sm"
               >
                 <Type size={20} />
                 <span className="hidden sm:inline">Text</span>
               </TabsTrigger>
               <TabsTrigger
                 value="media"
-                className="flex items-center justify-center gap-2 font-bold text-[14px]"
+                className="flex items-center justify-center gap-2 font-bold text-sm"
               >
                 <ImageIcon size={20} />
                 <span className="hidden sm:inline">Images & Video</span>
               </TabsTrigger>
               <TabsTrigger
                 value="link"
-                className="flex items-center justify-center gap-2 font-bold text-[14px]"
+                className="flex items-center justify-center gap-2 font-bold text-sm"
               >
                 <LinkIcon size={20} />
                 <span className="hidden sm:inline">Link</span>
@@ -249,7 +252,7 @@ export const CreatePostPage: React.FC = () => {
               <TabsTrigger
                 value="poll"
                 disabled
-                className="flex items-center justify-center gap-2 font-bold text-[14px]"
+                className="flex items-center justify-center gap-2 font-bold text-sm"
               >
                 <BarChart2 size={20} />
                 <span className="hidden sm:inline">Poll</span>
@@ -263,7 +266,7 @@ export const CreatePostPage: React.FC = () => {
                   placeholder="Title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value.slice(0, 300))}
-                  className="w-full bg-card border border-border rounded-[12px] px-4 py-3.5 min-h-[56px] h-auto text-[16px] sm:text-[18px] font-bold text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary transition-all resize-none overflow-hidden shadow-sm"
+                  className="w-full bg-card border border-border rounded-xl px-4 py-3.5 min-h-14 h-auto text-base sm:text-lg font-bold text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary transition-all resize-none overflow-hidden shadow-sm"
                   rows={1}
                 />
                 <div className="absolute right-3 bottom-2 text-[11px] text-muted-foreground font-bold pointer-events-none opacity-60">
@@ -273,12 +276,12 @@ export const CreatePostPage: React.FC = () => {
 
               {/* Dynamic Content based on Tab */}
               <TabsContent value="text" className="mt-0 space-y-4">
-                <div className="border border-border rounded-[12px] overflow-hidden focus-within:border-primary/50 transition-all shadow-sm">
+                <div className="border border-border rounded-xl overflow-hidden focus-within:border-primary/50 transition-all shadow-sm">
                   <div className="bg-muted/30 p-2 flex items-center gap-1 border-b border-border overflow-x-auto no-scrollbar">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={cn("h-9 w-9 shrink-0 rounded-[8px] hover:bg-muted font-bold", editor?.isActive('bold') && "bg-muted")}
+                      className={cn("h-9 w-9 shrink-0 rounded-lg hover:bg-muted font-bold", editor?.isActive('bold') && "bg-muted")}
                       onClick={() => editor?.chain().focus().toggleBold().run()}
                     >
                       <Bold size={16} />
@@ -286,7 +289,7 @@ export const CreatePostPage: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={cn("h-9 w-9 shrink-0 rounded-[8px] hover:bg-muted italic", editor?.isActive('italic') && "bg-muted")}
+                      className={cn("h-9 w-9 shrink-0 rounded-lg hover:bg-muted italic", editor?.isActive('italic') && "bg-muted")}
                       onClick={() => editor?.chain().focus().toggleItalic().run()}
                     >
                       <Italic size={16} />
@@ -295,7 +298,7 @@ export const CreatePostPage: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={cn("h-9 w-9 shrink-0 rounded-[8px] hover:bg-muted", editor?.isActive('bulletList') && "bg-muted")}
+                      className={cn("h-9 w-9 shrink-0 rounded-lg hover:bg-muted", editor?.isActive('bulletList') && "bg-muted")}
                       onClick={() => editor?.chain().focus().toggleBulletList().run()}
                     >
                       <List size={16} />
@@ -306,15 +309,15 @@ export const CreatePostPage: React.FC = () => {
               </TabsContent>
 
               <TabsContent value="media" className="mt-0">
-                <div className="border border-dashed border-border rounded-[16px] min-h-[240px] sm:min-h-[300px] flex flex-col items-center justify-center p-6 sm:p-10 gap-4 bg-muted/10 hover:bg-muted/20 transition-all cursor-pointer group active:scale-[0.99]">
+                <div className="border border-dashed border-border rounded-2xl min-h-[240px] sm:min-h-[300px] flex flex-col items-center justify-center p-6 sm:p-10 gap-4 bg-muted/10 hover:bg-muted/20 transition-all cursor-pointer group active:scale-[0.99]">
                   <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
                     <Plus size={28} className="text-muted-foreground" />
                   </div>
                   <div className="text-center">
-                    <p className="text-[16px] sm:text-[18px] font-bold">
+                    <p className="text-base sm:text-lg font-bold">
                       Drag and drop images or video
                     </p>
-                    <p className="text-[14px] text-muted-foreground font-medium mt-1">
+                    <p className="text-sm text-muted-foreground font-medium mt-1">
                       Upload up to 20 images or videos
                     </p>
                   </div>
@@ -330,7 +333,7 @@ export const CreatePostPage: React.FC = () => {
               <TabsContent value="link" className="mt-0">
                 <Textarea
                   placeholder="URL"
-                  className="w-full bg-card border border-border rounded-[12px] px-4 py-3.5 min-h-[56px] text-[15px] text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary transition-all resize-none shadow-sm"
+                  className="w-full bg-card border border-border rounded-xl px-4 py-3.5 min-h-14 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary transition-all resize-none shadow-sm"
                   rows={1}
                 />
               </TabsContent>
@@ -340,25 +343,25 @@ export const CreatePostPage: React.FC = () => {
             <div className="px-3 sm:px-5 pb-5 flex flex-wrap gap-2">
               <Button
                 variant="secondary"
-                className="rounded-full h-9 px-4 text-[13px] font-bold bg-muted hover:bg-muted/80 flex items-center gap-2 transition-all active:scale-[0.95]"
+                className="rounded-full h-9 px-4 text-xs font-bold bg-muted hover:bg-muted/80 flex items-center gap-2 transition-all active:scale-[0.95]"
               >
                 <Plus size={16} /> OC
               </Button>
               <Button
                 variant="secondary"
-                className="rounded-full h-9 px-4 text-[13px] font-bold bg-muted hover:bg-muted/80 flex items-center gap-2 transition-all active:scale-[0.95]"
+                className="rounded-full h-9 px-4 text-xs font-bold bg-muted hover:bg-muted/80 flex items-center gap-2 transition-all active:scale-[0.95]"
               >
                 <Plus size={16} /> Spoiler
               </Button>
               <Button
                 variant="secondary"
-                className="rounded-full h-9 px-4 text-[13px] font-bold bg-muted hover:bg-muted/80 flex items-center gap-2 transition-all active:scale-[0.95]"
+                className="rounded-full h-9 px-4 text-xs font-bold bg-muted hover:bg-muted/80 flex items-center gap-2 transition-all active:scale-[0.95]"
               >
                 <Plus size={16} /> NSFW
               </Button>
               <Button
                 variant="secondary"
-                className="rounded-full h-9 px-4 text-[13px] font-bold bg-muted hover:bg-muted/80 flex items-center gap-2 transition-all active:scale-[0.95]"
+                className="rounded-full h-9 px-4 text-xs font-bold bg-muted hover:bg-muted/80 flex items-center gap-2 transition-all active:scale-[0.95]"
               >
                 <Plus size={16} /> Flair
               </Button>
@@ -370,7 +373,7 @@ export const CreatePostPage: React.FC = () => {
               <div className="p-4 sm:p-5 bg-muted/20 flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-2">
                   <Info size={18} className="text-muted-foreground" />
-                  <span className="text-[12px] sm:text-[13px] text-muted-foreground font-medium">
+                  <span className="text-xs sm:text-xs text-muted-foreground font-medium">
                     Drafts are saved automatically
                   </span>
                 </div>
@@ -378,7 +381,7 @@ export const CreatePostPage: React.FC = () => {
                   <Button
                     variant="outline"
                     onClick={() => navigate(-1)}
-                    className="px-6 h-10 rounded-full font-bold text-[14px] border-primary text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-[0.95]"
+                    className="px-6 h-10 rounded-full font-bold text-sm border-primary text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-[0.95]"
                   >
                     Save Draft
                   </Button>
@@ -386,7 +389,7 @@ export const CreatePostPage: React.FC = () => {
                     disabled={!title.trim()}
                     onClick={handlePost}
                     className={cn(
-                      "px-10 h-10 rounded-full font-bold text-[14px] shadow-md transition-all active:scale-[0.95]",
+                      "px-10 h-10 rounded-full font-bold text-sm shadow-md transition-all active:scale-[0.95]",
                       title.trim()
                         ? "bg-primary text-primary-foreground hover:bg-primary/90"
                         : "bg-muted text-muted-foreground cursor-not-allowed opacity-50",
@@ -401,11 +404,11 @@ export const CreatePostPage: React.FC = () => {
         </div>
 
         {/* Post Options */}
-        <div className="flex flex-col gap-2 bg-card border border-border rounded-[16px] sm:rounded-[20px] p-4 sm:p-5 shadow-sm mb-8">
+        <div className="flex flex-col gap-2 bg-card border border-border rounded-2xl sm:rounded-[20px] p-4 sm:p-5 shadow-sm mb-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col">
-              <span className="text-[15px] font-bold">Post as profile</span>
-              <span className="text-[13px] text-muted-foreground font-medium leading-relaxed">
+              <span className="text-sm font-bold">Post as profile</span>
+              <span className="text-xs text-muted-foreground font-medium leading-relaxed">
                 Your post will be visible to your followers and on your profile.
               </span>
             </div>

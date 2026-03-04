@@ -50,7 +50,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           onClick={onCommentClick}
         >
           <MessageSquare size={18} />
-          <span className="text-[12px] font-bold">
+          <span className="text-xs font-bold">
             {formatNumber(commentsCount)}
           </span>
         </Button>
@@ -63,7 +63,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           onClick={onCommentClick}
         >
           <MessageSquare size={18} />
-          <span className="text-[12px] font-bold">Reply</span>
+          <span className="text-xs font-bold">Reply</span>
         </Button>
       )}
 
@@ -83,7 +83,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         }}
       >
         <Share2 size={18} />
-        {showShareLabel && <span className="text-[12px] font-bold">Share</span>}
+        {showShareLabel && <span className="text-xs font-bold">Share</span>}
       </Button>
 
       <DropdownMenu>
@@ -96,7 +96,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
             <MoreHorizontal size={18} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 rounded-[12px]">
+        <DropdownMenuContent align="end" className="w-56 rounded-xl">
           <DropdownMenuItem onClick={() => openShare(shareUrl)}>
             <Share2 size={16} className="mr-2" /> Share
           </DropdownMenuItem>

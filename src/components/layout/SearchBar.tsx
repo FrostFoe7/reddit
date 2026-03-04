@@ -72,7 +72,7 @@ export const SearchBar = () => {
     if (!match) return text;
     const parts = text.split(new RegExp(`(${match})`, "gi"));
     return (
-      <span className="text-[14px]">
+      <span className="text-sm">
         {parts.map((part, i) =>
           part.toLowerCase() === match.toLowerCase() ? (
             <span key={i} className="font-normal opacity-70">
@@ -123,7 +123,7 @@ export const SearchBar = () => {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-[750px]">
+    <div ref={containerRef} className="relative w-full max-w-3xl">
       <div
         className={cn(
           "flex items-center w-full bg-secondary hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full h-10 px-4 transition-all duration-200 border border-transparent focus-within:bg-background focus-within:border-border focus-within:shadow-sm",
@@ -136,7 +136,7 @@ export const SearchBar = () => {
           {searchInContext && (subName || profileName) && !query && (
             <Badge
               variant="secondary"
-              className="mr-2 h-7 gap-1.5 pl-1 pr-1 font-semibold text-[12px] bg-background border-border shrink-0 animate-in fade-in zoom-in duration-200"
+              className="mr-2 h-7 gap-1.5 pl-1 pr-1 font-semibold text-xs bg-background border-border shrink-0 animate-in fade-in zoom-in duration-200"
             >
               <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-[10px] text-white overflow-hidden">
                 {subName ? "r/" : "u/"}
@@ -163,7 +163,7 @@ export const SearchBar = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
-              className="w-full h-full bg-transparent border-none outline-none text-[14px] font-medium placeholder:text-muted-foreground"
+              className="w-full h-full bg-transparent border-none outline-none text-sm font-medium placeholder:text-muted-foreground"
             />
           </form>
         </div>
@@ -181,7 +181,7 @@ export const SearchBar = () => {
           <div className="w-[1px] h-6 bg-border mx-1" />
 
           <button
-            className="flex items-center gap-1.5 px-3 h-8 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full transition-colors text-primary text-[14px] font-bold"
+            className="flex items-center gap-1.5 px-3 h-8 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full transition-colors text-primary text-sm font-bold"
             onClick={() =>
               navigate(`/search?q=${encodeURIComponent(query)}&type=ask`)
             }
@@ -216,7 +216,7 @@ export const SearchBar = () => {
           {/* Communities Section */}
           {filteredCommunities.length > 0 && (
             <div className="mt-1">
-              <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider">
+              <div className="px-4 py-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Communities
               </div>
               {filteredCommunities.map((c: Community) => (
@@ -235,10 +235,10 @@ export const SearchBar = () => {
                       <Users size={20} />
                     </div>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[14px] font-bold truncate">
+                      <span className="text-sm font-bold truncate">
                         r/{c.name}
                       </span>
-                      <span className="text-[12px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         {c.members || 0} members
                       </span>
                     </div>
@@ -251,7 +251,7 @@ export const SearchBar = () => {
           {/* Profiles Section */}
           {filteredProfiles.length > 0 && (
             <div className="mt-1">
-              <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider">
+              <div className="px-4 py-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Profiles
               </div>
               {filteredProfiles.map((p: UserType) => (
@@ -268,10 +268,10 @@ export const SearchBar = () => {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[14px] font-bold truncate">
+                      <span className="text-sm font-bold truncate">
                         u/{p.username}
                       </span>
-                      <span className="text-[12px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         {p.karma || 0} karma
                       </span>
                     </div>

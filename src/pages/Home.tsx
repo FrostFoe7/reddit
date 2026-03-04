@@ -35,13 +35,13 @@ export const Home: React.FC = () => {
         {isLoading && (
           <div className="space-y-4 px-4 sm:px-0">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-card p-4 rounded-[16px] border border-border">
+              <div key={i} className="bg-card p-4 rounded-2xl border border-border">
                 <div className="flex items-center gap-2 mb-2">
                   <Skeleton circle width={32} height={32} />
                   <Skeleton width={100} />
                 </div>
                 <Skeleton height={24} width="80%" className="mb-2" />
-                <Skeleton height={200} className="rounded-[16px]" />
+                <Skeleton height={200} className="rounded-2xl" />
               </div>
             ))}
           </div>
@@ -86,8 +86,8 @@ export const Home: React.FC = () => {
         )}
 
         {!isLoading && posts.length === 0 && (
-          <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm mx-4">
-            <p className="text-[18px] font-bold text-foreground mb-1">
+          <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm mx-4">
+            <p className="text-lg font-bold text-foreground mb-1">
               No posts found
             </p>
             <p className="text-sm">Be the first to share something!</p>
@@ -108,7 +108,7 @@ export const Home: React.FC = () => {
               id="scroll-spinner"
               className="w-10 h-10 border-[3px] border-muted border-t-primary rounded-full animate-spin shadow-sm"
             ></div>
-            <p className="text-[14px] font-bold text-muted-foreground animate-pulse">
+            <p className="text-sm font-bold text-muted-foreground animate-pulse">
               Loading more posts...
             </p>
           </div>

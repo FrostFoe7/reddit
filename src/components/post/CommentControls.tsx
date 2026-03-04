@@ -35,7 +35,7 @@ export const CommentControls: React.FC<CommentControlsProps> = ({
       )}
     >
       <div className="flex items-center gap-1 shrink-0">
-        <span className="text-[12px] text-muted-foreground whitespace-nowrap">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">
           Sort by:
         </span>
         <DropdownMenu>
@@ -43,12 +43,12 @@ export const CommentControls: React.FC<CommentControlsProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 gap-1 font-bold text-[12px] text-muted-foreground hover:text-foreground"
+              className="h-8 gap-1 font-bold text-xs text-muted-foreground hover:text-foreground"
             >
               {activeSort} <ChevronDown size={14} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-40 rounded-[12px]">
+          <DropdownMenuContent align="start" className="w-40 rounded-xl">
             {["Best", "Top", "New", "Controversial", "Old", "Q&A"].map(
               (sort) => (
                 <DropdownMenuItem
@@ -73,7 +73,7 @@ export const CommentControls: React.FC<CommentControlsProps> = ({
             size={16}
             className="text-muted-foreground mr-2 shrink-0 group-hover:text-foreground"
           />
-          <span className="text-[14px] text-muted-foreground truncate group-hover:text-foreground">
+          <span className="text-sm text-muted-foreground truncate group-hover:text-foreground">
             Search Comments
           </span>
         </div>

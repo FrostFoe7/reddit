@@ -59,31 +59,31 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
             className="w-[220px] rounded-[20px] p-1.5 bg-glass backdrop-blur-2xl shadow-ios-float border-border"
           >
             <DropdownMenuItem
-              className="rounded-[12px] p-2.5 font-medium flex justify-between"
+              className="rounded-xl p-2.5 font-medium flex justify-between"
               onClick={() => openShare(window.location.href)}
             >
               Share <Share2 size={18} className="text-muted-foreground" />
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="rounded-[12px] p-2.5 font-medium flex justify-between"
+              className="rounded-xl p-2.5 font-medium flex justify-between"
               onClick={() => toast.info("Notifications turned on")}
             >
               Mute Notifications{" "}
               <Bell size={18} className="text-muted-foreground" />
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border my-1 mx-2" />
-            <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between">
+            <DropdownMenuItem className="rounded-xl p-2.5 font-medium flex justify-between">
               Community Info{" "}
               <Info size={18} className="text-muted-foreground" />
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive"
+              className="rounded-xl p-2.5 font-medium flex justify-between text-destructive focus:text-destructive"
               onClick={() => toast.error("Community blocked")}
             >
               Block Community <Ban size={18} />
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive"
+              className="rounded-xl p-2.5 font-medium flex justify-between text-destructive focus:text-destructive"
               onClick={() => openReport(`sub_${sub.id}`)}
             >
               Report <Flag size={18} />
@@ -96,7 +96,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
         <div className="flex justify-between items-end mb-4">
           <div
             className={cn(
-              "w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-[32px] font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter",
+              "w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-3xl font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter",
               subIcon,
             )}
           >
@@ -106,7 +106,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
             onClick={toggleJoin}
             variant={isJoined ? "outline" : "default"}
             className={cn(
-              "h-11 px-6 rounded-full font-bold text-[15px] shadow-sm transition-all active:scale-95",
+              "h-11 px-6 rounded-full font-bold text-sm shadow-sm transition-all active:scale-95",
               isJoined
                 ? "border-foreground text-foreground hover:bg-muted"
                 : "bg-foreground text-background hover:opacity-90",
@@ -115,13 +115,13 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
             {isJoined ? "Joined" : "Join"}
           </Button>
         </div>
-        <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground leading-tight tracking-tight mb-1">
+        <h1 className="text-3xl sm:text-3xl font-bold text-foreground leading-tight tracking-tight mb-1">
           r/{sub.name}
         </h1>
-        <p className="text-[15px] text-muted-foreground font-medium mb-4">
+        <p className="text-sm text-muted-foreground font-medium mb-4">
           r/{sub.name} • {subMembers} Members
         </p>
-        <p className="text-[16px] text-foreground leading-relaxed max-w-2xl font-medium">
+        <p className="text-base text-foreground leading-relaxed max-w-2xl font-medium">
           {subDesc}
         </p>
       </div>

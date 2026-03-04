@@ -45,15 +45,15 @@ export const SubredditPage: React.FC = () => {
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
         </div>
-        <h1 className="text-[28px] font-bold text-foreground tracking-tight mb-3">
+        <h1 className="text-3xl font-bold text-foreground tracking-tight mb-3">
           Community not found
         </h1>
-        <p className="text-[16px] text-muted-foreground font-medium mb-10 max-w-[280px]">
+        <p className="text-base text-muted-foreground font-medium mb-10 max-w-72">
           This community may have been banned or the name is incorrect.
         </p>
         <Link
           to="/"
-          className="bg-primary text-primary-foreground h-12 px-10 rounded-full font-bold text-[15px] flex items-center shadow-md hover:opacity-90 transition-all active:scale-95"
+          className="bg-primary text-primary-foreground h-12 px-10 rounded-full font-bold text-sm flex items-center shadow-md hover:opacity-90 transition-all active:scale-95"
         >
           Back to Home
         </Link>
@@ -77,7 +77,7 @@ export const SubredditPage: React.FC = () => {
             <TabsTrigger
               key={tab}
               value={tab}
-              className="font-bold text-[15px] sm:text-[16px] capitalize"
+              className="font-bold text-sm sm:text-base capitalize"
             >
               {tab}
             </TabsTrigger>
@@ -94,14 +94,14 @@ export const SubredditPage: React.FC = () => {
             </React.Fragment>
           ))}
           {subPosts.length === 0 && (
-            <div className="p-16 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm">
+            <div className="p-16 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm">
               <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4 text-muted-foreground">
                 <Wrench size={32} className="opacity-40" />
               </div>
-              <h3 className="text-[18px] font-bold text-foreground mb-1">
+              <h3 className="text-lg font-bold text-foreground mb-1">
                 No posts yet
               </h3>
-              <p className="text-[14px]">
+              <p className="text-sm">
                 Be the first to post in r/{sub.name}!
               </p>
               <Button className="mt-6 rounded-full px-8 font-bold bg-primary text-primary-foreground shadow-sm">
@@ -112,10 +112,10 @@ export const SubredditPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="rules" className="mt-0 px-0">
-          <div className="bg-card border-y sm:border border-border sm:rounded-[24px] p-6 sm:p-10 shadow-sm space-y-6">
+          <div className="bg-card border-y sm:border border-border sm:rounded-3xl p-6 sm:p-10 shadow-sm space-y-6">
             <div className="flex items-center gap-3 mb-2">
               <ShieldCheck size={28} className="text-primary" />
-              <h2 className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 Community Rules
               </h2>
             </div>
@@ -142,14 +142,14 @@ export const SubredditPage: React.FC = () => {
                   key={i}
                   className="py-5 border-b border-border/50 last:border-0 flex gap-4 sm:gap-6 group transition-colors hover:bg-muted/30 -mx-6 px-6"
                 >
-                  <span className="text-[18px] font-black text-muted-foreground/30 mt-0.5 group-hover:text-primary/30 transition-colors">
+                  <span className="text-lg font-black text-muted-foreground/30 mt-0.5 group-hover:text-primary/30 transition-colors">
                     {i + 1}
                   </span>
                   <div className="flex flex-col gap-1">
-                    <h3 className="font-bold text-[17px] text-foreground">
+                    <h3 className="font-bold text-base text-foreground">
                       {rule.title}
                     </h3>
-                    <p className="text-muted-foreground text-[15px] leading-relaxed font-medium">
+                    <p className="text-muted-foreground text-sm leading-relaxed font-medium">
                       {rule.desc}
                     </p>
                   </div>
@@ -160,18 +160,18 @@ export const SubredditPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="wiki" className="mt-0 px-0">
-          <div className="bg-card border-y sm:border border-border sm:rounded-[24px] p-8 sm:p-12 shadow-sm flex flex-col items-center text-center">
+          <div className="bg-card border-y sm:border border-border sm:rounded-3xl p-8 sm:p-12 shadow-sm flex flex-col items-center text-center">
             <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6 text-muted-foreground shadow-inner">
               <Wrench size={40} className="animate-pulse" />
             </div>
-            <h2 className="text-[24px] sm:text-[28px] font-bold tracking-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
               Wiki under construction
             </h2>
-            <p className="text-muted-foreground leading-relaxed text-[16px] max-w-md font-medium">
+            <p className="text-muted-foreground leading-relaxed text-base max-w-md font-medium">
               Welcome to the community wiki. Our moderators are currently
               working on compiling the best resources and FAQs for you.
             </p>
-            <div className="p-4 bg-primary/5 rounded-[16px] text-[14px] font-bold text-primary mt-8 border border-primary/10 flex items-center gap-2">
+            <div className="p-4 bg-primary/5 rounded-2xl text-sm font-bold text-primary mt-8 border border-primary/10 flex items-center gap-2">
               Check back soon for updates!
             </div>
           </div>

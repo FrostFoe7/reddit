@@ -81,21 +81,21 @@ export const ProfilePage: React.FC = () => {
                 className="w-[220px] rounded-[20px] p-2 bg-glass backdrop-blur-2xl shadow-ios-float border-border"
               >
                 <DropdownMenuItem
-                  className="rounded-[12px] p-3 font-semibold flex justify-between"
+                  className="rounded-xl p-3 font-semibold flex justify-between"
                   onClick={() => openShare(window.location.href)}
                 >
                   Share Profile{" "}
                   <Share2 size={18} className="text-muted-foreground" />
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="rounded-[12px] p-3 font-semibold flex justify-between"
+                  className="rounded-xl p-3 font-semibold flex justify-between"
                   onClick={toggleFollow}
                 >
                   {isFollowing ? "Unfollow" : "Follow"}{" "}
                   <UserPlus size={18} className="text-muted-foreground" />
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="rounded-[12px] p-3 font-semibold flex justify-between"
+                  className="rounded-xl p-3 font-semibold flex justify-between"
                   onClick={() => toast.info("Chat feature coming soon!")}
                 >
                   Send Message{" "}
@@ -103,13 +103,13 @@ export const ProfilePage: React.FC = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border my-1.5 mx-1" />
                 <DropdownMenuItem
-                  className="rounded-[12px] p-3 font-semibold flex justify-between text-destructive focus:text-destructive"
+                  className="rounded-xl p-3 font-semibold flex justify-between text-destructive focus:text-destructive"
                   onClick={() => toast.error("User blocked")}
                 >
                   Block User <Ban size={18} />
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="rounded-[12px] p-3 font-semibold flex justify-between text-destructive focus:text-destructive"
+                  className="rounded-xl p-3 font-semibold flex justify-between text-destructive focus:text-destructive"
                   onClick={() => openReport(`user_${username}`)}
                 >
                   Report <Flag size={18} />
@@ -133,14 +133,14 @@ export const ProfilePage: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row sm:items-end justify-between w-full mb-6 gap-4">
             <div className="flex flex-col gap-1">
-              <h1 className="text-[28px] sm:text-[36px] font-bold text-foreground leading-none tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-none tracking-tight">
                 {username}
               </h1>
-              <div className="flex items-center justify-center sm:justify-start gap-2 text-[14px] sm:text-[15px] text-muted-foreground font-medium">
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-sm sm:text-sm text-muted-foreground font-medium">
                 <span>u/{username}</span>
                 <span>•</span>
                 {user?.is_premium && (
-                  <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full text-[12px]">
+                  <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full text-xs">
                     Premium
                   </span>
                 )}
@@ -172,22 +172,22 @@ export const ProfilePage: React.FC = () => {
 
           <div className="w-full pt-5">
             <Separator className="mb-5 opacity-50" />
-            <div className="flex gap-10 text-[15px] justify-center sm:justify-start">
+            <div className="flex gap-10 text-sm justify-center sm:justify-start">
               <div className="flex flex-col items-center sm:items-start">
-                <span className="font-bold text-foreground text-[20px] tracking-tight">
+                <span className="font-bold text-foreground text-xl tracking-tight">
                   {user?.karma || 0}
                 </span>
-                <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">
+                <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold opacity-70 mt-0.5">
                   Karma
                 </span>
               </div>
               <div className="flex flex-col items-center sm:items-start">
-                <span className="font-bold text-foreground text-[20px] tracking-tight">
+                <span className="font-bold text-foreground text-xl tracking-tight">
                   {user?.cake_day
                     ? new Date(user.cake_day).toLocaleDateString()
                     : "Aug 12, 2023"}
                 </span>
-                <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">
+                <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold opacity-70 mt-0.5">
                   Cake day
                 </span>
               </div>
@@ -205,7 +205,7 @@ export const ProfilePage: React.FC = () => {
             <TabsTrigger
               key={tab}
               value={tab}
-              className="font-bold text-[15px] sm:text-[16px] capitalize"
+              className="font-bold text-sm sm:text-base capitalize"
             >
               {tab}
             </TabsTrigger>
@@ -217,11 +217,11 @@ export const ProfilePage: React.FC = () => {
             <PostCard key={post.id} post={post} />
           ))}
           {userPosts.length === 0 && (
-            <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm">
-              <p className="text-[18px] font-bold text-foreground mb-1">
+            <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm">
+              <p className="text-lg font-bold text-foreground mb-1">
                 No posts yet
               </p>
-              <p className="text-[14px]">
+              <p className="text-sm">
                 When {username} posts, they'll show up here.
               </p>
             </div>
@@ -238,25 +238,25 @@ export const ProfilePage: React.FC = () => {
               to={`/post/${comment.post_id}`}
               className="block group"
             >
-              <div className="bg-card border-y sm:border border-border sm:rounded-[24px] p-5 sm:p-6 cursor-pointer hover:border-primary/30 hover:shadow-ios-subtle transition-all duration-300 active:scale-[0.99]">
+              <div className="bg-card border-y sm:border border-border sm:rounded-3xl p-5 sm:p-6 cursor-pointer hover:border-primary/30 hover:shadow-ios-subtle transition-all duration-300 active:scale-[0.99]">
                 <div className="flex items-center gap-2 mb-3">
                   <MessageSquare size={18} className="text-primary" />
-                  <p className="text-[12px] text-muted-foreground font-bold uppercase tracking-widest">
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
                     Commented on post
                   </p>
                 </div>
-                <p className="text-[16px] text-foreground font-medium leading-relaxed group-hover:text-primary transition-colors">
+                <p className="text-base text-foreground font-medium leading-relaxed group-hover:text-primary transition-colors">
                   "{comment.content}"
                 </p>
               </div>
             </Link>
           ))}
           {userComments.length === 0 && (
-            <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm">
-              <p className="text-[18px] font-bold text-foreground mb-1">
+            <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm">
+              <p className="text-lg font-bold text-foreground mb-1">
                 No comments yet
               </p>
-              <p className="text-[14px]">
+              <p className="text-sm">
                 When {username} comments, they'll show up here.
               </p>
             </div>
@@ -264,11 +264,11 @@ export const ProfilePage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="saved" className="mt-0 space-y-3 sm:space-y-6">
-          <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm">
-            <p className="text-[18px] font-bold text-foreground mb-1">
+          <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm">
+            <p className="text-lg font-bold text-foreground mb-1">
               No saved posts
             </p>
-            <p className="text-[14px]">
+            <p className="text-sm">
               Saved posts are private and only visible to you.
             </p>
           </div>

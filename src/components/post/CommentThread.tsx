@@ -57,7 +57,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       </div>
 
       <div className="flex-1 pb-2 thread-content">
-        <div className="flex items-center gap-2.5 text-[14px] sm:text-[13px] mb-1.5">
+        <div className="flex items-center gap-2.5 text-sm sm:text-xs mb-1.5">
           {comment.isOp && (
             <Badge className="font-bold text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-md uppercase border-none">
               OP
@@ -77,7 +77,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           <span className="text-muted-foreground font-medium">{time}</span>
           {isCollapsed && (
             <span
-              className="text-primary font-bold cursor-pointer ml-1 text-[12px]"
+              className="text-primary font-bold cursor-pointer ml-1 text-xs"
               onClick={() => setIsCollapsed(false)}
             >
               [expand]
@@ -87,7 +87,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
 
         {!isCollapsed && (
           <>
-            <div className="text-[16px] sm:text-[15px] text-foreground leading-relaxed mb-3 font-medium">
+            <div className="text-base sm:text-sm text-foreground leading-relaxed mb-3 font-medium">
               {comment.content}
             </div>
             <div className="flex items-center gap-2 -ml-2">

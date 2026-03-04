@@ -25,7 +25,7 @@ export const SidebarNavItem = ({
   <Link
     to={to}
     className={cn(
-      "flex items-center rounded-[8px] transition-colors group",
+      "flex items-center rounded-lg transition-colors group",
       collapsed
         ? "justify-center w-10 h-10 p-0 mx-auto"
         : "justify-between px-4 py-2",
@@ -46,7 +46,7 @@ export const SidebarNavItem = ({
       {!collapsed && (
         <span
           className={cn(
-            "text-[14px] font-medium truncate",
+            "text-sm font-medium truncate",
             active && "font-bold",
           )}
         >
@@ -55,7 +55,7 @@ export const SidebarNavItem = ({
       )}
     </div>
     {!collapsed && badge && (
-      <Badge className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0 rounded-[4px] border-none">
+      <Badge className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0 rounded border-none">
         {badge}
       </Badge>
     )}

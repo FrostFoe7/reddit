@@ -19,19 +19,19 @@ export const NotFound: React.FC = () => {
           <path d="M12 17h.01" />
         </svg>
       </div>
-      <h1 className="text-[32px] sm:text-[48px] font-black text-foreground tracking-tight mb-4">
+      <h1 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight mb-4">
         404
       </h1>
-      <h2 className="text-[20px] sm:text-[24px] font-bold text-foreground mb-4">
+      <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">
         Page not found
       </h2>
-      <p className="text-[16px] sm:text-[17px] text-muted-foreground font-medium mb-12 max-w-md leading-relaxed">
+      <p className="text-base sm:text-base text-muted-foreground font-medium mb-12 max-w-md leading-relaxed">
         The page you're looking for doesn't exist or has been moved to a
         different community.
       </p>
       <Link
         to="/"
-        className="inline-block bg-primary text-primary-foreground h-14 px-10 rounded-full font-bold text-[16px] leading-[56px] hover:opacity-90 transition-all active:scale-95 shadow-lg"
+        className="inline-block bg-primary text-primary-foreground h-14 px-10 rounded-full font-bold text-base leading-[56px] hover:opacity-90 transition-all active:scale-95 shadow-lg"
       >
         Back to Home
       </Link>

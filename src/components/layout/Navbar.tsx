@@ -95,7 +95,7 @@ export const Navbar = () => {
             aria-label="Reddit Home"
           >
             <svg
-              className="h-[20px] sm:h-[22px] text-primary fill-current"
+              className="h-5 sm:h-[22px] text-primary fill-current"
               viewBox="0 0 514 149"
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -109,7 +109,7 @@ export const Navbar = () => {
           </Link>
         </div>
 
-        <div className="flex-1 max-w-[750px] mx-4 hidden md:block">
+        <div className="flex-1 max-w-3xl mx-4 hidden md:block">
           <SearchBar />
         </div>
 
@@ -185,12 +185,12 @@ export const Navbar = () => {
                 className="w-[calc(100vw-32px)] sm:w-80 rounded-[20px] p-0 overflow-hidden shadow-ios-float border-border mt-2"
               >
                 <div className="p-4 border-b border-border bg-muted/30 flex justify-between items-center">
-                  <span className="font-bold text-[15px]">Notifications</span>
+                  <span className="font-bold text-sm">Notifications</span>
                   <Button
                     onClick={handleMarkAllRead}
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 text-[13px] font-bold text-primary hover:bg-transparent"
+                    className="h-auto p-0 text-xs font-bold text-primary hover:bg-transparent"
                   >
                     Read All
                   </Button>
@@ -215,11 +215,11 @@ export const Navbar = () => {
                         <AvatarFallback>U</AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col min-w-0 justify-center">
-                        <p className="text-[14px] leading-snug">
+                        <p className="text-sm leading-snug">
                           <span className="font-bold">{n.user || n.sub}</span>{" "}
                           {n.text}
                         </p>
-                        <span className="text-[12px] text-muted-foreground mt-1 font-medium">
+                        <span className="text-xs text-muted-foreground mt-1 font-medium">
                           {n.created_at}
                         </span>
                       </div>
@@ -231,7 +231,7 @@ export const Navbar = () => {
                     onClick={() => navigate("/notifications")}
                     variant="ghost"
                     size="sm"
-                    className="w-full text-[13px] font-bold text-primary"
+                    className="w-full text-xs font-bold text-primary"
                   >
                     See all notifications
                   </Button>
@@ -263,8 +263,8 @@ export const Navbar = () => {
                     <AvatarImage src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png" />
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="font-bold text-[16px]">User123</span>
-                    <span className="text-[13px] text-muted-foreground font-medium flex items-center gap-1.5 mt-0.5">
+                    <span className="font-bold text-base">User123</span>
+                    <span className="text-xs text-muted-foreground font-medium flex items-center gap-1.5 mt-0.5">
                       <Star size={12} className="text-primary fill-current" />{" "}
                       1.2k karma
                     </span>
@@ -272,14 +272,14 @@ export const Navbar = () => {
                 </div>
                 <DropdownMenuItem
                   onClick={() => navigate("/u/User123")}
-                  className="rounded-[12px] py-3 font-semibold px-3"
+                  className="rounded-xl py-3 font-semibold px-3"
                 >
                   <User size={20} className="mr-3 text-muted-foreground" /> View
                   Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate("/settings")}
-                  className="rounded-[12px] py-3 font-semibold px-3"
+                  className="rounded-xl py-3 font-semibold px-3"
                 >
                   <Settings size={20} className="mr-3 text-muted-foreground" />{" "}
                   Settings
@@ -287,7 +287,7 @@ export const Navbar = () => {
                 <DropdownMenuSeparator className="my-1.5" />
                 <DropdownMenuItem
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="rounded-[12px] py-3 font-semibold px-3"
+                  className="rounded-xl py-3 font-semibold px-3"
                 >
                   {theme === "dark" ? (
                     <Sun size={20} className="mr-3" />
@@ -299,7 +299,7 @@ export const Navbar = () => {
                 <DropdownMenuSeparator className="my-1.5" />
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="rounded-[12px] py-3 font-semibold px-3 text-destructive focus:text-destructive"
+                  className="rounded-xl py-3 font-semibold px-3 text-destructive focus:text-destructive"
                 >
                   <LogOut size={20} className="mr-3" /> Log Out
                 </DropdownMenuItem>

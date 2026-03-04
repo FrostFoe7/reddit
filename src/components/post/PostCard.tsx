@@ -57,14 +57,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
       transition={{ duration: 0.2 }}
       className={cn(
         "w-full group bg-background transition-colors cursor-pointer",
-        isDetail ? "" : "hover:bg-neutral-100 dark:hover:bg-neutral-900/50 sm:rounded-[16px] px-4 py-3 my-1"
+        isDetail ? "" : "hover:bg-neutral-100 dark:hover:bg-neutral-900/50 sm:rounded-2xl px-4 py-3 my-1"
       )}
       onClick={() => !isDetail && navigate(`/post/${post.id}`)}
     >
       <div className="flex flex-col">
         {/* Credit Bar / PDP Header */}
         {isDetail ? (
-          <div id="pdp-credit-bar" className="flex justify-between text-[12px] px-4 sm:px-0 relative pb-2 pt-4">
+          <div id="pdp-credit-bar" className="flex justify-between text-xs px-4 sm:px-0 relative pb-2 pt-4">
             <span className="flex gap-2 items-center pr-2 truncate">
               <Button 
                 variant="secondary" 
@@ -101,7 +101,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
                 size="sm" 
                 onClick={toggleJoin}
                 className={cn(
-                  "h-8 rounded-full font-bold px-4 text-[12px] transition-all",
+                  "h-8 rounded-full font-bold px-4 text-xs transition-all",
                   isJoined ? "bg-muted text-foreground border border-border" : "bg-primary text-primary-foreground hover:bg-primary/90"
                 )}
               >
@@ -113,7 +113,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
                     <MoreHorizontal size={18} />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 rounded-[12px]">
+                <DropdownMenuContent align="end" className="w-56 rounded-xl">
                   <DropdownMenuItem onClick={() => openShare(window.location.origin + `/post/${post.id}`)}>
                     <Share2 size={16} className="mr-2" /> Share
                   </DropdownMenuItem>
@@ -125,7 +125,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between text-[12px] min-h-[32px] mb-1">
+          <div className="flex items-center justify-between text-xs min-h-8 mb-1">
             <div className="flex items-center gap-1.5 min-w-0 relative z-10" onClick={(e) => e.stopPropagation()}>
               <Link to={`/r/${subName}`} className="flex items-center gap-1.5 hover:underline group/sub">
                 <Avatar className="h-6 w-6">
@@ -144,7 +144,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
                 size="sm" 
                 onClick={toggleJoin}
                 className={cn(
-                  "h-7 rounded-full font-bold px-3 text-[12px] transition-all",
+                  "h-7 rounded-full font-bold px-3 text-xs transition-all",
                   isJoined ? "bg-muted text-foreground border border-border" : "bg-primary text-primary-foreground hover:bg-primary/90"
                 )}
               >
@@ -159,14 +159,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
 
         <h1 className={cn(
           "font-semibold text-foreground leading-tight tracking-tight px-4 sm:px-0",
-          isDetail ? "text-[22px] sm:text-[24px] mt-2 mb-3" : "text-[18px] mb-1"
+          isDetail ? "text-xl sm:text-2xl mt-2 mb-3" : "text-lg mb-1"
         )}>
           {post.title}
         </h1>
 
         {post.content && (
           <div className={cn(
-            "text-[14px] leading-relaxed text-foreground px-4 sm:px-0",
+            "text-sm leading-relaxed text-foreground px-4 sm:px-0",
             !isDetail && "line-clamp-3 text-muted-foreground"
           )}>
             {post.content}
@@ -177,7 +177,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           <div 
             className={cn(
               "relative overflow-hidden bg-black group/media mt-3",
-              isDetail ? "sm:rounded-[16px] border-y sm:border border-border" : "rounded-[16px] border border-border"
+              isDetail ? "sm:rounded-2xl border-y sm:border border-border" : "rounded-2xl border border-border"
             )}
             onClick={(e) => {
               if (!isDetail) return;

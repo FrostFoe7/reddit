@@ -12,26 +12,26 @@ export const SettingsPage: React.FC = () => {
       className="view-section active px-4 sm:px-0 animate-in fade-in slide-in-from-bottom-2 duration-300"
     >
       <div className="mb-8">
-        <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground tracking-tight">
+        <h1 className="text-3xl sm:text-3xl font-bold text-foreground tracking-tight">
           Settings
         </h1>
       </div>
 
       <div className="space-y-10 max-w-2xl">
         <section>
-          <h2 className="text-[12px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 px-2 opacity-70">
+          <h2 className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 px-2 opacity-70">
             Appearance
           </h2>
-          <div className="bg-card border border-border rounded-[24px] overflow-hidden divide-y divide-border shadow-sm">
+          <div className="bg-card border border-border rounded-3xl overflow-hidden divide-y divide-border shadow-sm">
             <div
               className="p-5 sm:p-6 flex items-center justify-between hover:bg-muted/50 transition-all cursor-pointer group"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               <div className="flex flex-col gap-0.5">
-                <span className="text-[16px] sm:text-[17px] font-bold text-foreground group-hover:text-primary transition-colors">
+                <span className="text-base sm:text-base font-bold text-foreground group-hover:text-primary transition-colors">
                   Dark Mode
                 </span>
-                <span className="text-[14px] text-muted-foreground font-medium">
+                <span className="text-sm text-muted-foreground font-medium">
                   Use dark theme across the app
                 </span>
               </div>
@@ -46,10 +46,10 @@ export const SettingsPage: React.FC = () => {
 
             <div className="p-5 sm:p-6 flex items-center justify-between hover:bg-muted/50 transition-all cursor-pointer group">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[16px] sm:text-[17px] font-bold text-foreground group-hover:text-primary transition-colors">
+                <span className="text-base sm:text-base font-bold text-foreground group-hover:text-primary transition-colors">
                   Reduce Motion
                 </span>
-                <span className="text-[14px] text-muted-foreground font-medium">
+                <span className="text-sm text-muted-foreground font-medium">
                   Minimize animations for better accessibility
                 </span>
               </div>
@@ -58,10 +58,10 @@ export const SettingsPage: React.FC = () => {
 
             <div className="p-5 sm:p-6 flex items-center justify-between hover:bg-muted/50 transition-all cursor-pointer group">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[16px] sm:text-[17px] font-bold text-foreground group-hover:text-primary transition-colors">
+                <span className="text-base sm:text-base font-bold text-foreground group-hover:text-primary transition-colors">
                   Compact Mode
                 </span>
-                <span className="text-[14px] text-muted-foreground font-medium">
+                <span className="text-sm text-muted-foreground font-medium">
                   Fit more content on the screen
                 </span>
               </div>
@@ -71,16 +71,16 @@ export const SettingsPage: React.FC = () => {
         </section>
 
         <section>
-          <h2 className="text-[12px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 px-2 opacity-70">
+          <h2 className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 px-2 opacity-70">
             Privacy & Security
           </h2>
-          <div className="bg-card border border-border rounded-[24px] overflow-hidden divide-y divide-border shadow-sm">
+          <div className="bg-card border border-border rounded-3xl overflow-hidden divide-y divide-border shadow-sm">
             <div className="p-5 sm:p-6 flex items-center justify-between hover:bg-muted/50 transition-all cursor-pointer group">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[16px] sm:text-[17px] font-bold text-foreground group-hover:text-primary transition-colors">
+                <span className="text-base sm:text-base font-bold text-foreground group-hover:text-primary transition-colors">
                   Allow followers
                 </span>
-                <span className="text-[14px] text-muted-foreground font-medium">
+                <span className="text-sm text-muted-foreground font-medium">
                   People can follow you and see your posts
                 </span>
               </div>
@@ -89,10 +89,10 @@ export const SettingsPage: React.FC = () => {
 
             <div className="p-5 sm:p-6 flex items-center justify-between hover:bg-muted/50 transition-all cursor-pointer group">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[16px] sm:text-[17px] font-bold text-foreground group-hover:text-primary transition-colors">
+                <span className="text-base sm:text-base font-bold text-foreground group-hover:text-primary transition-colors">
                   Content Visibility
                 </span>
-                <span className="text-[14px] text-muted-foreground font-medium">
+                <span className="text-sm text-muted-foreground font-medium">
                   Show your posts in search results
                 </span>
               </div>
@@ -108,7 +108,7 @@ export const SettingsPage: React.FC = () => {
           >
             Delete Account
           </Button>
-          <p className="text-[12px] text-muted-foreground mt-4 font-medium leading-relaxed">
+          <p className="text-xs text-muted-foreground mt-4 font-medium leading-relaxed">
             Deleting your account is permanent and cannot be undone. All your
             posts and comments will be anonymized.
           </p>

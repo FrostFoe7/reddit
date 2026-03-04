@@ -24,7 +24,7 @@ export const CreatePostPrompt: React.FC<CreatePostPromptProps> = ({
     <TooltipProvider>
       <div
         className={cn(
-          "hidden sm:flex items-center gap-4 p-4.5 bg-card border border-border rounded-[24px] shadow-ios-subtle dark:shadow-none transition-all duration-400 cursor-pointer group",
+          "hidden sm:flex items-center gap-4 p-4.5 bg-card border border-border rounded-3xl shadow-ios-subtle dark:shadow-none transition-all duration-400 cursor-pointer group",
           className,
         )}
         onClick={() => navigate("/create")}
@@ -33,7 +33,7 @@ export const CreatePostPrompt: React.FC<CreatePostPromptProps> = ({
           <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=ff4500" />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
-        <div className="flex-1 bg-background border border-transparent group-hover:border-border transition-colors rounded-full h-12 px-5 flex items-center text-[15px] text-muted-foreground font-medium">
+        <div className="flex-1 bg-background border border-transparent group-hover:border-border transition-colors rounded-full h-12 px-5 flex items-center text-sm text-muted-foreground font-medium">
           Create Post
         </div>
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>

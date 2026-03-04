@@ -35,19 +35,19 @@ export const SearchPage: React.FC = () => {
       className="view-section active animate-in fade-in slide-in-from-bottom-2 duration-300"
     >
       <div className="px-4 sm:px-0 mb-6">
-        <h1 className="text-[24px] sm:text-[32px] font-bold text-foreground tracking-tight mb-5">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-5">
           Results for <span className="text-primary">"{query}"</span>
         </h1>
         <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
           <Button
             variant="ghost"
-            className="px-6 py-2 bg-foreground text-background rounded-full text-[14px] font-bold shadow-md"
+            className="px-6 py-2 bg-foreground text-background rounded-full text-sm font-bold shadow-md"
           >
             Posts
           </Button>
           <Button
             variant="ghost"
-            className="px-6 py-2 bg-muted text-foreground hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-full text-[14px] font-bold whitespace-nowrap transition-all active:scale-95"
+            className="px-6 py-2 bg-muted text-foreground hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-full text-sm font-bold whitespace-nowrap transition-all active:scale-95"
           >
             Communities
           </Button>
@@ -56,9 +56,9 @@ export const SearchPage: React.FC = () => {
 
       <div className="flex flex-col gap-6">
         {filteredCommunities.length > 0 && (
-          <div className="bg-card border-y sm:border border-border sm:rounded-[24px] overflow-hidden shadow-sm">
+          <div className="bg-card border-y sm:border border-border sm:rounded-3xl overflow-hidden shadow-sm">
             <div className="px-6 py-4 border-b border-border bg-muted/20">
-              <h3 className="font-bold text-foreground text-[15px] uppercase tracking-widest opacity-70">
+              <h3 className="font-bold text-foreground text-sm uppercase tracking-widest opacity-70">
                 Communities
               </h3>
             </div>
@@ -72,17 +72,17 @@ export const SearchPage: React.FC = () => {
                   <div className="flex items-center gap-4">
                     <div
                       className={cn(
-                        "w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-[18px] shadow-sm tracking-tighter transition-transform group-hover:scale-110",
+                        "w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm tracking-tighter transition-transform group-hover:scale-110",
                         community.icon_url || community.icon,
                       )}
                     >
                       r/
                     </div>
                     <div className="flex flex-col">
-                      <div className="font-bold text-foreground group-hover:text-primary transition-colors text-[16px]">
+                      <div className="font-bold text-foreground group-hover:text-primary transition-colors text-base">
                         r/{community.name}
                       </div>
-                      <div className="text-[13px] text-muted-foreground font-medium">
+                      <div className="text-xs text-muted-foreground font-medium">
                         {community.members || 0} members
                       </div>
                     </div>
@@ -112,7 +112,7 @@ export const SearchPage: React.FC = () => {
             </React.Fragment>
           ))}
           {filteredPosts.length === 0 && filteredCommunities.length === 0 && (
-            <div className="p-16 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm flex flex-col items-center gap-4">
+            <div className="p-16 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm flex flex-col items-center gap-4">
               <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center text-muted-foreground">
                 <svg
                   viewBox="0 0 24 24"
@@ -126,10 +126,10 @@ export const SearchPage: React.FC = () => {
                 </svg>
               </div>
               <div className="flex flex-col gap-1">
-                <h3 className="text-[18px] font-bold text-foreground">
+                <h3 className="text-lg font-bold text-foreground">
                   No results found for "{query}"
                 </h3>
-                <p className="text-[14px]">
+                <p className="text-sm">
                   Try searching for something else or check your spelling.
                 </p>
               </div>

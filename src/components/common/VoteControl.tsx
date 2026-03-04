@@ -57,7 +57,7 @@ export const VoteControl: React.FC<VoteControlProps> = ({
       </Button>
       <span
         className={cn(
-          "px-1 font-bold text-[12px] min-w-[20px] text-center",
+          "px-1 font-bold text-xs min-w-[20px] text-center",
           voteStatus === "up"
             ? "text-vote-up"
             : voteStatus === "down"

@@ -45,10 +45,10 @@ export const PostPage: React.FC = () => {
             <line x1="9" y1="11" x2="15" y2="11" />
           </svg>
         </div>
-        <h1 className="text-[28px] font-bold text-foreground tracking-tight mb-3">
+        <h1 className="text-3xl font-bold text-foreground tracking-tight mb-3">
           Post not found
         </h1>
-        <p className="text-[16px] text-muted-foreground font-medium mb-10 max-w-[280px]">
+        <p className="text-base text-muted-foreground font-medium mb-10 max-w-72">
           This post may have been removed or the link might be broken.
         </p>
         <Button
@@ -98,8 +98,8 @@ export const PostPage: React.FC = () => {
                   </svg>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <h4 className="font-bold text-[18px]">No comments yet</h4>
-                  <p className="text-[14px] text-muted-foreground font-medium">
+                  <h4 className="font-bold text-lg">No comments yet</h4>
+                  <p className="text-sm text-muted-foreground font-medium">
                     Be the first to share what you think!
                   </p>
                 </div>

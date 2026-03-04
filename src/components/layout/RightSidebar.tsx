@@ -71,12 +71,12 @@ export const RightSidebar = () => {
       <div className="flex flex-col p-4 space-y-6">
         {isCreatePage && (
           <div className="flex flex-col space-y-4">
-            <div className="bg-card border border-border rounded-[16px] p-4 flex flex-col gap-3 shadow-sm">
+            <div className="bg-card border border-border rounded-2xl p-4 flex flex-col gap-3 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-[20px]">📝</span>
+                  <span className="text-xl">📝</span>
                 </div>
-                <h3 className="text-[16px] font-bold text-foreground">
+                <h3 className="text-base font-bold text-foreground">
                   Posting to Reddit
                 </h3>
               </div>
@@ -92,7 +92,7 @@ export const RightSidebar = () => {
                     key={i}
                     className="flex flex-col"
                   >
-                    <div className="flex gap-3 text-[14px] font-medium py-3">
+                    <div className="flex gap-3 text-sm font-medium py-3">
                       <span className="text-muted-foreground whitespace-nowrap font-bold opacity-50">
                         {i + 1}.
                       </span>
@@ -104,7 +104,7 @@ export const RightSidebar = () => {
               </ol>
             </div>
 
-            <div className="text-[12px] text-muted-foreground px-2 leading-relaxed">
+            <div className="text-xs text-muted-foreground px-2 leading-relaxed">
               Please be mindful of Reddit's{" "}
               <button
                 onClick={() => handleExternal("Content Policy")}
@@ -126,18 +126,18 @@ export const RightSidebar = () => {
 
         {isProfilePage && userContext && (
           <div className="flex flex-col space-y-3">
-            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4 border border-border shadow-sm">
+            <div className="bg-secondary-background/50 rounded-2xl p-4 flex flex-col gap-4 border border-border shadow-sm">
               <div className="flex flex-col gap-1">
-                <h3 className="text-[16px] font-bold text-foreground capitalize">
+                <h3 className="text-base font-bold text-foreground capitalize">
                   {userContext}
                 </h3>
-                <p className="text-[12px] text-muted-foreground font-medium">
+                <p className="text-xs text-muted-foreground font-medium">
                   u/{userContext}
                 </p>
               </div>
 
               <div className="flex flex-col gap-2">
-                <p className="text-[14px] text-foreground leading-normal italic">
+                <p className="text-sm text-foreground leading-normal italic">
                   "Bull | Couple | Dhaka |"
                 </p>
               </div>
@@ -146,14 +146,14 @@ export const RightSidebar = () => {
                 <Separator className="opacity-50" />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col">
-                    <span className="text-[16px] font-bold">1,245</span>
-                    <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">
+                    <span className="text-base font-bold">1,245</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                       Karma
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[16px] font-bold">Aug 12, 2023</span>
-                    <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">
+                    <span className="text-base font-bold">Aug 12, 2023</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                       Cake Day
                     </span>
                   </div>
@@ -178,37 +178,37 @@ export const RightSidebar = () => {
               </div>
             </div>
 
-            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-3 border border-border shadow-sm">
-              <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest px-1">
+            <div className="bg-secondary-background/50 rounded-2xl p-4 flex flex-col gap-3 border border-border shadow-sm">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">
                 Achievements
               </h3>
               <div className="flex gap-2 px-1">
                 <div
-                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px] shadow-sm"
+                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl shadow-sm"
                   title="Banana Aficionado"
                 >
                   🍌
                 </div>
                 <div
-                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px] shadow-sm"
+                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl shadow-sm"
                   title="Detective Doggo"
                 >
                   🐶
                 </div>
                 <div
-                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px] shadow-sm"
+                  className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl shadow-sm"
                   title="Banana Enthusiast"
                 >
                   🍌
                 </div>
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[14px] font-bold text-muted-foreground shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-muted-foreground shadow-sm">
                   +8
                 </div>
               </div>
               <Button
                 onClick={() => handleAction("View Achievements")}
                 variant="ghost"
-                className="w-full text-primary font-bold text-[12px] py-1 justify-start px-1 h-auto hover:bg-transparent hover:underline"
+                className="w-full text-primary font-bold text-xs py-1 justify-start px-1 h-auto hover:bg-transparent hover:underline"
               >
                 View your achievements
               </Button>
@@ -219,31 +219,31 @@ export const RightSidebar = () => {
         {showCommunityInfo && communityContext && (
           <div className="flex flex-col space-y-3">
             <div className="flex items-center justify-between px-2">
-              <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                 About Community
               </h3>
             </div>
-            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4 border border-border shadow-sm">
+            <div className="bg-secondary-background/50 rounded-2xl p-4 flex flex-col gap-4 border border-border shadow-sm">
               <div className="flex items-center gap-3">
                 <div
                   className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-bold text-white shadow-sm",
+                    "w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm",
                     contextIcon,
                   )}
                 >
                   r/
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-bold text-[16px]">
+                  <span className="font-bold text-base">
                     r/{communityContext.name}
                   </span>
-                  <div className="flex items-center gap-1.5 text-[12px] text-green-500 font-medium">
+                  <div className="flex items-center gap-1.5 text-xs text-green-500 font-medium">
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>{" "}
                     Online
                   </div>
                 </div>
               </div>
-              <p className="text-[14px] text-foreground leading-normal">
+              <p className="text-sm text-foreground leading-normal">
                 {contextDesc ||
                   "A community for creators, developers, entrepreneurs, and makers to openly share their journey."}
               </p>
@@ -252,16 +252,16 @@ export const RightSidebar = () => {
                 <Separator className="opacity-50" />
                 <div className="flex gap-6 py-1">
                   <div className="flex flex-col">
-                    <span className="text-[16px] font-bold">
+                    <span className="text-base font-bold">
                       {contextMembers}
                     </span>
-                    <span className="text-[12px] text-muted-foreground font-medium">
+                    <span className="text-xs text-muted-foreground font-medium">
                       Members
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[16px] font-bold">4.5k</span>
-                    <span className="text-[12px] text-muted-foreground font-medium">
+                    <span className="text-base font-bold">4.5k</span>
+                    <span className="text-xs text-muted-foreground font-medium">
                       Online
                     </span>
                   </div>
@@ -290,7 +290,7 @@ export const RightSidebar = () => {
 
         {showCommunityInfo && (
           <div className="flex flex-col space-y-3">
-            <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest px-2">
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-2">
               r/{communityContext?.name || "community"} Rules
             </h3>
             <div className="space-y-1">
@@ -303,12 +303,12 @@ export const RightSidebar = () => {
                 <div
                   key={i}
                   onClick={() => handleAction(`Rule ${i + 1}`)}
-                  className="flex items-start gap-3 p-2 hover:bg-muted rounded-[12px] cursor-pointer transition-colors group"
+                  className="flex items-start gap-3 p-2 hover:bg-muted rounded-xl cursor-pointer transition-colors group"
                 >
-                  <span className="text-[12px] font-bold text-muted-foreground mt-0.5 opacity-50">
+                  <span className="text-xs font-bold text-muted-foreground mt-0.5 opacity-50">
                     {i + 1}
                   </span>
-                  <span className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">
+                  <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                     {rule}
                   </span>
                 </div>
@@ -320,7 +320,7 @@ export const RightSidebar = () => {
         {showCommunityInfo && (
           <div className="flex flex-col space-y-3">
             <div className="flex justify-between items-center px-2">
-              <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                 Moderators
               </h3>
               <Button
@@ -337,7 +337,7 @@ export const RightSidebar = () => {
                 <Link
                   key={mod}
                   to={`/u/${mod}`}
-                  className="flex items-center gap-3 p-2 hover:bg-muted rounded-[12px] transition-colors group"
+                  className="flex items-center gap-3 p-2 hover:bg-muted rounded-xl transition-colors group"
                 >
                   <Avatar className="h-7 w-7 border border-border/50">
                     <AvatarImage
@@ -345,7 +345,7 @@ export const RightSidebar = () => {
                     />
                     <AvatarFallback>M</AvatarFallback>
                   </Avatar>
-                  <span className="text-[13px] font-bold group-hover:text-primary transition-colors">
+                  <span className="text-xs font-bold group-hover:text-primary transition-colors">
                     u/{mod}
                   </span>
                 </Link>
@@ -353,7 +353,7 @@ export const RightSidebar = () => {
               <Button
                 onClick={() => handleAction("View All Moderators")}
                 variant="ghost"
-                className="w-full text-primary font-bold text-[12px] py-2.5 rounded-[12px] h-auto hover:bg-primary/5 mt-1 border border-transparent hover:border-primary/20"
+                className="w-full text-primary font-bold text-xs py-2.5 rounded-xl h-auto hover:bg-primary/5 mt-1 border border-transparent hover:border-primary/20"
               >
                 View All Moderators
               </Button>
@@ -365,13 +365,13 @@ export const RightSidebar = () => {
           <>
             <div className="flex flex-col space-y-3">
               <div className="flex justify-between items-center px-2">
-                <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">
+                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                   Recent Posts
                 </h3>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-primary hover:text-primary/80 hover:bg-transparent h-auto p-0 font-bold text-[12px]"
+                  className="text-primary hover:text-primary/80 hover:bg-transparent h-auto p-0 font-bold text-xs"
                 >
                   Clear
                 </Button>
@@ -381,7 +381,7 @@ export const RightSidebar = () => {
                   <Link
                     key={post.id}
                     to={`/post/${post.id}`}
-                    className="px-2 py-2.5 hover:bg-muted rounded-[12px] transition-colors flex flex-col gap-1 group"
+                    className="px-2 py-2.5 hover:bg-muted rounded-xl transition-colors flex flex-col gap-1 group"
                   >
                     <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                       <Avatar className="w-4 h-4">
@@ -403,7 +403,7 @@ export const RightSidebar = () => {
                       <span>•</span>
                       <span>3d ago</span>
                     </div>
-                    <h4 className="text-[13px] font-semibold leading-snug text-foreground group-hover:underline line-clamp-2">
+                    <h4 className="text-xs font-semibold leading-snug text-foreground group-hover:underline line-clamp-2">
                       {post.title}
                     </h4>
                     <div className="text-[11px] text-muted-foreground font-medium">
@@ -416,7 +416,7 @@ export const RightSidebar = () => {
             </div>
 
             <div className="flex flex-col space-y-3">
-              <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest px-2">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-2">
                 Top Communities
               </h3>
               <div className="flex flex-col space-y-1">
@@ -426,10 +426,10 @@ export const RightSidebar = () => {
                     <Link
                       key={community.id}
                       to={`/r/${community.id}`}
-                      className="flex items-center justify-between px-2 py-2 hover:bg-muted rounded-[12px] transition-colors group"
+                      className="flex items-center justify-between px-2 py-2 hover:bg-muted rounded-xl transition-colors group"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-[12px] font-bold text-muted-foreground w-4 opacity-50">
+                        <span className="text-xs font-bold text-muted-foreground w-4 opacity-50">
                           {i + 1}
                         </span>
                         <div
@@ -440,7 +440,7 @@ export const RightSidebar = () => {
                         >
                           r/
                         </div>
-                        <span className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">
+                        <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
                           r/{community.name}
                         </span>
                       </div>
@@ -460,7 +460,7 @@ export const RightSidebar = () => {
                 <Button
                   onClick={() => navigate("/explore")}
                   variant="ghost"
-                  className="w-full text-primary font-bold text-[12px] py-2.5 rounded-[12px] h-auto hover:bg-primary/5 mt-1 border border-transparent hover:border-primary/20"
+                  className="w-full text-primary font-bold text-xs py-2.5 rounded-xl h-auto hover:bg-primary/5 mt-1 border border-transparent hover:border-primary/20"
                 >
                   View All
                 </Button>
