@@ -24,7 +24,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { mockNotifications } from '@/db/db';
+import { useNotifications } from '@/hooks';
+import type { Notification } from '@/types';
 import { useTheme } from 'next-themes';
 import { SearchBar } from './SearchBar';
 import { useOverlays } from '@/components/common/GlobalOverlays';
@@ -34,6 +35,8 @@ export const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const { toggleSidebar } = useOverlays();
+  const { data: notifications = [] } = useNotifications();
+  const unreadCount = notifications.filter((n: Notification) => !n.is_read).length;
 
   const handleAction = (label: string) => {
     toast.success(`${label} clicked!`, {
@@ -139,6 +142,7 @@ export const Navbar = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 relative">
                 <Bell size={20} />
+                {unreadCount > 0 && <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-background"></span>}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[calc(100vw-32px)] sm:w-80 rounded-[20px] p-0 overflow-hidden shadow-ios-float border-border mt-2">
@@ -147,15 +151,16 @@ export const Navbar = () => {
                 <Button onClick={handleMarkAllRead} variant="ghost" size="sm" className="h-auto p-0 text-[13px] font-bold text-primary hover:bg-transparent">Read All</Button>
               </div>
               <div className="max-h-[70vh] sm:max-h-[400px] overflow-y-auto no-scrollbar">
-                {mockNotifications.map(n => (
-                  <div key={n.id} onClick={() => { navigate('/notifications'); handleAction(`Notification from ${n.user || n.sub}`); }} className="p-4 flex gap-3 hover:bg-muted cursor-pointer transition-colors border-b border-border last:border-0">
+                {notifications.map((n: Notification) => (
+                  <div key={n.id} onClick={() => { navigate('/notifications'); handleAction(`Notification from ${n.user || n.sub}`); }} className="p-4 flex gap-3 hover:bg-muted cursor-pointer transition-colors border-b border-border last:border-0 relative">
+                    {!n.is_read && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>}
                     <Avatar className="h-10 w-10 shrink-0">
                       <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${n.user || n.sub}`} />
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col min-w-0 justify-center">
                       <p className="text-[14px] leading-snug"><span className="font-bold">{n.user || n.sub}</span> {n.text}</p>
-                      <span className="text-[12px] text-muted-foreground mt-1 font-medium">{n.time}</span>
+                      <span className="text-[12px] text-muted-foreground mt-1 font-medium">{n.created_at}</span>
                     </div>
                   </div>
                 ))}

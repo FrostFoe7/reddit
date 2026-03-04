@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import type { Comment } from '@/db/db';
-import { mockComments } from '@/db/db';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { VoteControl } from '@/components/common/VoteControl';
@@ -9,19 +7,28 @@ import { ActionButtons } from '@/components/common/ActionButtons';
 
 interface CommentThreadProps {
   comment: Comment;
+  allComments?: Comment[];
   isChild?: boolean;
 }
 
-export const CommentThread: React.FC<CommentThreadProps> = ({ comment, isChild = false }) => {
+export const CommentThread: React.FC<CommentThreadProps> = ({ comment, allComments = [], isChild = false }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const childComments = mockComments.filter(c => c.postId === comment.id);
+  
+  // Find replies to this comment
+  const childComments = allComments.filter(c => c.parent_id === comment.id);
+
+  // Normalize data
+  const authorName = comment.author_username || comment.author;
+  const avatarUrl = comment.avatar_url || (comment.avatar ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.avatar}` : undefined);
+  const upvotes = comment.upvotes ?? 0;
+  const time = comment.created_at || comment.time;
 
   return (
     <div className={cn("thread-container flex gap-3 sm:gap-4", isChild && "mt-5", isCollapsed && "collapsed-thread")}>
       <div className="thread-col flex flex-col items-center">
         <Avatar className={cn("shrink-0 shadow-sm border border-border", isChild ? "h-8 w-8" : "h-10 w-10")}>
-          <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.avatar}`} />
-          <AvatarFallback>{comment.author[0]}</AvatarFallback>
+          <AvatarImage src={avatarUrl} />
+          <AvatarFallback>{authorName?.[0]}</AvatarFallback>
         </Avatar>
         <div 
           className="thread-line" 
@@ -37,10 +44,10 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ comment, isChild =
             </Badge>
           )}
           <span className={cn("font-bold tracking-tight hover:underline cursor-pointer", comment.isOp ? "text-primary" : "text-foreground")}>
-            {comment.author}
+            {authorName}
           </span>
           <span className="text-muted-foreground opacity-50 font-bold text-[10px]">•</span>
-          <span className="text-muted-foreground font-medium">{comment.time}</span>
+          <span className="text-muted-foreground font-medium">{time}</span>
           {isCollapsed && (
             <span 
               className="text-primary font-bold cursor-pointer ml-1 text-[12px]" 
@@ -57,7 +64,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ comment, isChild =
               {comment.content}
             </div>
             <div className="flex items-center gap-2 -ml-2">
-              <VoteControl initialScore={comment.upvotes} />
+              <VoteControl initialScore={upvotes} />
               <ActionButtons 
                 id={comment.id} 
                 type="comment" 
@@ -66,7 +73,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ comment, isChild =
             
             <div className="reply-container">
               {childComments.map(child => (
-                <CommentThread key={child.id} comment={child} isChild />
+                <CommentThread key={child.id} comment={child} allComments={allComments} isChild />
               ))}
             </div>
           </>

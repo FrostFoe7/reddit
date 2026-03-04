@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useCommunity, usePosts } from '@/hooks';
 import { PostCard } from '@/components/post/PostCard';
-import { mockPosts, mockCommunities } from '@/db/db';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Wrench, ShieldCheck } from 'lucide-react';
@@ -9,8 +9,19 @@ import { CommunityHeader } from '@/components/layout/CommunityHeader';
 
 export const SubredditPage: React.FC = () => {
   const { name } = useParams<{ name: string }>();
-  const sub = mockCommunities.find(c => c.id === name);
-  const subPosts = mockPosts.filter(p => p.sub === name);
+  
+  const { data: sub, isLoading: subLoading } = useCommunity(name);
+  const { data: allPosts = [] } = usePosts();
+  
+  const subPosts = allPosts.filter((p: Post) => (p.subreddit_name || p.sub) === name);
+
+  if (subLoading) {
+    return (
+      <div className="flex justify-center py-24">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   if (!sub) {
     return (

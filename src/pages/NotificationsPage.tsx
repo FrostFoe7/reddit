@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { mockNotifications } from '@/db/db';
+import React from 'react';
+import { useNotifications, useMarkNotificationsRead } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageSquare, TrendingUp, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const NotificationsPage: React.FC = () => {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const { data: notifications = [] } = useNotifications();
+  const markReadMutation = useMarkNotificationsRead();
 
   const markAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    markReadMutation.mutate();
   };
 
   return (
@@ -39,8 +40,8 @@ export const NotificationsPage: React.FC = () => {
 
       <div className="bg-card border-y sm:border border-border sm:rounded-[32px] shadow-sm overflow-hidden divide-y divide-border/50">
         {notifications.map(n => (
-          <div key={n.id} className={cn("p-5 sm:p-6 flex gap-4 hover:bg-muted/50 transition-all cursor-pointer group relative", !n.isRead && "bg-primary/[0.03]")}>
-            {!n.isRead && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>}
+          <div key={n.id} className={cn("p-5 sm:p-6 flex gap-4 hover:bg-muted/50 transition-all cursor-pointer group relative", !n.is_read && "bg-primary/[0.03]")}>
+            {!n.is_read && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>}
             
             <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] rounded-full bg-muted flex items-center justify-center shrink-0 relative shadow-sm border border-border/50">
               {n.type === 'reply' ? (
@@ -70,7 +71,7 @@ export const NotificationsPage: React.FC = () => {
                   )}
                 </p>
                 <div className="flex items-center gap-2">
-                   {!n.isRead && <div className="w-2.5 h-2.5 bg-primary rounded-full shrink-0 shadow-[0_0_8px_rgba(255,69,0,0.5)]"></div>}
+                   {!n.is_read && <div className="w-2.5 h-2.5 bg-primary rounded-full shrink-0 shadow-[0_0_8px_rgba(255,69,0,0.5)]"></div>}
                    <span className="text-[12px] text-muted-foreground whitespace-nowrap font-bold opacity-60 hidden sm:block">{n.time}</span>
                 </div>
               </div>

@@ -14,11 +14,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { Post } from '@/db/db';
+import { ActionButtons } from '@/components/common/ActionButtons';
 import { cn } from '@/lib/utils';
 import { useOverlays } from '@/components/common/GlobalOverlays';
 import { VoteControl } from '@/components/common/VoteControl';
-import { ActionButtons } from '@/components/common/ActionButtons';
 
 interface PostCardProps {
   post: Post;
@@ -30,11 +29,20 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
   const { openShare, openReport, openLightbox } = useOverlays();
   const [isJoined, setIsJoined] = React.useState(false);
 
+  // Normalize data between mock and backend
+  const subName = (post as any).subreddit_name || post.sub;
+  const authorName = (post as any).author_username || post.author;
+  const postUpvotes = (post as any).upvotes ?? 0;
+  const postCommentCount = (post as any).comment_count ?? (post as any).comments ?? 0;
+  const postTime = (post as any).created_at || post.time;
+  const postImage = (post as any).image_url || post.image;
+  const subIcon = (post as any).subreddit_icon || post.subIcon;
+
   const toggleJoin = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsJoined(!isJoined);
     import('sonner').then(({ toast }) => {
-      toast.success(isJoined ? `Left r/${post.sub}` : `Joined r/${post.sub}`);
+      toast.success(isJoined ? `Left r/${subName}` : `Joined r/${subName}`);
     });
   };
 
@@ -61,21 +69,21 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
               </Button>
               
               <Avatar className="h-8 w-8 shrink-0">
-                <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${post.sub}&backgroundColor=ff4500`} />
-                <AvatarFallback className={cn("text-[10px] font-bold text-white shadow-sm", post.subIcon)}>r/</AvatarFallback>
+                <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${subName}&backgroundColor=ff4500`} />
+                <AvatarFallback className={cn("text-[10px] font-bold text-white shadow-sm", subIcon)}>r/</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col truncate">
                 <span className="flex items-center gap-1 flex-nowrap">
-                  <Link to={`/r/${post.sub}`} className="font-bold text-foreground hover:underline">r/{post.sub}</Link>
+                  <Link to={`/r/${subName}`} className="font-bold text-foreground hover:underline">r/{subName}</Link>
                   <span className="text-muted-foreground">•</span>
-                  <span className="text-muted-foreground whitespace-nowrap">{post.time}</span>
+                  <span className="text-muted-foreground whitespace-nowrap">{postTime}</span>
                 </span>
                 <span className="text-muted-foreground truncate hover:underline" onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/u/${post.author}`);
+                  navigate(`/u/${authorName}`);
                 }}>
-                  {post.author}
+                  {authorName}
                 </span>
               </div>
             </span>
@@ -112,15 +120,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
         ) : (
           <div className="flex items-center justify-between text-[12px] min-h-[32px] mb-1">
             <div className="flex items-center gap-1.5 min-w-0 relative z-10" onClick={(e) => e.stopPropagation()}>
-              <Link to={`/r/${post.sub}`} className="flex items-center gap-1.5 hover:underline group/sub">
+              <Link to={`/r/${subName}`} className="flex items-center gap-1.5 hover:underline group/sub">
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${post.sub}&backgroundColor=ff4500`} />
-                  <AvatarFallback className={cn("text-[10px] font-bold text-white shadow-sm", post.subIcon)}>r/</AvatarFallback>
+                  <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${subName}&backgroundColor=ff4500`} />
+                  <AvatarFallback className={cn("text-[10px] font-bold text-white shadow-sm", subIcon)}>r/</AvatarFallback>
                 </Avatar>
-                <span className="font-bold text-foreground">r/{post.sub}</span>
+                <span className="font-bold text-foreground">r/{subName}</span>
               </Link>
               <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground whitespace-nowrap">{post.time}</span>
+              <span className="text-muted-foreground whitespace-nowrap">{postTime}</span>
             </div>
             
             <div className="flex items-center gap-1 relative z-10" onClick={(e) => e.stopPropagation()}>
@@ -158,7 +166,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           </div>
         )}
 
-        {post.image && (
+        {postImage && (
           <div 
             className={cn(
               "relative overflow-hidden bg-black group/media mt-3",
@@ -167,12 +175,12 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
             onClick={(e) => {
               if (!isDetail) return;
               e.stopPropagation();
-              openLightbox(post.image!);
+              openLightbox(postImage);
             }}
           >
             <div className="aspect-video w-full flex items-center justify-center overflow-hidden">
               <img 
-                src={post.image} 
+                src={postImage} 
                 alt={post.title} 
                 className="w-full h-full object-contain transition-transform group-hover/media:scale-[1.01]" 
                 loading="lazy"
@@ -185,12 +193,12 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           "flex items-center gap-2 mt-3 relative z-10 px-4 sm:px-0 pb-2",
           isDetail && "border-b border-border mb-2"
         )} onClick={(e) => e.stopPropagation()}>
-          <VoteControl initialScore={post.upvotes} />
+          <VoteControl initialScore={postUpvotes} />
           
           <ActionButtons 
             id={post.id} 
             type="post" 
-            commentsCount={post.comments} 
+            commentsCount={postCommentCount} 
             showShareLabel={true}
             onCommentClick={() => !isDetail && navigate(`/post/${post.id}`)}
           />

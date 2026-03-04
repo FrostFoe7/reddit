@@ -1,0 +1,22 @@
+# Disable directory listing for security
+Options -Indexes
+
+# 1. Block access to SQL files, logs, and READMEs
+<FilesMatch "\.(sql|md|log|ini|env)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# 2. Route all requests starting with /api/ to the index.php entry point
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /proxy/
+  
+  # Ensure the api subfolder is handled properly
+  RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+</IfModule>

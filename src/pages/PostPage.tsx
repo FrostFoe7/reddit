@@ -1,17 +1,28 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { usePost, useComments } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { PostCard } from '@/components/post/PostCard';
 import { CommentThread } from '@/components/post/CommentThread';
-import { mockPosts, mockComments } from '@/db/db';
 import { CommentComposer } from '@/components/post/CommentComposer';
 import { CommentControls } from '@/components/post/CommentControls';
 
 export const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const post = mockPosts.find(p => p.id === id);
-  const comments = mockComments.filter(c => c.postId === id && !c.parentId);
+  
+  const { data: post, isLoading: postLoading } = usePost(id);
+  const { data: comments = [], isLoading: commentsLoading } = useComments(id);
+  
+  const topLevelComments = comments.filter((c: Comment) => !c.parent_id);
+
+  if (postLoading) {
+    return (
+      <div className="flex justify-center py-24">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -48,10 +59,10 @@ export const PostPage: React.FC = () => {
           </div>
 
           <div className="space-y-1 sm:space-y-4 pb-20 pt-2">
-            {comments.map(comment => (
-              <CommentThread key={comment.id} comment={comment} />
+            {topLevelComments.map((comment: any) => (
+              <CommentThread key={comment.id} comment={comment} allComments={comments} />
             ))}
-            {comments.length === 0 && (
+            {!commentsLoading && topLevelComments.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
                 <div className="w-12 h-12 bg-muted/50 rounded-full flex items-center justify-center text-muted-foreground">
                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 opacity-50">

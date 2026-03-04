@@ -14,7 +14,7 @@ import {
   Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { mockCommunities } from '@/db/db';
+import { useCommunities, useCreatePost } from '@/hooks';
 import {
   Command,
   CommandEmpty,
@@ -35,7 +35,10 @@ export const CreatePostPage: React.FC = () => {
   const [body, setBody] = useState('');
   const [activeTab, setActiveTab] = useState('text');
   const [open, setOpen] = useState(false);
-  const [selectedCommunity, setSelectedCommunity] = useState<typeof mockCommunities[0] | null>(null);
+  
+  const { data: communities } = useCommunities();
+  const createPostMutation = useCreatePost();
+  const [selectedCommunity, setSelectedCommunity] = useState<any | null>(null);
   
   const navigate = useNavigate();
 
@@ -44,9 +47,20 @@ export const CreatePostPage: React.FC = () => {
       toast.error('Please select a community first');
       return;
     }
-    toast.success('Post submitted successfully!');
-    console.log('Posting:', { title, body, type: activeTab, community: selectedCommunity.id });
-    setTimeout(() => navigate('/'), 1500);
+    
+    createPostMutation.mutate({
+      id: Math.random().toString(36).substr(2, 9), // Temporary ID generation for mock
+      title,
+      content: body,
+      subreddit_id: selectedCommunity.id,
+      post_type: (activeTab === 'media' ? 'image' : activeTab) as any, // Simple cast to bypass strict union for now or use Post['post_type']
+      author_id: 'a7f-p9q-m2l', // Mock author
+    }, {
+      onSuccess: () => {
+        toast.success('Post submitted successfully!');
+        setTimeout(() => navigate('/'), 1500);
+      }
+    });
   };
 
   return (
@@ -99,7 +113,7 @@ export const CreatePostPage: React.FC = () => {
                 <CommandList className="max-h-[300px] no-scrollbar">
                   <CommandEmpty className="p-4 text-[14px] text-muted-foreground font-medium text-center">No community found.</CommandEmpty>
                   <CommandGroup heading="Your Communities" className="px-2 pt-2 pb-4">
-                    {mockCommunities.map((community) => (
+                    {communities?.map((community) => (
                       <CommandItem
                         key={community.id}
                         value={community.name}
@@ -109,12 +123,12 @@ export const CreatePostPage: React.FC = () => {
                         }}
                         className="rounded-[12px] px-3 py-2.5 flex items-center gap-3 cursor-pointer aria-selected:bg-primary/10 aria-selected:text-primary transition-colors"
                       >
-                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", community.icon)}>
+                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", community.icon_url)}>
                           r/
                         </div>
                         <div className="flex flex-col flex-1 min-w-0">
                           <span className="font-bold text-[14px] truncate">r/{community.name}</span>
-                          <span className="text-[12px] text-muted-foreground truncate">{community.members} members</span>
+                          <span className="text-[12px] text-muted-foreground truncate">{community.members || 0} members</span>
                         </div>
                         {selectedCommunity?.id === community.id && (
                           <Check className="h-4 w-4 text-primary shrink-0" />

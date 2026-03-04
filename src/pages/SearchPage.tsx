@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { usePosts, useCommunities } from '@/hooks';
 import { PostCard } from '@/components/post/PostCard';
-import { mockPosts, mockCommunities } from '@/db/db';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -11,15 +11,18 @@ export const SearchPage: React.FC = () => {
   const query = searchParams.get('q') || '';
   const qLower = query.toLowerCase();
 
-  const filteredPosts = mockPosts.filter(p => 
+  const { data: posts = [] } = usePosts();
+  const { data: communities = [] } = useCommunities();
+
+  const filteredPosts = posts.filter((p: Post) => 
     p.title.toLowerCase().includes(qLower) || 
-    p.sub.toLowerCase().includes(qLower) ||
-    p.content?.toLowerCase().includes(qLower)
+    (p.subreddit_name || p.sub || '').toLowerCase().includes(qLower) ||
+    (p.content || '').toLowerCase().includes(qLower)
   );
 
-  const filteredCommunities = mockCommunities.filter(c => 
+  const filteredCommunities = communities.filter((c: Community) => 
     c.name.toLowerCase().includes(qLower) || 
-    c.desc.toLowerCase().includes(qLower)
+    (c.description || c.desc || '').toLowerCase().includes(qLower)
   );
 
   return (
@@ -52,10 +55,10 @@ export const SearchPage: React.FC = () => {
                   className="flex items-center justify-between p-4 sm:p-5 hover:bg-muted/50 transition-all group"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-[18px] shadow-sm tracking-tighter transition-transform group-hover:scale-110", community.icon)}>r/</div>
+                    <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-[18px] shadow-sm tracking-tighter transition-transform group-hover:scale-110", community.icon_url || community.icon)}>r/</div>
                     <div className="flex flex-col">
                       <div className="font-bold text-foreground group-hover:text-primary transition-colors text-[16px]">r/{community.name}</div>
-                      <div className="text-[13px] text-muted-foreground font-medium">{community.members} members</div>
+                      <div className="text-[13px] text-muted-foreground font-medium">{community.members || 0} members</div>
                     </div>
                   </div>
                   <Button variant="outline" className="rounded-full h-9 px-6 font-bold border-primary text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-95">Join</Button>

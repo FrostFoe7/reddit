@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, X, MessageCircle, User, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { mockCommunities, mockPosts, mockProfiles } from '@/db/db';
+import { useCommunities, usePosts, useUsers } from '@/hooks';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
@@ -12,6 +12,10 @@ export const SearchBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const { data: posts = [] } = usePosts();
+  const { data: communities = [] } = useCommunities();
+  const { data: profiles = [] } = useUsers();
 
   // Context detection (Subreddit or Profile)
   const isSubreddit = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
@@ -30,15 +34,15 @@ export const SearchBar = () => {
 
   // Filter logic
   const filteredQueries = query.length > 0
-    ? mockPosts.filter(p => p.title.toLowerCase().includes(query.toLowerCase())).slice(0, 4)
+    ? posts.filter((p: Post) => p.title.toLowerCase().includes(query.toLowerCase())).slice(0, 4)
     : [];
 
   const filteredCommunities = query.length > 0
-    ? mockCommunities.filter(c => c.name.toLowerCase().includes(query.toLowerCase())).slice(0, 3)
+    ? communities.filter((c: Community) => c.name.toLowerCase().includes(query.toLowerCase())).slice(0, 3)
     : [];
 
   const filteredProfiles = query.length > 0
-    ? mockProfiles.filter(p => p.name.toLowerCase().includes(query.toLowerCase())).slice(0, 4)
+    ? profiles.filter((p: Post) => (p.username || p.name).toLowerCase().includes(query.toLowerCase())).slice(0, 4)
     : [];
 
   const hasResults = filteredQueries.length > 0 || filteredCommunities.length > 0 || filteredProfiles.length > 0;
@@ -158,7 +162,7 @@ export const SearchBar = () => {
         <div className="absolute top-full left-0 right-0 bg-background border border-t-0 border-border rounded-b-[20px] shadow-xl z-50 overflow-hidden py-2 max-h-[80vh] overflow-y-auto">
           {/* Queries Section */}
           <div className="flex flex-col">
-            {filteredQueries.map((q) => (
+            {filteredQueries.map((q: Post) => (
               <button
                 key={q.id}
                 className="flex items-center gap-3 px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-left"
@@ -181,19 +185,19 @@ export const SearchBar = () => {
               <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider">
                 Communities
               </div>
-              {filteredCommunities.map(c => (
+              {filteredCommunities.map((c: Community) => (
                 <button
                   key={c.id}
                   className="flex items-center justify-between px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors w-full text-left"
                   onClick={() => navigate(`/r/${c.id}`)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 relative", c.icon)}>
+                    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 relative", c.icon_url || c.icon)}>
                       <Users size={20} />
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="text-[14px] font-bold truncate">r/{c.name}</span>
-                      <span className="text-[12px] text-muted-foreground">1.3K weekly visitors</span>
+                      <span className="text-[12px] text-muted-foreground">{c.members || 0} members</span>
                     </div>
                   </div>
                 </button>
@@ -207,20 +211,20 @@ export const SearchBar = () => {
               <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider">
                 Profiles
               </div>
-              {filteredProfiles.map(p => (
+              {filteredProfiles.map((p: Post) => (
                 <button
                   key={p.id}
                   className="flex items-center justify-between px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors w-full text-left"
-                  onClick={() => navigate(`/user/${p.id}`)}
+                  onClick={() => navigate(`/u/${p.username || p.name}`)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={p.avatar} />
+                      <AvatarImage src={p.avatar_url || p.avatar} />
                       <AvatarFallback><User size={20} /></AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[14px] font-bold truncate">u/{p.name}</span>
-                      <span className="text-[12px] text-muted-foreground">{p.karma} karma</span>
+                      <span className="text-[14px] font-bold truncate">u/{p.username || p.name}</span>
+                      <span className="text-[12px] text-muted-foreground">{p.karma || 0} karma</span>
                     </div>
                   </div>
                 </button>

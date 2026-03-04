@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
+import { useUser, usePosts, useComments } from '@/hooks';
 import { PostCard } from '@/components/post/PostCard';
-import { mockPosts, mockComments } from '@/db/db';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,13 +32,26 @@ export const ProfilePage: React.FC = () => {
   const { openShare, openReport } = useOverlays();
   const [isFollowing, setIsFollowing] = React.useState(false);
 
+  const { data: user, isLoading: userLoading } = useUser(username);
+  const { data: posts = [] } = usePosts();
+  // Filter posts and comments for this user
+  // In a real app, you'd have a specific API for user's content
+  const userPosts = posts.filter((p: Post) => (p.author_username || p.author) === username);
+  const { data: allComments = [] } = useComments(undefined); // This might need a different hook for user's comments
+  const userComments = allComments.filter((c: Comment) => (c.author_username || c.author) === username);
+
   const toggleFollow = () => {
     setIsFollowing(!isFollowing);
     toast.success(isFollowing ? `Unfollowed u/${username}` : `Following u/${username}`);
   };
 
-  const userPosts = mockPosts.filter(p => p.author === username);
-  const userComments = mockComments.filter(c => c.author === username);
+  if (userLoading) {
+    return (
+      <div className="flex justify-center py-24">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div id="view-profile" className="view-section active">
@@ -87,7 +100,7 @@ export const ProfilePage: React.FC = () => {
               <div className="flex items-center justify-center sm:justify-start gap-2 text-[14px] sm:text-[15px] text-muted-foreground font-medium">
                 <span>u/{username}</span>
                 <span>•</span>
-                <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full text-[12px]">Premium</span>
+                {user?.is_premium && <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full text-[12px]">Premium</span>}
               </div>
             </div>
             <div className="flex gap-3 mt-2 sm:mt-0">
@@ -107,11 +120,13 @@ export const ProfilePage: React.FC = () => {
           
           <div className="flex gap-10 text-[15px] justify-center sm:justify-start w-full border-t border-border/50 pt-5">
             <div className="flex flex-col items-center sm:items-start">
-              <span className="font-bold text-foreground text-[20px] tracking-tight">1,245</span> 
+              <span className="font-bold text-foreground text-[20px] tracking-tight">{user?.karma || 0}</span> 
               <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">Karma</span>
             </div>
             <div className="flex flex-col items-center sm:items-start">
-              <span className="font-bold text-foreground text-[20px] tracking-tight">Aug 12, 2023</span> 
+              <span className="font-bold text-foreground text-[20px] tracking-tight">
+                {user?.cake_day ? new Date(user.cake_day).toLocaleDateString() : 'Aug 12, 2023'}
+              </span> 
               <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">Cake day</span>
             </div>
           </div>
@@ -143,7 +158,7 @@ export const ProfilePage: React.FC = () => {
         
         <TabsContent value="comments" className="mt-0 space-y-3 sm:space-y-4 px-0">
           {userComments.map(comment => (
-            <Link key={comment.id} to={`/post/${comment.postId}`} className="block group">
+            <Link key={comment.id} to={`/post/${comment.post_id}`} className="block group">
               <div className="bg-card border-y sm:border border-border sm:rounded-[24px] p-5 sm:p-6 cursor-pointer hover:border-primary/30 hover:shadow-ios-subtle transition-all duration-300 active:scale-[0.99]">
                 <div className="flex items-center gap-2 mb-3">
                   <MessageSquare size={18} className="text-primary" />

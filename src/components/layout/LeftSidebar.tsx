@@ -26,7 +26,8 @@ import {
 } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { mockCommunities } from '@/db/db';
+import { useCommunities } from '@/hooks';
+import type { Community } from '@/types';
 import { cn } from '@/lib/utils';
 import { SidebarNavItem } from './SidebarNavItem';
 import { useOverlays } from '@/components/common/GlobalOverlays';
@@ -68,6 +69,7 @@ export const LeftSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { sidebarCollapsed } = useOverlays();
+  const { data: communities = [] } = useCommunities();
 
   const handleExternalClick = (label: string) => {
     toast.info(`Redirecting to ${label}...`, {
@@ -147,12 +149,12 @@ export const LeftSidebar = () => {
                     </div>
                     <span className="text-[14px] font-medium text-left">Manage Communities</span>
                   </button>
-                  {mockCommunities.map(community => (
+                  {communities?.map((community: Community) => (
                     <NavItem 
                       key={community.id}
                       to={`/r/${community.id}`} 
                       icon={() => (
-                        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", community.icon)}>r/</div>
+                        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm", community.icon_url || "bg-primary")}>r/</div>
                       )}
                       label={community.name}
                     />
