@@ -6,6 +6,7 @@ import { SortBar } from "@/components/common/SortBar";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { Separator } from "@/components/ui/separator";
 
 export const Home: React.FC = () => {
   const { data: posts = [], isLoading, error } = usePosts();
@@ -29,7 +30,7 @@ export const Home: React.FC = () => {
       <div
         ref={parentRef}
         id="feed-container"
-        className="h-[calc(100vh-120px)] overflow-y-auto no-scrollbar flex flex-col gap-1 sm:gap-4 lg:gap-6"
+        className="h-[calc(100vh-120px)] overflow-y-auto no-scrollbar flex flex-col"
       >
         {isLoading && (
           <div className="space-y-4 px-4 sm:px-0">
@@ -73,8 +74,11 @@ export const Home: React.FC = () => {
                   transform: `translateY(${virtualItem.start}px)`,
                 }}
               >
-                <div className="pb-2 sm:pb-4 px-0 sm:px-0">
-                  <PostCard post={posts[virtualItem.index]} />
+                <div className="flex flex-col">
+                  <div className="pb-2 sm:pb-4 px-0 sm:px-0">
+                    <PostCard post={posts[virtualItem.index]} />
+                  </div>
+                  <Separator className="my-2 opacity-50" />
                 </div>
               </div>
             ))}
@@ -95,8 +99,8 @@ export const Home: React.FC = () => {
             id="scroll-trigger"
             className="h-32 flex flex-col items-center justify-center py-10 gap-4"
             style={{
-               position: 'absolute',
-               bottom: -150,
+               position: 'relative',
+               bottom: 0,
                width: '100%'
             }}
           >

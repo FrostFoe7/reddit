@@ -1,10 +1,36 @@
 -- Initial MySQL Schema for project-reddit-v2
--- Optimized for production and cPanel hosting environments (MySQL 8.0+)
+-- Optimized for production and cPanel hosting environments (MySQL 5.7+ / 8.0+)
 -- Using custom ID format: xxx-xxx-xxx (11 characters total)
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Drop existing tables
+DROP TABLE IF EXISTS reports;
+DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS conversation_participants;
+DROP TABLE IF EXISTS conversations;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS post_drafts;
+DROP TABLE IF EXISTS saved_posts;
+DROP TABLE IF EXISTS user_blocks;
+DROP TABLE IF EXISTS user_follows;
+DROP TABLE IF EXISTS comment_votes;
+DROP TABLE IF EXISTS post_votes;
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS post_media;
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS subreddit_bans;
+DROP TABLE IF EXISTS subreddit_members;
+DROP TABLE IF EXISTS subreddit_rules;
+DROP TABLE IF EXISTS subreddits;
+DROP TABLE IF EXISTS users;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- Users Table
 CREATE TABLE users (
-    id VARCHAR(11) PRIMARY KEY, -- Custom format: 1bw-j2k-e39
+    id VARCHAR(11) PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) UNIQUE,
     avatar_url TEXT,
@@ -18,7 +44,7 @@ CREATE TABLE users (
     last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE INDEX idx_users_username ON users (username);
 
@@ -35,7 +61,7 @@ CREATE TABLE subreddits (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE INDEX idx_subreddits_name ON subreddits (name);
 
@@ -48,7 +74,7 @@ CREATE TABLE subreddit_rules (
     priority INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (subreddit_id) REFERENCES subreddits(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Subreddit Memberships & Moderation
 CREATE TABLE subreddit_members (
@@ -59,7 +85,7 @@ CREATE TABLE subreddit_members (
     PRIMARY KEY (user_id, subreddit_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subreddit_id) REFERENCES subreddits(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Subreddit Bans
 CREATE TABLE subreddit_bans (
@@ -72,7 +98,7 @@ CREATE TABLE subreddit_bans (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subreddit_id) REFERENCES subreddits(id) ON DELETE CASCADE,
     FOREIGN KEY (banned_by) REFERENCES users(id) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Posts Table
 CREATE TABLE posts (
@@ -92,13 +118,13 @@ CREATE TABLE posts (
     FOREIGN KEY (subreddit_id) REFERENCES subreddits(id) ON DELETE CASCADE,
     FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
     FULLTEXT INDEX idx_posts_search (title, content)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE INDEX idx_posts_subreddit_id ON posts (subreddit_id);
 CREATE INDEX idx_posts_author_id ON posts (author_id);
 CREATE INDEX idx_posts_created_at ON posts (created_at DESC);
 
--- Post Media (For multiple images/videos)
+-- Post Media
 CREATE TABLE post_media (
     id VARCHAR(11) PRIMARY KEY,
     post_id VARCHAR(11) NOT NULL,
@@ -106,7 +132,7 @@ CREATE TABLE post_media (
     media_type VARCHAR(50) DEFAULT 'image',
     priority INT DEFAULT 0,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Comments Table
 CREATE TABLE comments (
@@ -120,7 +146,7 @@ CREATE TABLE comments (
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE INDEX idx_comments_post_id ON comments (post_id);
 CREATE INDEX idx_comments_author_id ON comments (author_id);
@@ -135,7 +161,7 @@ CREATE TABLE post_votes (
     PRIMARY KEY (user_id, post_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Comment Votes
 CREATE TABLE comment_votes (
@@ -146,7 +172,7 @@ CREATE TABLE comment_votes (
     PRIMARY KEY (user_id, comment_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Social: Follows & Blocks
 CREATE TABLE user_follows (
@@ -156,7 +182,7 @@ CREATE TABLE user_follows (
     PRIMARY KEY (follower_id, followed_id),
     FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (followed_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE user_blocks (
     blocker_id VARCHAR(11) NOT NULL,
@@ -165,7 +191,7 @@ CREATE TABLE user_blocks (
     PRIMARY KEY (blocker_id, blocked_id),
     FOREIGN KEY (blocker_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (blocked_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Saved Posts
 CREATE TABLE saved_posts (
@@ -175,7 +201,7 @@ CREATE TABLE saved_posts (
     PRIMARY KEY (user_id, post_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Post Drafts
 CREATE TABLE post_drafts (
@@ -188,7 +214,7 @@ CREATE TABLE post_drafts (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subreddit_id) REFERENCES subreddits(id) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Notifications Table
 CREATE TABLE notifications (
@@ -205,7 +231,7 @@ CREATE TABLE notifications (
     FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE INDEX idx_notifications_recipient_id ON notifications (recipient_id);
 
@@ -214,7 +240,7 @@ CREATE TABLE conversations (
     id VARCHAR(11) PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE conversation_participants (
     conversation_id VARCHAR(11) NOT NULL,
@@ -223,7 +249,7 @@ CREATE TABLE conversation_participants (
     PRIMARY KEY (conversation_id, user_id),
     FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE messages (
     id VARCHAR(11) PRIMARY KEY,
@@ -233,7 +259,7 @@ CREATE TABLE messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Reporting System
 CREATE TABLE reports (
@@ -245,10 +271,10 @@ CREATE TABLE reports (
     status ENUM('pending', 'reviewed', 'dismissed') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Useful Views
-
+DROP VIEW IF EXISTS post_details;
 CREATE VIEW post_details AS
 SELECT 
     p.*,
@@ -272,6 +298,7 @@ LEFT JOIN (
     FROM comments GROUP BY post_id
 ) c ON p.id = c.post_id;
 
+DROP VIEW IF EXISTS comment_details;
 CREATE VIEW comment_details AS
 SELECT 
     c.*,

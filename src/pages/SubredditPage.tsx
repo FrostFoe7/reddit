@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Wrench, ShieldCheck } from "lucide-react";
 import { CommunityHeader } from "@/components/layout/CommunityHeader";
+import { Separator } from "@/components/ui/separator";
 
 export const SubredditPage: React.FC = () => {
   const { name } = useParams<{ name: string }>();
@@ -84,8 +85,13 @@ export const SubredditPage: React.FC = () => {
         </TabsList>
 
         <TabsContent value="posts" className="mt-0 space-y-2 sm:space-y-6">
-          {subPosts.map((post) => (
-            <PostCard key={post.id} post={post} />
+          {subPosts.map((post, index) => (
+            <React.Fragment key={post.id}>
+              <PostCard post={post} />
+              {index < subPosts.length - 1 && (
+                <Separator className="my-4 opacity-50" />
+              )}
+            </React.Fragment>
           ))}
           {subPosts.length === 0 && (
             <div className="p-16 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm">

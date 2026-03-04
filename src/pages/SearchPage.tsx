@@ -6,6 +6,7 @@ import { PostCard } from "@/components/post/PostCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 export const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -100,10 +101,15 @@ export const SearchPage: React.FC = () => {
 
         <div
           id="search-results-container"
-          className="flex flex-col gap-1 sm:gap-4"
+          className="flex flex-col"
         >
-          {filteredPosts.map((post) => (
-            <PostCard key={post.id} post={post} />
+          {filteredPosts.map((post, index) => (
+            <React.Fragment key={post.id}>
+              <PostCard post={post} />
+              {index < filteredPosts.length - 1 && (
+                <Separator className="my-4 opacity-50" />
+              )}
+            </React.Fragment>
           ))}
           {filteredPosts.length === 0 && filteredCommunities.length === 0 && (
             <div className="p-16 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm flex flex-col items-center gap-4">
