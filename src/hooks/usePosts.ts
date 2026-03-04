@@ -3,13 +3,32 @@ import { api } from "@/lib/api";
 import type { Post } from "@/types";
 import { useAuthStore } from "@/store/useStore";
 
-export function usePosts() {
+export function usePosts(sort: string = 'new') {
   const user = useAuthStore((state) => state.user);
   const userId = user?.id;
 
   return useQuery({
-    queryKey: ["posts", userId],
-    queryFn: () => api.get<Post[]>(userId ? `posts?user_id=${userId}` : "posts"),
+    queryKey: ["posts", userId, sort],
+    queryFn: () => {
+        let url = `posts?sort=${sort}`;
+        if (userId) url += `&user_id=${userId}`;
+        return api.get<Post[]>(url);
+    },
+  });
+}
+
+export function useSearchPosts(query: string) {
+  const user = useAuthStore((state) => state.user);
+  const userId = user?.id;
+
+  return useQuery({
+    queryKey: ["posts", "search", query, userId],
+    queryFn: () => {
+        let url = `posts?q=${encodeURIComponent(query)}`;
+        if (userId) url += `&user_id=${userId}`;
+        return api.get<Post[]>(url);
+    },
+    enabled: !!query,
   });
 }
 

@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import { Flame, Star, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface SortBarProps {
   className?: string;
-  onSortChange?: (sort: "hot" | "new" | "top") => void;
+  activeSort?: string;
+  onSortChange?: (sort: string) => void;
 }
 
 export const SortBar: React.FC<SortBarProps> = ({
   className,
+  activeSort = "hot",
   onSortChange,
 }) => {
-  const [activeSort, setActiveSort] = useState<"hot" | "new" | "top">("hot");
-
   const handleSort = (sort: "hot" | "new" | "top") => {
-    setActiveSort(sort);
     if (onSortChange) onSortChange(sort);
   };
 

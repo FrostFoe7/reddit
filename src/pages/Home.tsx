@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { usePosts } from "@/hooks";
 import { PostCard } from "@/components/post/PostCard";
 import { CreatePostPrompt } from "@/components/common/CreatePostPrompt";
@@ -9,13 +9,14 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { Separator } from "@/components/ui/separator";
 
 export const Home: React.FC = () => {
-  const { data: posts = [], isLoading, error } = usePosts();
+  const [currentSort, setCurrentSort] = useState('new');
+  const { data: posts = [], isLoading, error } = usePosts(currentSort);
   const parentRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
     count: posts.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 200, // Smaller estimate, will be measured dynamically
+    estimateSize: () => 200, 
     overscan: 5,
   });
 
@@ -24,7 +25,11 @@ export const Home: React.FC = () => {
       <CreatePostPrompt className="hidden sm:flex" />
 
       <div className="bg-card sm:bg-transparent border-y sm:border-none border-border">
-        <SortBar className="py-2 sm:py-0" />
+        <SortBar 
+            className="py-2 sm:py-0" 
+            activeSort={currentSort} 
+            onSortChange={setCurrentSort} 
+        />
       </div>
 
       <div
@@ -109,7 +114,7 @@ export const Home: React.FC = () => {
               className="w-10 h-10 border-[3px] border-muted border-t-primary rounded-full animate-spin shadow-sm"
             ></div>
             <p className="text-sm font-bold text-muted-foreground animate-pulse">
-              Loading more posts...
+              No more posts to load
             </p>
           </div>
         )}
