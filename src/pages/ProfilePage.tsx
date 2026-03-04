@@ -14,6 +14,7 @@ import {
   UserPlus, 
   Mail
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,114 +30,141 @@ export const ProfilePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'posts';
   const { openShare, openReport } = useOverlays();
+  const [isFollowing, setIsFollowing] = React.useState(false);
+
+  const toggleFollow = () => {
+    setIsFollowing(!isFollowing);
+    toast.success(isFollowing ? `Unfollowed u/${username}` : `Following u/${username}`);
+  };
 
   const userPosts = mockPosts.filter(p => p.author === username);
   const userComments = mockComments.filter(c => c.author === username);
 
   return (
     <div id="view-profile" className="view-section active">
-      <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 -mt-2 sm:mt-0 relative shadow-sm">
-        <div className="h-32 sm:h-40 bg-gradient-to-r from-orange-400 to-red-500 relative">
-           <div className="absolute top-4 right-4 flex gap-2">
+      <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 relative shadow-sm">
+        <div className="h-32 sm:h-48 bg-gradient-to-br from-orange-500 via-red-500 to-purple-600 relative">
+           <div className="absolute top-3 right-3 sm:top-6 sm:right-6 flex gap-2">
              <DropdownMenu>
                <DropdownMenuTrigger asChild>
-                 <Button variant="ghost" size="icon" className="w-11 h-11 bg-black/30 hover:bg-black/50 rounded-full text-white backdrop-blur-xl shadow-sm transition-colors">
+                 <Button variant="ghost" size="icon" className="w-10 h-10 sm:w-12 sm:h-12 bg-black/20 hover:bg-black/40 rounded-full text-white backdrop-blur-md shadow-sm transition-all active:scale-95 border border-white/10">
                   <MoreHorizontal size={22} />
                  </Button>
                </DropdownMenuTrigger>
-               <DropdownMenuContent align="end" className="w-[220px] rounded-[20px] p-1.5 bg-glass backdrop-blur-2xl shadow-ios-float border-border">
-                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between" onClick={() => openShare(window.location.href)}>
+               <DropdownMenuContent align="end" className="w-[220px] rounded-[20px] p-2 bg-glass backdrop-blur-2xl shadow-ios-float border-border">
+                 <DropdownMenuItem className="rounded-[12px] p-3 font-semibold flex justify-between" onClick={() => openShare(window.location.href)}>
                    Share Profile <Share2 size={18} className="text-muted-foreground" />
                  </DropdownMenuItem>
-                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between" onClick={() => toast.success("Following user")}>
-                   Follow <UserPlus size={18} className="text-muted-foreground" />
+                 <DropdownMenuItem className="rounded-[12px] p-3 font-semibold flex justify-between" onClick={toggleFollow}>
+                   {isFollowing ? "Unfollow" : "Follow"} <UserPlus size={18} className="text-muted-foreground" />
                  </DropdownMenuItem>
-                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between">
+                 <DropdownMenuItem className="rounded-[12px] p-3 font-semibold flex justify-between" onClick={() => toast.info("Chat feature coming soon!")}>
                    Send Message <Mail size={18} className="text-muted-foreground" />
                  </DropdownMenuItem>
-                 <DropdownMenuSeparator className="bg-border my-1 mx-2" />
-                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive" onClick={() => toast.error("User blocked")}>
+                 <DropdownMenuSeparator className="bg-border my-1.5 mx-1" />
+                 <DropdownMenuItem className="rounded-[12px] p-3 font-semibold flex justify-between text-destructive focus:text-destructive" onClick={() => toast.error("User blocked")}>
                    Block User <Ban size={18} />
                  </DropdownMenuItem>
-                 <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive" onClick={() => openReport(`user_${username}`)}>
+                 <DropdownMenuItem className="rounded-[12px] p-3 font-semibold flex justify-between text-destructive focus:text-destructive" onClick={() => openReport(`user_${username}`)}>
                    Report <Flag size={18} />
                  </DropdownMenuItem>
                </DropdownMenuContent>
              </DropdownMenu>
            </div>
         </div>
-        <div className="px-5 sm:px-8 pb-8 relative flex flex-col items-center sm:items-start text-center sm:text-left">
-          <Avatar className="w-[104px] h-[104px] sm:w-[120px] sm:h-[120px] border-4 border-card -mt-[52px] sm:-mt-[60px] shadow-md mb-4">
-            <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=ff4500`} />
-            <AvatarFallback>{username?.[0]}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between w-full mb-5">
-            <div>
-              <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground leading-tight tracking-tight mb-1">{username}</h1>
-              <p className="text-[15px] text-muted-foreground font-medium">u/{username} • <span className="text-primary font-bold">Premium</span></p>
+        <div className="px-5 sm:px-10 pb-8 relative flex flex-col items-center sm:items-start text-center sm:text-left">
+          <div className="relative -mt-[52px] sm:-mt-[60px] mb-4">
+            <Avatar className="w-[104px] h-[104px] sm:w-[130px] sm:h-[130px] border-[5px] border-card shadow-lg">
+              <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=ff4500`} />
+              <AvatarFallback className="text-2xl font-bold">{username?.[0]}</AvatarFallback>
+            </Avatar>
+            <div className="absolute bottom-1 right-1 w-7 h-7 bg-green-500 rounded-full border-4 border-card shadow-sm"></div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between w-full mb-6 gap-4">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-[28px] sm:text-[36px] font-bold text-foreground leading-none tracking-tight">{username}</h1>
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-[14px] sm:text-[15px] text-muted-foreground font-medium">
+                <span>u/{username}</span>
+                <span>•</span>
+                <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full text-[12px]">Premium</span>
+              </div>
             </div>
-            <div className="flex gap-3 mt-4 sm:mt-0">
-              <Button className="rounded-full px-6 font-bold bg-primary text-primary-foreground hover:opacity-90">Follow</Button>
-              <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-border hover:bg-muted"><Mail size={20} /></Button>
+            <div className="flex gap-3 mt-2 sm:mt-0">
+              <Button 
+                onClick={toggleFollow}
+                variant={isFollowing ? "outline" : "default"}
+                className={cn(
+                  "rounded-full px-8 font-bold h-11 shadow-md transition-all active:scale-95",
+                  isFollowing ? "border-primary text-primary hover:bg-primary/5" : "bg-primary text-primary-foreground hover:opacity-90"
+                )}
+              >
+                {isFollowing ? "Following" : "Follow"}
+              </Button>
+              <Button onClick={() => toast.info("Chat feature coming soon!")} variant="outline" size="icon" className="rounded-full h-11 w-11 border-border hover:bg-muted shadow-sm transition-all active:scale-95"><Mail size={20} /></Button>
             </div>
           </div>
-          <div className="flex gap-8 text-[15px] justify-center sm:justify-start w-full">
-            <div className="flex flex-col">
-              <span className="font-bold text-foreground text-[18px]">1,245</span> 
-              <span className="text-muted-foreground text-[13px] uppercase tracking-wider font-semibold">Karma</span>
+          
+          <div className="flex gap-10 text-[15px] justify-center sm:justify-start w-full border-t border-border/50 pt-5">
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="font-bold text-foreground text-[20px] tracking-tight">1,245</span> 
+              <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">Karma</span>
             </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-foreground text-[18px]">Aug 12, 2023</span> 
-              <span className="text-muted-foreground text-[13px] uppercase tracking-wider font-semibold">Cake day</span>
+            <div className="flex flex-col items-center sm:items-start">
+              <span className="font-bold text-foreground text-[20px] tracking-tight">Aug 12, 2023</span> 
+              <span className="text-muted-foreground text-[12px] uppercase tracking-widest font-bold opacity-70 mt-0.5">Cake day</span>
             </div>
           </div>
         </div>
       </div>
 
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="bg-transparent border-b border-border rounded-none h-auto p-0 flex gap-8 mb-6 px-4 sm:px-0 overflow-x-auto no-scrollbar">
-          <TabsTrigger value="posts" className="pb-3.5 pt-2 text-[16px] font-semibold data-[state=active]:text-foreground data-[state=active]:border-b-[3px] data-[state=active]:border-foreground rounded-none shadow-none bg-transparent border-b-[3px] border-transparent px-1 whitespace-nowrap">
-            Posts
-          </TabsTrigger>
-          <TabsTrigger value="comments" className="pb-3.5 pt-2 text-[16px] font-semibold data-[state=active]:text-foreground data-[state=active]:border-b-[3px] data-[state=active]:border-foreground rounded-none shadow-none bg-transparent border-b-[3px] border-transparent px-1 whitespace-nowrap">
-            Comments
-          </TabsTrigger>
-          <TabsTrigger value="saved" className="pb-3.5 pt-2 text-[16px] font-semibold data-[state=active]:text-foreground data-[state=active]:border-b-[3px] data-[state=active]:border-foreground rounded-none shadow-none bg-transparent border-b-[3px] border-transparent px-1 whitespace-nowrap">
-            Saved
-          </TabsTrigger>
+        <TabsList variant="line" className="px-4 sm:px-0 gap-6 sm:gap-10 mb-6 overflow-x-auto no-scrollbar justify-start">
+          {['posts', 'comments', 'saved'].map((tab) => (
+            <TabsTrigger 
+              key={tab}
+              value={tab} 
+              className="font-bold text-[15px] sm:text-[16px] capitalize"
+            >
+              {tab}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value="posts" className="mt-0 space-y-2 sm:space-y-6">
+        <TabsContent value="posts" className="mt-0 space-y-3 sm:space-y-6">
           {userPosts.map(post => <PostCard key={post.id} post={post} />)}
           {userPosts.length === 0 && (
-            <div className="p-10 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border">
-              No posts yet.
+            <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm">
+              <p className="text-[18px] font-bold text-foreground mb-1">No posts yet</p>
+              <p className="text-[14px]">When {username} posts, they'll show up here.</p>
             </div>
           )}
         </TabsContent>
         
-        <TabsContent value="comments" className="mt-0 space-y-2 sm:space-y-4 px-4 sm:px-0">
+        <TabsContent value="comments" className="mt-0 space-y-3 sm:space-y-4 px-0">
           {userComments.map(comment => (
-            <Link key={comment.id} to={`/post/${comment.postId}`} className="block">
-              <div className="bg-card border-y sm:border border-border sm:rounded-[24px] p-6 cursor-pointer hover:border-neutral-400 dark:hover:border-neutral-500 hover:shadow-ios-subtle transition-all duration-300 active:scale-[0.99]">
+            <Link key={comment.id} to={`/post/${comment.postId}`} className="block group">
+              <div className="bg-card border-y sm:border border-border sm:rounded-[24px] p-5 sm:p-6 cursor-pointer hover:border-primary/30 hover:shadow-ios-subtle transition-all duration-300 active:scale-[0.99]">
                 <div className="flex items-center gap-2 mb-3">
-                  <MessageSquare size={18} className="text-muted-foreground" />
-                  <p className="text-[13px] text-muted-foreground font-bold uppercase tracking-wider">Commented on post</p>
+                  <MessageSquare size={18} className="text-primary" />
+                  <p className="text-[12px] text-muted-foreground font-bold uppercase tracking-widest">Commented on post</p>
                 </div>
-                <p className="text-[16px] text-foreground font-medium leading-relaxed">"{comment.content}"</p>
+                <p className="text-[16px] text-foreground font-medium leading-relaxed group-hover:text-primary transition-colors">"{comment.content}"</p>
               </div>
             </Link>
           ))}
           {userComments.length === 0 && (
-            <div className="p-10 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border">
-              No comments yet.
+            <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm">
+              <p className="text-[18px] font-bold text-foreground mb-1">No comments yet</p>
+              <p className="text-[14px]">When {username} comments, they'll show up here.</p>
             </div>
           )}
         </TabsContent>
         
-        <TabsContent value="saved" className="mt-0 space-y-2 sm:space-y-6">
-           <div className="p-10 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border">
-              No saved posts yet.
+        <TabsContent value="saved" className="mt-0 space-y-3 sm:space-y-6">
+           <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-[24px] border border-border shadow-sm">
+              <p className="text-[18px] font-bold text-foreground mb-1">No saved posts</p>
+              <p className="text-[14px]">Saved posts are private and only visible to you.</p>
             </div>
         </TabsContent>
       </Tabs>

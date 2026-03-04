@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
   TrendingUp, 
@@ -35,6 +35,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from 'sonner';
 
 type NavItemProps = Omit<React.ComponentProps<typeof SidebarNavItem>, 'collapsed'>;
 
@@ -67,6 +68,12 @@ export const LeftSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { sidebarCollapsed } = useOverlays();
+
+  const handleExternalClick = (label: string) => {
+    toast.info(`Redirecting to ${label}...`, {
+      description: "This feature would open an external Reddit page."
+    });
+  };
 
   return (
     <aside 
@@ -131,15 +138,15 @@ export const LeftSidebar = () => {
                     </div>
                     <span className="text-[14px] font-medium">Create a community</span>
                   </button>
-                  <Link 
-                    to="/user/communities"
+                  <button 
+                    onClick={() => toast.info("Manage Communities", { description: "Community management interface is coming soon!" })}
                     className="flex items-center gap-3 px-4 py-2 rounded-[8px] hover:bg-muted transition-colors text-foreground group w-full"
                   >
                     <div className="flex items-center justify-center w-8 h-8 shrink-0">
                       <Settings size={18} className="text-muted-foreground group-hover:text-foreground" />
                     </div>
-                    <span className="text-[14px] font-medium">Manage Communities</span>
-                  </Link>
+                    <span className="text-[14px] font-medium text-left">Manage Communities</span>
+                  </button>
                   {mockCommunities.map(community => (
                     <NavItem 
                       key={community.id}
@@ -161,10 +168,10 @@ export const LeftSidebar = () => {
               <AccordionContent className="pt-1 pb-2">
                 <div className="flex flex-col space-y-0.5">
                   <NavItem to="/r/GamesOnReddit" icon={Gamepad2} label="Discover Games" />
-                  <NavItem to="/post/game1" icon={() => (
+                  <NavItem to="/post/post1" icon={() => (
                     <Avatar className="w-6 h-6"><AvatarImage src="https://styles.redditmedia.com/t5_g4t9vd/styles/communityIcon_jejg2erkc48g1.png" /></Avatar>
                   )} label="BattleBirds" />
-                  <NavItem to="/post/game2" icon={() => (
+                  <NavItem to="/post/post2" icon={() => (
                     <Avatar className="w-6 h-6"><AvatarImage src="https://styles.redditmedia.com/t5_gikv8d/styles/communityIcon_nz4nl06rg4hg1.png" /></Avatar>
                   )} label="Soul Thieves" />
                 </div>
@@ -177,20 +184,44 @@ export const LeftSidebar = () => {
               </AccordionTrigger>
               <AccordionContent className="pt-1 pb-2">
                 <div className="flex flex-col space-y-0.5">
-                  <NavItem to="https://www.redditinc.com" icon={Info} label="About Reddit" />
-                  <NavItem to="https://ads.reddit.com" icon={Megaphone} label="Advertise" />
-                  <NavItem to="/reddit-pro" icon={PieChart} label="Reddit Pro" />
-                  <Badge variant="outline" className="ml-12 w-fit text-[10px] font-bold text-primary border-primary bg-primary/5 px-1 py-0 h-4">BETA</Badge>
-                  <NavItem to="https://support.reddithelp.com" icon={LifeBuoy} label="Help" />
-                  <NavItem to="https://redditblog.com" icon={BookOpen} label="Blog" />
-                  <NavItem to="https://www.redditinc.com/careers" icon={Briefcase} label="Careers" />
-                  <NavItem to="https://www.redditinc.com/press" icon={Mic2} label="Press" />
+                  <button onClick={() => handleExternalClick("About Reddit")} className="w-full text-left">
+                    <NavItem to="#" icon={Info} label="About Reddit" />
+                  </button>
+                  <button onClick={() => handleExternalClick("Advertise")} className="w-full text-left">
+                    <NavItem to="#" icon={Megaphone} label="Advertise" />
+                  </button>
+                  <button onClick={() => handleExternalClick("Reddit Pro")} className="w-full text-left">
+                    <div className="relative">
+                      <NavItem to="#" icon={PieChart} label="Reddit Pro" />
+                      <Badge variant="outline" className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-primary border-primary bg-primary/5 px-1 py-0 h-4">BETA</Badge>
+                    </div>
+                  </button>
+                  <button onClick={() => handleExternalClick("Help")} className="w-full text-left">
+                    <NavItem to="#" icon={LifeBuoy} label="Help" />
+                  </button>
+                  <button onClick={() => handleExternalClick("Blog")} className="w-full text-left">
+                    <NavItem to="#" icon={BookOpen} label="Blog" />
+                  </button>
+                  <button onClick={() => handleExternalClick("Careers")} className="w-full text-left">
+                    <NavItem to="#" icon={Briefcase} label="Careers" />
+                  </button>
+                  <button onClick={() => handleExternalClick("Press")} className="w-full text-left">
+                    <NavItem to="#" icon={Mic2} label="Press" />
+                  </button>
                   <hr className="my-2 border-border mx-4" />
-                  <NavItem to="/best/communities" icon={Users} label="Communities" />
-                  <NavItem to="/posts/2026/global" icon={Star} label="Best of Reddit" />
-                  <NavItem to="/policies/content-policy" icon={BookOpen} label="Content Policy" />
-                  <NavItem to="/policies/privacy-policy" icon={ShieldCheck} label="Privacy Policy" />
-                  <NavItem to="/policies/user-agreement" icon={BookOpen} label="User Agreement" />
+                  <NavItem to="/explore" icon={Users} label="Communities" />
+                  <button onClick={() => handleExternalClick("Best of Reddit")} className="w-full text-left">
+                    <NavItem to="#" icon={Star} label="Best of Reddit" />
+                  </button>
+                  <button onClick={() => handleExternalClick("Content Policy")} className="w-full text-left">
+                    <NavItem to="#" icon={BookOpen} label="Content Policy" />
+                  </button>
+                  <button onClick={() => handleExternalClick("Privacy Policy")} className="w-full text-left">
+                    <NavItem to="#" icon={ShieldCheck} label="Privacy Policy" />
+                  </button>
+                  <button onClick={() => handleExternalClick("User Agreement")} className="w-full text-left">
+                    <NavItem to="#" icon={BookOpen} label="User Agreement" />
+                  </button>
                 </div>
               </AccordionContent>
             </AccordionItem>

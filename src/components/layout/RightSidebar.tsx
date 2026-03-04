@@ -1,12 +1,14 @@
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { mockCommunities, mockPosts } from '@/db/db';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export const RightSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isSubredditPage = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
   const isPostPage = location.pathname.startsWith('/post/');
   const isProfilePage = location.pathname.startsWith('/u/');
@@ -30,12 +32,24 @@ export const RightSidebar = () => {
   const isCreatePage = location.pathname === '/create';
   const showCommunityInfo = isSubredditPage || isPostPage;
 
+  const handleAction = (label: string) => {
+    toast.success(`${label} action performed!`, {
+      description: "This is a demo action."
+    });
+  };
+
+  const handleExternal = (label: string) => {
+    toast.info(`Opening ${label}...`, {
+      description: "Redirecting to external Reddit resource."
+    });
+  };
+
   return (
     <aside id="right-sidebar" className="hidden xl:flex flex-col w-[312px] shrink-0 border-l border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-colors duration-400">
       <div className="flex flex-col p-4 space-y-6">
         {isCreatePage && (
           <div className="flex flex-col space-y-4">
-            <div className="bg-card border border-border rounded-[16px] p-4 flex flex-col gap-3">
+            <div className="bg-card border border-border rounded-[16px] p-4 flex flex-col gap-3 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-[20px]">📝</span>
@@ -51,7 +65,7 @@ export const RightSidebar = () => {
                   "Read the community's rules"
                 ].map((rule, i) => (
                   <li key={i} className="flex gap-3 text-[14px] font-medium border-b border-border/50 pb-2 last:border-0 last:pb-0">
-                    <span className="text-muted-foreground whitespace-nowrap">{i + 1}.</span>
+                    <span className="text-muted-foreground whitespace-nowrap font-bold opacity-50">{i + 1}.</span>
                     <span className="text-foreground leading-snug">{rule}</span>
                   </li>
                 ))}
@@ -59,14 +73,14 @@ export const RightSidebar = () => {
             </div>
             
             <div className="text-[12px] text-muted-foreground px-2 leading-relaxed">
-              Please be mindful of Reddit's <Link to="#" className="text-primary hover:underline">Content Policy</Link> and practice good <Link to="#" className="text-primary hover:underline">reddiquette</Link>.
+              Please be mindful of Reddit's <button onClick={() => handleExternal("Content Policy")} className="text-primary hover:underline font-bold">Content Policy</button> and practice good <button onClick={() => handleExternal("Reddiquette")} className="text-primary hover:underline font-bold">reddiquette</button>.
             </div>
           </div>
         )}
 
         {isProfilePage && userContext && (
           <div className="flex flex-col space-y-3">
-            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4 border border-border">
+            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4 border border-border shadow-sm">
               <div className="flex flex-col gap-1">
                 <h3 className="text-[16px] font-bold text-foreground capitalize">{userContext}</h3>
                 <p className="text-[12px] text-muted-foreground font-medium">u/{userContext}</p>
@@ -90,20 +104,20 @@ export const RightSidebar = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Button className="w-full rounded-full font-bold h-10 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90">Follow</Button>
-                <Button variant="outline" className="w-full rounded-full font-bold h-10 border-primary text-primary hover:bg-primary/5">Chat</Button>
+                <Button onClick={() => handleAction("Follow")} className="w-full rounded-full font-bold h-10 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90">Follow</Button>
+                <Button onClick={() => handleAction("Chat")} variant="outline" className="w-full rounded-full font-bold h-10 border-primary text-primary hover:bg-primary/5">Chat</Button>
               </div>
             </div>
 
-            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-3 border border-border">
+            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-3 border border-border shadow-sm">
               <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest px-1">Achievements</h3>
               <div className="flex gap-2 px-1">
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px]" title="Banana Aficionado">🍌</div>
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px]" title="Detective Doggo">🐶</div>
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px]" title="Banana Enthusiast">🍌</div>
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[14px] font-bold text-muted-foreground">+8</div>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px] shadow-sm" title="Banana Aficionado">🍌</div>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px] shadow-sm" title="Detective Doggo">🐶</div>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px] shadow-sm" title="Banana Enthusiast">🍌</div>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[14px] font-bold text-muted-foreground shadow-sm">+8</div>
               </div>
-              <Button variant="ghost" className="w-full text-primary font-bold text-[12px] py-1 justify-start px-1 h-auto hover:bg-transparent hover:underline">View your achievements</Button>
+              <Button onClick={() => handleAction("View Achievements")} variant="ghost" className="w-full text-primary font-bold text-[12px] py-1 justify-start px-1 h-auto hover:bg-transparent hover:underline">View your achievements</Button>
             </div>
           </div>
         )}
@@ -113,13 +127,13 @@ export const RightSidebar = () => {
             <div className="flex items-center justify-between px-2">
               <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">About Community</h3>
             </div>
-            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4">
+            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4 border border-border shadow-sm">
               <div className="flex items-center gap-3">
                 <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-[12px] font-bold text-white shadow-sm", communityContext.icon)}>r/</div>
                 <div className="flex flex-col">
                   <span className="font-bold text-[16px]">r/{communityContext.name}</span>
                   <div className="flex items-center gap-1.5 text-[12px] text-green-500 font-medium">
-                    <div className="w-2 h-2 rounded-full bg-green-500"></div> Online
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> Online
                   </div>
                 </div>
               </div>
@@ -137,8 +151,8 @@ export const RightSidebar = () => {
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <Button className="w-full rounded-full font-bold h-10 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90">Join</Button>
-                <Button variant="outline" className="w-full rounded-full font-bold h-10 border-primary text-primary hover:bg-primary/5">Create Post</Button>
+                <Button onClick={() => handleAction("Join")} className="w-full rounded-full font-bold h-10 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90">Join</Button>
+                <Button onClick={() => navigate('/create')} variant="outline" className="w-full rounded-full font-bold h-10 border-primary text-primary hover:bg-primary/5">Create Post</Button>
               </div>
             </div>
           </div>
@@ -154,9 +168,9 @@ export const RightSidebar = () => {
                 "No Self-Promotion Without Context",
                 "No Spam"
               ].map((rule, i) => (
-                <div key={i} className="flex items-start gap-3 p-2 hover:bg-muted rounded-[12px] cursor-pointer transition-colors group">
-                  <span className="text-[12px] font-bold text-muted-foreground mt-0.5">{i + 1}</span>
-                  <span className="text-[13px] font-medium text-foreground group-hover:text-primary">{rule}</span>
+                <div key={i} onClick={() => handleAction(`Rule ${i+1}`)} className="flex items-start gap-3 p-2 hover:bg-muted rounded-[12px] cursor-pointer transition-colors group">
+                  <span className="text-[12px] font-bold text-muted-foreground mt-0.5 opacity-50">{i + 1}</span>
+                  <span className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">{rule}</span>
                 </div>
               ))}
             </div>
@@ -167,21 +181,21 @@ export const RightSidebar = () => {
           <div className="flex flex-col space-y-3">
             <div className="flex justify-between items-center px-2">
               <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">Moderators</h3>
-              <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
-                <MessageSquare size={14} className="text-primary" />
+              <Button onClick={() => handleAction("Message Mods")} variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-primary/10">
+                <MessageSquare size={16} className="text-primary" />
               </Button>
             </div>
             <div className="flex flex-col space-y-1 px-1">
               {["doctor-_-atomic", "mod-person", "stuckyfeet"].map((mod) => (
-                <Link key={mod} to={`/u/${mod}`} className="flex items-center gap-3 p-2 hover:bg-muted rounded-[12px] transition-colors">
-                  <Avatar className="h-6 w-6">
+                <Link key={mod} to={`/u/${mod}`} className="flex items-center gap-3 p-2 hover:bg-muted rounded-[12px] transition-colors group">
+                  <Avatar className="h-7 w-7 border border-border/50">
                     <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${mod}`} />
                     <AvatarFallback>M</AvatarFallback>
                   </Avatar>
-                  <span className="text-[13px] font-medium">u/{mod}</span>
+                  <span className="text-[13px] font-bold group-hover:text-primary transition-colors">u/{mod}</span>
                 </Link>
               ))}
-              <Button variant="ghost" className="w-full text-primary font-bold text-[12px] py-2 rounded-[12px] h-auto hover:bg-muted mt-1">View All Moderators</Button>
+              <Button onClick={() => handleAction("View All Moderators")} variant="ghost" className="w-full text-primary font-bold text-[12px] py-2.5 rounded-[12px] h-auto hover:bg-primary/5 mt-1 border border-transparent hover:border-primary/20">View All Moderators</Button>
             </div>
           </div>
         )}
@@ -220,16 +234,16 @@ export const RightSidebar = () => {
               <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest px-2">Top Communities</h3>
               <div className="flex flex-col space-y-1">
                 {mockCommunities.slice(0, 5).map((community, i) => (
-                  <Link key={community.id} to={`/r/${community.id}`} className="flex items-center justify-between px-2 py-2 hover:bg-muted rounded-[12px] transition-colors">
+                  <Link key={community.id} to={`/r/${community.id}`} className="flex items-center justify-between px-2 py-2 hover:bg-muted rounded-[12px] transition-colors group">
                     <div className="flex items-center gap-3">
-                      <span className="text-[12px] font-bold text-muted-foreground w-4">{i + 1}</span>
-                      <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm", community.icon)}>r/</div>
-                      <span className="text-[13px] font-bold text-foreground">r/{community.name}</span>
+                      <span className="text-[12px] font-bold text-muted-foreground w-4 opacity-50">{i + 1}</span>
+                      <div className={cn("w-7 h-7 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm transition-transform group-hover:scale-110", community.icon)}>r/</div>
+                      <span className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">r/{community.name}</span>
                     </div>
-                    <Button variant="outline" size="sm" className="rounded-full h-7 px-3 font-bold border-primary text-primary hover:bg-primary/5 text-[11px]">Join</Button>
+                    <Button onClick={(e) => { e.preventDefault(); handleAction("Join"); }} variant="outline" size="sm" className="rounded-full h-7 px-3 font-bold border-primary text-primary hover:bg-primary/5 text-[11px] shadow-sm">Join</Button>
                   </Link>
                 ))}
-                <Button variant="ghost" className="w-full text-primary font-bold text-[12px] py-2 rounded-[12px] h-auto hover:bg-muted mt-1">View All</Button>
+                <Button onClick={() => navigate('/explore')} variant="ghost" className="w-full text-primary font-bold text-[12px] py-2.5 rounded-[12px] h-auto hover:bg-primary/5 mt-1 border border-transparent hover:border-primary/20">View All</Button>
               </div>
             </div>
           </>
@@ -237,9 +251,9 @@ export const RightSidebar = () => {
 
         <div className="px-2 pt-4 flex flex-wrap gap-x-3 gap-y-1 border-t border-border mt-4">
           {["User Agreement", "Privacy Policy", "Content Policy", "Moderator Code"].map((link) => (
-            <Link key={link} to="#" className="text-[11px] font-medium text-muted-foreground hover:underline">{link}</Link>
+            <button key={link} onClick={() => handleExternal(link)} className="text-[11px] font-bold text-muted-foreground hover:text-primary hover:underline transition-colors">{link}</button>
           ))}
-          <p className="text-[11px] font-medium text-muted-foreground mt-2 w-full">Reddit, Inc. © 2026. All rights reserved.</p>
+          <p className="text-[11px] font-bold text-muted-foreground mt-3 w-full opacity-50">Reddit, Inc. © 2026. All rights reserved.</p>
         </div>
       </div>
     </aside>

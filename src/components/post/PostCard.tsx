@@ -28,6 +28,15 @@ interface PostCardProps {
 export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) => {
   const navigate = useNavigate();
   const { openShare, openReport, openLightbox } = useOverlays();
+  const [isJoined, setIsJoined] = React.useState(false);
+
+  const toggleJoin = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsJoined(!isJoined);
+    import('sonner').then(({ toast }) => {
+      toast.success(isJoined ? `Left r/${post.sub}` : `Joined r/${post.sub}`);
+    });
+  };
 
   return (
     <article 
@@ -72,8 +81,16 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
             </span>
 
             <div className="flex items-center gap-1 shrink-0">
-              <Button variant="secondary" size="sm" className="h-8 rounded-full font-bold px-4 text-[12px] bg-primary text-primary-foreground hover:bg-primary/90">
-                Join
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                onClick={toggleJoin}
+                className={cn(
+                  "h-8 rounded-full font-bold px-4 text-[12px] transition-all",
+                  isJoined ? "bg-muted text-foreground border border-border" : "bg-primary text-primary-foreground hover:bg-primary/90"
+                )}
+              >
+                {isJoined ? "Joined" : "Join"}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -107,8 +124,16 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
             </div>
             
             <div className="flex items-center gap-1 relative z-10" onClick={(e) => e.stopPropagation()}>
-              <Button variant="secondary" size="sm" className="h-7 rounded-full font-bold px-3 text-[12px] bg-primary text-primary-foreground hover:bg-primary/90">
-                Join
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                onClick={toggleJoin}
+                className={cn(
+                  "h-7 rounded-full font-bold px-3 text-[12px] transition-all",
+                  isJoined ? "bg-muted text-foreground border border-border" : "bg-primary text-primary-foreground hover:bg-primary/90"
+                )}
+              >
+                {isJoined ? "Joined" : "Join"}
               </Button>
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:bg-muted">
                 <MoreHorizontal size={18} />

@@ -18,7 +18,7 @@ export const MainLayoutContent = ({ children }: { children: React.ReactNode }) =
       <div className="flex justify-center w-full max-w-[1400px] mx-auto pt-14 flex-1">
         <LeftSidebar />
         <main className={cn(
-          "flex-1 w-full px-0 sm:px-6 pt-0 sm:pt-6 pb-24 relative min-h-[85vh] flex justify-center transition-all duration-300",
+          "flex-1 w-full px-0 sm:px-6 pt-6 sm:pt-8 pb-24 relative min-h-[85vh] flex justify-center transition-all duration-300",
           sidebarCollapsed ? "max-w-[calc(1400px-80px-312px)]" : "max-w-[calc(1400px-270px-312px)]"
         )}>
           <div className="w-full max-w-[760px]">

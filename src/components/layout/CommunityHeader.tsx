@@ -31,9 +31,15 @@ interface CommunityHeaderProps {
 
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
   const { openShare, openReport } = useOverlays();
+  const [isJoined, setIsJoined] = React.useState(false);
+
+  const toggleJoin = () => {
+    setIsJoined(!isJoined);
+    toast.success(isJoined ? `Left r/${sub.name}` : `Joined r/${sub.name}`);
+  };
 
   return (
-    <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 -mt-2 sm:mt-0 shadow-sm relative">
+    <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 shadow-sm relative">
       <div className={cn("h-28 sm:h-36 opacity-90 relative", sub.icon)}>
          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>
@@ -71,8 +77,15 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
           <div className={cn("w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-[32px] font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter", sub.icon)}>
             r/
           </div>
-          <Button className="bg-foreground text-background h-11 px-6 rounded-full font-bold text-[15px] shadow-sm hover:opacity-90 transition-opacity">
-            Join
+          <Button 
+            onClick={toggleJoin}
+            variant={isJoined ? "outline" : "default"}
+            className={cn(
+              "h-11 px-6 rounded-full font-bold text-[15px] shadow-sm transition-all active:scale-95",
+              isJoined ? "border-foreground text-foreground hover:bg-muted" : "bg-foreground text-background hover:opacity-90"
+            )}
+          >
+            {isJoined ? "Joined" : "Join"}
           </Button>
         </div>
         <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground leading-tight tracking-tight mb-1">r/{sub.name}</h1>
