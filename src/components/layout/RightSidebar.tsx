@@ -27,11 +27,43 @@ export const RightSidebar = () => {
     userContext = location.pathname.split('/')[2];
   }
 
+  const isCreatePage = location.pathname === '/create';
   const showCommunityInfo = isSubredditPage || isPostPage;
 
   return (
     <aside id="right-sidebar" className="hidden xl:flex flex-col w-[312px] shrink-0 border-l border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-colors duration-400">
       <div className="flex flex-col p-4 space-y-6">
+        {isCreatePage && (
+          <div className="flex flex-col space-y-4">
+            <div className="bg-card border border-border rounded-[16px] p-4 flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-[20px]">📝</span>
+                </div>
+                <h3 className="text-[16px] font-bold text-foreground">Posting to Reddit</h3>
+              </div>
+              <ol className="flex flex-col space-y-3 pt-2">
+                {[
+                  "Remember the human",
+                  "Behave like you would in real life",
+                  "Look for the original source of content",
+                  "Search for duplicates before posting",
+                  "Read the community's rules"
+                ].map((rule, i) => (
+                  <li key={i} className="flex gap-3 text-[14px] font-medium border-b border-border/50 pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground whitespace-nowrap">{i + 1}.</span>
+                    <span className="text-foreground leading-snug">{rule}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            
+            <div className="text-[12px] text-muted-foreground px-2 leading-relaxed">
+              Please be mindful of Reddit's <Link to="#" className="text-primary hover:underline">Content Policy</Link> and practice good <Link to="#" className="text-primary hover:underline">reddiquette</Link>.
+            </div>
+          </div>
+        )}
+
         {isProfilePage && userContext && (
           <div className="flex flex-col space-y-3">
             <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4 border border-border">
@@ -154,7 +186,7 @@ export const RightSidebar = () => {
           </div>
         )}
 
-        {!showCommunityInfo && (
+        {!showCommunityInfo && !isCreatePage && !isProfilePage && (
           <>
             <div className="flex flex-col space-y-3">
               <div className="flex justify-between items-center px-2">
