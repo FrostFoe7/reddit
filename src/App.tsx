@@ -1,18 +1,40 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { MainLayout } from '@/components/layout/MainLayout';
+import { lazy, Suspense } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 // Lazy load pages for better bundle splitting
-const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
-const PostPage = lazy(() => import('@/pages/PostPage').then(m => ({ default: m.PostPage })));
-const SubredditPage = lazy(() => import('@/pages/SubredditPage').then(m => ({ default: m.SubredditPage })));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
-const CreatePostPage = lazy(() => import('@/pages/CreatePostPage').then(m => ({ default: m.CreatePostPage })));
-const SearchPage = lazy(() => import('@/pages/SearchPage').then(m => ({ default: m.SearchPage })));
-const NotificationsPage = lazy(() => import('@/pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
-const MessagesPage = lazy(() => import('@/pages/MessagesPage').then(m => ({ default: m.MessagesPage })));
-const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
-const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.NotFound })));
+const Home = lazy(() =>
+  import("@/pages/Home").then((m) => ({ default: m.Home })),
+);
+const PostPage = lazy(() =>
+  import("@/pages/PostPage").then((m) => ({ default: m.PostPage })),
+);
+const SubredditPage = lazy(() =>
+  import("@/pages/SubredditPage").then((m) => ({ default: m.SubredditPage })),
+);
+const ProfilePage = lazy(() =>
+  import("@/pages/ProfilePage").then((m) => ({ default: m.ProfilePage })),
+);
+const CreatePostPage = lazy(() =>
+  import("@/pages/CreatePostPage").then((m) => ({ default: m.CreatePostPage })),
+);
+const SearchPage = lazy(() =>
+  import("@/pages/SearchPage").then((m) => ({ default: m.SearchPage })),
+);
+const NotificationsPage = lazy(() =>
+  import("@/pages/NotificationsPage").then((m) => ({
+    default: m.NotificationsPage,
+  })),
+);
+const MessagesPage = lazy(() =>
+  import("@/pages/MessagesPage").then((m) => ({ default: m.MessagesPage })),
+);
+const SettingsPage = lazy(() =>
+  import("@/pages/SettingsPage").then((m) => ({ default: m.SettingsPage })),
+);
+const NotFound = lazy(() =>
+  import("@/pages/NotFound").then((m) => ({ default: m.NotFound })),
+);
 
 // Loading component
 const PageLoader = () => (

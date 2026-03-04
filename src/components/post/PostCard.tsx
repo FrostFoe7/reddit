@@ -17,8 +17,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ActionButtons } from '@/components/common/ActionButtons';
 import { cn } from '@/lib/utils';
-import { useOverlays } from '@/components/common/GlobalOverlays';
+import { useUIStore } from '@/store/useStore';
 import { VoteControl } from '@/components/common/VoteControl';
+import dayjs from '@/lib/dayjs';
+import { motion } from 'motion/react';
 
 interface PostCardProps {
   post: Post;
@@ -27,17 +29,17 @@ interface PostCardProps {
 
 export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) => {
   const navigate = useNavigate();
-  const { openShare, openReport, openLightbox } = useOverlays();
+  const { openShare, openReport, openLightbox } = useUIStore();
   const [isJoined, setIsJoined] = React.useState(false);
 
   // Normalize data between mock and backend
-  const subName = (post as any).subreddit_name || post.sub;
-  const authorName = (post as any).author_username || post.author;
-  const postUpvotes = (post as any).upvotes ?? 0;
-  const postCommentCount = (post as any).comment_count ?? (post as any).comments ?? 0;
-  const postTime = (post as any).created_at || post.time;
-  const postImage = (post as any).image_url || post.image;
-  const subIcon = (post as any).subreddit_icon || post.subIcon;
+  const subName = post.subreddit_name || post.sub;
+  const authorName = post.author_username || post.author;
+  const postUpvotes = post.upvotes ?? 0;
+  const postCommentCount = post.comment_count || post.comments || 0;
+  const postTime = post.created_at ? dayjs(post.created_at).fromNow() : post.time;
+  const postImage = post.image_url || post.image;
+  const subIcon = post.subreddit_icon || post.subIcon;
 
   const toggleJoin = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -48,7 +50,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
   };
 
   return (
-    <article 
+    <motion.article 
+      initial={isDetail ? { opacity: 1 } : { opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={isDetail ? {} : { scale: 1.002 }}
+      transition={{ duration: 0.2 }}
       className={cn(
         "w-full group bg-background transition-colors cursor-pointer",
         isDetail ? "" : "hover:bg-neutral-100 dark:hover:bg-neutral-900/50 sm:rounded-[16px] px-4 py-3 my-1"
@@ -71,7 +77,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
               
               <Avatar className="h-8 w-8 shrink-0">
                 <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${subName}&backgroundColor=ff4500`} />
-                <AvatarFallback className={cn("text-[10px] font-bold text-white shadow-sm", subIcon)}>r/</AvatarFallback>
+                <AvatarFallback className={cn("text-[10px] font-bold text-white shadow-sm", subIcon || "bg-primary")}>r/</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col truncate">
@@ -124,7 +130,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
               <Link to={`/r/${subName}`} className="flex items-center gap-1.5 hover:underline group/sub">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${subName}&backgroundColor=ff4500`} />
-                  <AvatarFallback className={cn("text-[10px] font-bold text-white shadow-sm", subIcon)}>r/</AvatarFallback>
+                  <AvatarFallback className={cn("text-[10px] font-bold text-white shadow-sm", subIcon || "bg-primary")}>r/</AvatarFallback>
                 </Avatar>
                 <span className="font-bold text-foreground">r/{subName}</span>
               </Link>
@@ -205,6 +211,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
           />
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 };

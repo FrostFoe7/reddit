@@ -3,12 +3,14 @@
  * Works with the /proxy/api proxy in Vite and production cPanel paths
  */
 
-const BASE_URL = '/proxy/api';
+const BASE_URL = "/proxy/api";
 
 async function handleResponse(response: Response) {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`,
+    );
   }
   return response.json();
 }
@@ -21,9 +23,9 @@ export const api = {
 
   async post<T>(endpoint: string, data: unknown): Promise<T> {
     const response = await fetch(`${BASE_URL}/${endpoint}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
@@ -32,9 +34,9 @@ export const api = {
 
   async put<T>(endpoint: string, data: unknown): Promise<T> {
     const response = await fetch(`${BASE_URL}/${endpoint}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
@@ -43,7 +45,7 @@ export const api = {
 
   async delete<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${BASE_URL}/${endpoint}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     return handleResponse(response);
   },

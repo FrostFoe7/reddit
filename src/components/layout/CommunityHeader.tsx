@@ -1,23 +1,16 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { 
-  MoreHorizontal, 
-  Share2, 
-  Flag, 
-  Bell, 
-  Ban, 
-  Info
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Share2, Flag, Bell, Ban, Info } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useOverlays } from '@/components/common/GlobalOverlays';
-import { toast } from 'sonner';
+} from "@/components/ui/dropdown-menu";
+import { useUIStore } from "@/store/useStore";
+import { toast } from "sonner";
 
 interface CommunityHeaderProps {
   sub: {
@@ -32,7 +25,7 @@ interface CommunityHeaderProps {
 }
 
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
-  const { openShare, openReport } = useOverlays();
+  const { openShare, openReport } = useUIStore();
   const [isJoined, setIsJoined] = React.useState(false);
 
   const toggleJoin = () => {
@@ -47,31 +40,52 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
   return (
     <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 shadow-sm relative">
       <div className={cn("h-28 sm:h-36 opacity-90 relative", subIcon)}>
-         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>
-      
+
       <div className="absolute top-4 right-4 flex gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="w-10 h-10 bg-black/30 hover:bg-black/50 rounded-full text-white backdrop-blur-xl transition-colors shadow-sm">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-10 h-10 bg-black/30 hover:bg-black/50 rounded-full text-white backdrop-blur-xl transition-colors shadow-sm"
+            >
               <MoreHorizontal size={22} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[220px] rounded-[20px] p-1.5 bg-glass backdrop-blur-2xl shadow-ios-float border-border">
-            <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between" onClick={() => openShare(window.location.href)}>
+          <DropdownMenuContent
+            align="end"
+            className="w-[220px] rounded-[20px] p-1.5 bg-glass backdrop-blur-2xl shadow-ios-float border-border"
+          >
+            <DropdownMenuItem
+              className="rounded-[12px] p-2.5 font-medium flex justify-between"
+              onClick={() => openShare(window.location.href)}
+            >
               Share <Share2 size={18} className="text-muted-foreground" />
             </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between" onClick={() => toast.info("Notifications turned on")}>
-              Mute Notifications <Bell size={18} className="text-muted-foreground" />
+            <DropdownMenuItem
+              className="rounded-[12px] p-2.5 font-medium flex justify-between"
+              onClick={() => toast.info("Notifications turned on")}
+            >
+              Mute Notifications{" "}
+              <Bell size={18} className="text-muted-foreground" />
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border my-1 mx-2" />
             <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between">
-              Community Info <Info size={18} className="text-muted-foreground" />
+              Community Info{" "}
+              <Info size={18} className="text-muted-foreground" />
             </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive" onClick={() => toast.error("Community blocked")}>
+            <DropdownMenuItem
+              className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive"
+              onClick={() => toast.error("Community blocked")}
+            >
               Block Community <Ban size={18} />
             </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive" onClick={() => openReport(`sub_${sub.id}`)}>
+            <DropdownMenuItem
+              className="rounded-[12px] p-2.5 font-medium flex justify-between text-destructive focus:text-destructive"
+              onClick={() => openReport(`sub_${sub.id}`)}
+            >
               Report <Flag size={18} />
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -80,23 +94,36 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
 
       <div className="px-5 sm:px-8 pb-8 relative">
         <div className="flex justify-between items-end mb-4">
-          <div className={cn("w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-[32px] font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter", subIcon)}>
+          <div
+            className={cn(
+              "w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-[32px] font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter",
+              subIcon,
+            )}
+          >
             r/
           </div>
-          <Button 
+          <Button
             onClick={toggleJoin}
             variant={isJoined ? "outline" : "default"}
             className={cn(
               "h-11 px-6 rounded-full font-bold text-[15px] shadow-sm transition-all active:scale-95",
-              isJoined ? "border-foreground text-foreground hover:bg-muted" : "bg-foreground text-background hover:opacity-90"
+              isJoined
+                ? "border-foreground text-foreground hover:bg-muted"
+                : "bg-foreground text-background hover:opacity-90",
             )}
           >
             {isJoined ? "Joined" : "Join"}
           </Button>
         </div>
-        <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground leading-tight tracking-tight mb-1">r/{sub.name}</h1>
-        <p className="text-[15px] text-muted-foreground font-medium mb-4">r/{sub.name} • {subMembers} Members</p>
-        <p className="text-[16px] text-foreground leading-relaxed max-w-2xl font-medium">{subDesc}</p>
+        <h1 className="text-[28px] sm:text-[32px] font-bold text-foreground leading-tight tracking-tight mb-1">
+          r/{sub.name}
+        </h1>
+        <p className="text-[15px] text-muted-foreground font-medium mb-4">
+          r/{sub.name} • {subMembers} Members
+        </p>
+        <p className="text-[16px] text-foreground leading-relaxed max-w-2xl font-medium">
+          {subDesc}
+        </p>
       </div>
     </div>
   );

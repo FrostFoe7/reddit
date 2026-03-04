@@ -39,8 +39,8 @@ export interface Post {
   image_url?: string;
   image?: string; // Fallback
   link_url?: string;
-  post_type: 'text' | 'image' | 'link' | 'poll';
-  type?: 'text' | 'image'; // Fallback
+  post_type: "text" | "image" | "link" | "poll";
+  type?: "text" | "image"; // Fallback
   is_oc: boolean;
   is_spoiler: boolean;
   is_nsfw: boolean;

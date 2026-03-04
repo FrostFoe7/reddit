@@ -1,24 +1,24 @@
-import path from "path"
-import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+import path from "path";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react({
       babel: {
-        plugins: [['babel-plugin-react-compiler']],
+        plugins: [["babel-plugin-react-compiler"]],
       },
     }),
     tailwindcss(),
   ],
   server: {
     proxy: {
-      '/proxy/api': {
-        target: 'http://localhost:8000',
+      "/proxy/api": {
+        target: "http://localhost:8000",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/proxy\/api/, '/api'),
+        rewrite: (path) => path.replace(/^\/proxy\/api/, "/api"),
       },
     },
   },
@@ -54,4 +54,4 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 800,
   },
-})
+});
