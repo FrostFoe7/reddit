@@ -1,3 +1,4 @@
+import type { Post, Community } from '@/types';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { usePosts, useCommunities } from '@/hooks';

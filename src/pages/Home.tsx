@@ -1,3 +1,4 @@
+import type { Post } from '@/types';
 import React from 'react';
 import { usePosts } from '@/hooks';
 import { PostCard } from '@/components/post/PostCard';

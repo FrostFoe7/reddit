@@ -1,3 +1,4 @@
+import type { Post, Community, User as UserType } from '@/types';
 import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, X, MessageCircle, User, Users } from 'lucide-react';
@@ -42,7 +43,7 @@ export const SearchBar = () => {
     : [];
 
   const filteredProfiles = query.length > 0
-    ? profiles.filter((p: Post) => (p.username || p.name).toLowerCase().includes(query.toLowerCase())).slice(0, 4)
+    ? profiles.filter((p: UserType) => (p.username || '').toLowerCase().includes(query.toLowerCase())).slice(0, 4)
     : [];
 
   const hasResults = filteredQueries.length > 0 || filteredCommunities.length > 0 || filteredProfiles.length > 0;
@@ -211,11 +212,11 @@ export const SearchBar = () => {
               <div className="px-4 py-2 text-[12px] font-bold text-muted-foreground uppercase tracking-wider">
                 Profiles
               </div>
-              {filteredProfiles.map((p: Post) => (
+              {filteredProfiles.map((p: UserType) => (
                 <button
                   key={p.id}
                   className="flex items-center justify-between px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors w-full text-left"
-                  onClick={() => navigate(`/u/${p.username || p.name}`)}
+                  onClick={() => navigate(`/u/${p.username}`)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar className="h-10 w-10">
@@ -223,7 +224,7 @@ export const SearchBar = () => {
                       <AvatarFallback><User size={20} /></AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[14px] font-bold truncate">u/{p.username || p.name}</span>
+                      <span className="text-[14px] font-bold truncate">u/{p.username}</span>
                       <span className="text-[12px] text-muted-foreground">{p.karma || 0} karma</span>
                     </div>
                   </div>

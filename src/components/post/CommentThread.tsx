@@ -1,3 +1,4 @@
+import type { Comment } from '@/types';
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
@@ -19,7 +20,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ comment, allCommen
 
   // Normalize data
   const authorName = comment.author_username || comment.author;
-  const avatarUrl = comment.avatar_url || (comment.avatar ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.avatar}` : undefined);
+  const avatarUrl = comment.author_avatar || (comment.avatar ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.avatar}` : undefined);
   const upvotes = comment.upvotes ?? 0;
   const time = comment.created_at || comment.time;
 

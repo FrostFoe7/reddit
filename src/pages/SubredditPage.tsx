@@ -1,3 +1,4 @@
+import type { Post } from '@/types';
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCommunity, usePosts } from '@/hooks';
