@@ -9,8 +9,11 @@ export const RightSidebar = () => {
   const location = useLocation();
   const isSubredditPage = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
   const isPostPage = location.pathname.startsWith('/post/');
+  const isProfilePage = location.pathname.startsWith('/u/');
   
   let communityContext = null;
+  let userContext = null;
+
   if (isSubredditPage) {
     const subName = location.pathname.split('/')[2];
     communityContext = mockCommunities.find(c => c.id === subName || c.name === subName);
@@ -20,6 +23,8 @@ export const RightSidebar = () => {
     if (post) {
       communityContext = mockCommunities.find(c => c.id === post.sub || c.name === post.sub);
     }
+  } else if (isProfilePage) {
+    userContext = location.pathname.split('/')[2];
   }
 
   const showCommunityInfo = isSubredditPage || isPostPage;
@@ -27,6 +32,50 @@ export const RightSidebar = () => {
   return (
     <aside id="right-sidebar" className="hidden xl:flex flex-col w-[312px] shrink-0 border-l border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-colors duration-400">
       <div className="flex flex-col p-4 space-y-6">
+        {isProfilePage && userContext && (
+          <div className="flex flex-col space-y-3">
+            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-4 border border-border">
+              <div className="flex flex-col gap-1">
+                <h3 className="text-[16px] font-bold text-foreground capitalize">{userContext}</h3>
+                <p className="text-[12px] text-muted-foreground font-medium">u/{userContext}</p>
+              </div>
+              
+              <div className="flex flex-col gap-2">
+                <p className="text-[14px] text-foreground leading-normal italic">
+                  "Bull | Couple | Dhaka |"
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 border-y border-border/50 py-3">
+                <div className="flex flex-col">
+                  <span className="text-[16px] font-bold">1,245</span>
+                  <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">Karma</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[16px] font-bold">Aug 12, 2023</span>
+                  <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">Cake Day</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Button className="w-full rounded-full font-bold h-10 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90">Follow</Button>
+                <Button variant="outline" className="w-full rounded-full font-bold h-10 border-primary text-primary hover:bg-primary/5">Chat</Button>
+              </div>
+            </div>
+
+            <div className="bg-secondary-background/50 rounded-[16px] p-4 flex flex-col gap-3 border border-border">
+              <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest px-1">Achievements</h3>
+              <div className="flex gap-2 px-1">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px]" title="Banana Aficionado">🍌</div>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px]" title="Detective Doggo">🐶</div>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[20px]" title="Banana Enthusiast">🍌</div>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[14px] font-bold text-muted-foreground">+8</div>
+              </div>
+              <Button variant="ghost" className="w-full text-primary font-bold text-[12px] py-1 justify-start px-1 h-auto hover:bg-transparent hover:underline">View your achievements</Button>
+            </div>
+          </div>
+        )}
+
         {showCommunityInfo && communityContext && (
           <div className="flex flex-col space-y-3">
             <div className="flex items-center justify-between px-2">

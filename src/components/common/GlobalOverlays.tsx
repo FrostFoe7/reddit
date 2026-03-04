@@ -13,6 +13,9 @@ interface OverlayContextType {
   openShare: (url: string) => void;
   openReport: (postId: string) => void;
   openLightbox: (image: string) => void;
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  toggleSidebar: () => void;
 }
 
 const OverlayContext = createContext<OverlayContextType | undefined>(undefined);
@@ -27,13 +30,22 @@ export const OverlayProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [reportId, setReportId] = useState<string | null>(null);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const openShare = (url: string) => setShareUrl(url);
   const openReport = (postId: string) => setReportId(postId);
   const openLightbox = (image: string) => setLightboxImg(image);
+  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
   return (
-    <OverlayContext.Provider value={{ openShare, openReport, openLightbox }}>
+    <OverlayContext.Provider value={{ 
+      openShare, 
+      openReport, 
+      openLightbox, 
+      sidebarCollapsed, 
+      setSidebarCollapsed,
+      toggleSidebar 
+    }}>
       {children}
       
       {/* Share Modal */}

@@ -25,10 +25,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { mockNotifications } from '@/db/db';
 import { useTheme } from 'next-themes';
 import { SearchBar } from './SearchBar';
+import { useOverlays } from '@/components/common/GlobalOverlays';
 
 export const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+  const { toggleSidebar } = useOverlays();
 
   return (
     <header className="fixed top-0 inset-x-0 h-14 bg-background border-b border-border flex items-center justify-between px-4 z-50">
@@ -36,11 +38,16 @@ export const Navbar = () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden rounded-full h-10 w-10">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full h-10 w-10"
+                onClick={toggleSidebar}
+              >
                 <Menu size={20} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right">Open navigation</TooltipContent>
+            <TooltipContent side="bottom">Toggle navigation</TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
