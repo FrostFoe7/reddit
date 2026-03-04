@@ -11,31 +11,22 @@ if ($method === 'GET') {
     
     try {
         if ($post_id) {
-            if ($user_id) {
-                $stmt = $pdo->prepare("
-                    SELECT cd.*, COALESCE(cv.vote, 0) as user_vote
-                    FROM comment_details cd
-                    LEFT JOIN comment_votes cv ON cd.id = cv.comment_id AND cv.user_id = ?
-                    WHERE cd.post_id = ? 
-                    ORDER BY cd.created_at ASC
-                ");
-                $stmt->execute([$user_id, $post_id]);
-            } else {
-                $stmt = $pdo->prepare("SELECT *, 0 as user_vote FROM comment_details WHERE post_id = ? ORDER BY created_at ASC");
-                $stmt->execute([$post_id]);
-            }
+            $stmt = $pdo->prepare("
+                SELECT cd.*, COALESCE(cv.vote, 0) as user_vote
+                FROM comment_details cd
+                LEFT JOIN comment_votes cv ON cd.id = cv.comment_id AND cv.user_id = :user_id
+                WHERE cd.post_id = :post_id 
+                ORDER BY cd.created_at ASC
+            ");
+            $stmt->execute([':user_id' => $user_id, ':post_id' => $post_id]);
         } else {
-            if ($user_id) {
-                $stmt = $pdo->prepare("
-                    SELECT cd.*, COALESCE(cv.vote, 0) as user_vote
-                    FROM comment_details cd
-                    LEFT JOIN comment_votes cv ON cd.id = cv.comment_id AND cv.user_id = ?
-                    ORDER BY cd.created_at DESC LIMIT 50
-                ");
-                $stmt->execute([$user_id]);
-            } else {
-                $stmt = $pdo->query("SELECT *, 0 as user_vote FROM comment_details ORDER BY created_at DESC LIMIT 50");
-            }
+            $stmt = $pdo->prepare("
+                SELECT cd.*, COALESCE(cv.vote, 0) as user_vote
+                FROM comment_details cd
+                LEFT JOIN comment_votes cv ON cd.id = cv.comment_id AND cv.user_id = :user_id
+                ORDER BY cd.created_at DESC LIMIT 50
+            ");
+            $stmt->execute([':user_id' => $user_id]);
         }
         $comments = $stmt->fetchAll();
         sendResponse($comments);
@@ -63,6 +54,51 @@ if ($method === 'POST') {
             $input['parent_id'] ?? null,
             $input['content']
         ]);
+
+        // Create notification for post owner
+        $stmtPost = $pdo->prepare("SELECT author_id FROM posts WHERE id = ?");
+        $stmtPost->execute([$input['post_id']]);
+        $post = $stmtPost->fetch();
+        
+        if ($post && $post['author_id'] !== $input['author_id']) {
+            $notif_id = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 11);
+            $stmtNotif = $pdo->prepare("
+                INSERT INTO notifications (id, recipient_id, actor_id, type, post_id, text)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+            $stmtNotif->execute([
+                $notif_id,
+                $post['author_id'],
+                $input['author_id'],
+                'comment',
+                $input['post_id'],
+                "commented on your post"
+            ]);
+        }
+
+        // Create notification for parent comment owner if exists
+        if (!empty($input['parent_id'])) {
+            $stmtParent = $pdo->prepare("SELECT author_id FROM comments WHERE id = ?");
+            $stmtParent->execute([$input['parent_id']]);
+            $parent = $stmtParent->fetch();
+            
+            if ($parent && $parent['author_id'] !== $input['author_id']) {
+                $notif_id = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 11);
+                $stmtNotif = $pdo->prepare("
+                    INSERT INTO notifications (id, recipient_id, actor_id, type, post_id, comment_id, text)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ");
+                $stmtNotif->execute([
+                    $notif_id,
+                    $parent['author_id'],
+                    $input['author_id'],
+                    'reply',
+                    $input['post_id'],
+                    $input['id'],
+                    "replied to your comment"
+                ]);
+            }
+        }
 
         sendResponse(['success' => true, 'id' => $input['id']], 201);
     } catch (\Exception $e) {

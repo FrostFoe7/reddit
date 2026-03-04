@@ -8,21 +8,35 @@ $pdo = DB::connect();
 // Handle GET requests (Fetch posts)
 if ($method === 'GET') {
     $user_id = $_GET['user_id'] ?? null;
+    $sort = $_GET['sort'] ?? 'new'; // 'new', 'top', 'hot'
+    $search = $_GET['q'] ?? null;
+    
     try {
-        if ($user_id) {
-            // Join with post_votes to get current user's vote
-            $stmt = $pdo->prepare("
-                SELECT pd.*, COALESCE(pv.vote, 0) as user_vote
-                FROM post_details pd
-                LEFT JOIN post_votes pv ON pd.id = pv.post_id AND pv.user_id = ?
-                ORDER BY pd.created_at DESC LIMIT 20
-            ");
-            $stmt->execute([$user_id]);
-        } else {
-            // Use the pre-built view for complete post data including counts
-            $stmt = $pdo->prepare("SELECT *, 0 as user_vote FROM post_details ORDER BY created_at DESC LIMIT 20");
-            $stmt->execute();
+        $orderBy = "pd.created_at DESC";
+        if ($sort === 'top') {
+            $orderBy = "pd.upvotes DESC, pd.created_at DESC";
+        } elseif ($sort === 'hot') {
+            // Simple hot algorithm: (upvotes) / (hours since creation + 2)
+            $orderBy = "(pd.upvotes / (TIMESTAMPDIFF(HOUR, pd.created_at, NOW()) + 2)) DESC";
         }
+
+        $query = "
+            SELECT pd.*, COALESCE(pv.vote, 0) as user_vote
+            FROM post_details pd
+            LEFT JOIN post_votes pv ON pd.id = pv.post_id AND pv.user_id = :user_id
+        ";
+
+        $params = [':user_id' => $user_id];
+
+        if ($search) {
+            $query .= " WHERE pd.title LIKE :search OR pd.content LIKE :search ";
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        $query .= " ORDER BY $orderBy LIMIT 50";
+
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $posts = $stmt->fetchAll();
         
         sendResponse($posts);
@@ -36,14 +50,14 @@ if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     
     // Simple validation
-    if (empty($input['id']) || empty($input['title'])) {
-        sendResponse(['error' => 'Missing required fields: id and title'], 400);
+    if (empty($input['id']) || empty($input['title']) || empty($input['author_id']) || empty($input['subreddit_id'])) {
+        sendResponse(['error' => 'Missing required fields'], 400);
     }
 
     try {
         $stmt = $pdo->prepare("
-            INSERT INTO posts (id, author_id, subreddit_id, title, content, post_type)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO posts (id, author_id, subreddit_id, title, content, image_url, post_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $input['id'],
@@ -51,6 +65,7 @@ if ($method === 'POST') {
             $input['subreddit_id'],
             $input['title'],
             $input['content'] ?? null,
+            $input['image_url'] ?? null,
             $input['post_type'] ?? 'text'
         ]);
 
