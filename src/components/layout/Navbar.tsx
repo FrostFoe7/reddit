@@ -1,13 +1,10 @@
-import { useState, type FormEvent } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Search, 
   Bell, 
   MessageSquare, 
   SquarePlus, 
   Megaphone, 
   Menu, 
-  X, 
   User, 
   Settings, 
   Moon, 
@@ -16,7 +13,6 @@ import {
   Star 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,37 +21,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { mockCommunities, mockNotifications, mockPosts } from '@/db/db';
-import { cn } from '@/lib/utils';
+import { mockNotifications } from '@/db/db';
 import { useTheme } from 'next-themes';
+import { SearchBar } from './SearchBar';
 
 export const Navbar = () => {
   const { theme, setTheme } = useTheme();
-  const [searchQuery, setSearchInput] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const isSubreddit = location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
-  const subName = isSubreddit ? location.pathname.split('/')[2] : null;
-
-  const filteredCommunities = searchQuery.length > 0 
-    ? mockCommunities.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3)
-    : [];
-  
-  const filteredPosts = searchQuery.length > 0
-    ? mockPosts.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3)
-    : [];
-
-  const handleSearchSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setIsSearchFocused(false);
-    }
-  };
 
   return (
     <header className="fixed top-0 inset-x-0 h-14 bg-background border-b border-border flex items-center justify-between px-4 z-50">
@@ -84,60 +57,7 @@ export const Navbar = () => {
       </div>
 
       <div className="flex-1 max-w-[750px] mx-4 hidden md:block">
-        <form onSubmit={handleSearchSubmit} className="relative group/search">
-          <div className={cn(
-            "flex items-center w-full bg-secondary-background hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full h-10 px-4 transition-colors border border-transparent focus-within:bg-background focus-within:border-border focus-within:shadow-sm",
-            isSearchFocused && "rounded-b-none"
-          )}>
-            <Search size={18} className="text-muted-foreground mr-2 shrink-0" />
-            
-            {subName && !searchQuery && (
-              <Badge variant="secondary" className="mr-2 h-7 gap-1.5 pl-1.5 pr-1 font-semibold text-[12px] bg-background border-border">
-                <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[8px] text-white">r/</div>
-                r/{subName}
-                <X size={14} className="cursor-pointer hover:text-foreground" onClick={() => navigate('/')} />
-              </Badge>
-            )}
-
-            <Input 
-              type="text" 
-              placeholder={subName ? `Search in r/${subName}` : "Search Reddit"} 
-              value={searchQuery}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-              className="bg-transparent border-none shadow-none focus-visible:ring-0 h-full p-0 text-[14px] font-medium placeholder:text-muted-foreground"
-            />
-            
-            {searchQuery && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-6 w-6 rounded-full ml-1" 
-                onClick={() => setSearchInput('')}
-              >
-                <X size={14} />
-              </Button>
-            )}
-          </div>
-
-          {isSearchFocused && searchQuery.length > 0 && (
-            <div className="absolute top-full left-0 right-0 bg-background border border-t-0 border-border rounded-b-[20px] shadow-lg z-50 overflow-hidden py-2">
-              {filteredCommunities.map(c => (
-                <Link key={c.id} to={`/r/${c.id}`} className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors">
-                  <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white", c.icon)}>r/</div>
-                  <span className="text-[14px] font-medium">r/{c.name}</span>
-                </Link>
-              ))}
-              {filteredPosts.map(p => (
-                <Link key={p.id} to={`/post/${p.id}`} className="flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors">
-                  <Search size={16} className="text-muted-foreground" />
-                  <span className="text-[14px] font-medium truncate">{p.title}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </form>
+        <SearchBar />
       </div>
 
       <div className="flex items-center gap-1">

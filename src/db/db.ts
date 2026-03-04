@@ -44,9 +44,25 @@ export interface Notification {
   isRead: boolean;
 }
 
+export interface Profile {
+  id: string;
+  name: string;
+  karma: string;
+  avatar: string;
+}
+
 export const mockCommunities: Community[] = [
   { id: 'webdev', name: 'webdev', icon: 'bg-[#007aff]', members: '1.8M', desc: 'A community dedicated to all things web development.' },
-  { id: 'UI_Design', name: 'UI_Design', icon: 'bg-[#ff4500]', members: '350k', desc: 'Design, principles, and practice.' }
+  { id: 'UI_Design', name: 'UI_Design', icon: 'bg-[#ff4500]', members: '350k', desc: 'Design, principles, and practice.' },
+  { id: 'javascript', name: 'javascript', icon: 'bg-[#f7df1e]', members: '2.1M', desc: 'All about JS!' }
+];
+
+export const mockProfiles: Profile[] = [
+  { id: 'User123', name: 'User123', karma: '1.2k', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=User123' },
+  { id: 'frontend_wizard', name: 'frontend_wizard', karma: '15.4k', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=frontend' },
+  { id: 'design_guy', name: 'design_guy', karma: '8.9k', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=design' },
+  { id: 'react_ninja', name: 'react_ninja', karma: '4.5k', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ninja' },
+  { id: 'state_guru', name: 'state_guru', karma: '22.1k', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guru' }
 ];
 
 export const mockPosts: Post[] = [
