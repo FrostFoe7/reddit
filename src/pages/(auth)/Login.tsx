@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/useStore";
 import { toast } from "sonner";
 import { X, ArrowLeft } from "lucide-react";
+import type { User } from "@/types";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -20,7 +21,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await api.post<{ success: boolean; user: any }>("auth/login", {
+      const response = await api.post<{ success: boolean; user: User }>("auth/login", {
         username,
         password,
       });
@@ -30,8 +31,9 @@ export default function LoginPage() {
         toast.success("Welcome back!");
         navigate("/");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Invalid username or password");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Invalid username or password";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

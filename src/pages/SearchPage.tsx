@@ -1,4 +1,4 @@
-import type { Post, Community } from "@/types";
+import type { Community } from "@/types";
 import React, { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useSearchPosts, useCommunities, useUserMemberships, useJoinCommunity, useLeaveCommunity } from "@/hooks";

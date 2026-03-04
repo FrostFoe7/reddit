@@ -26,11 +26,15 @@ export interface Community {
   is_verified: boolean;
   members?: number | string;
   created_at: string;
+  rules?: { title: string; content?: string }[];
+  moderators?: { id: string; username: string; avatar_url?: string }[];
+  wiki?: string;
 }
 
 export interface Post {
   id: string;
   subreddit_id: string;
+  sub_id?: string; // Fallback
   sub?: string; // Fallback
   author_id: string;
   author?: string; // Fallback
@@ -76,6 +80,29 @@ export interface Comment {
   author_avatar?: string;
   upvotes: number;
   user_vote?: number; // 1, -1, or 0
+}
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  sender_name?: string;
+  sender_avatar?: string;
+}
+
+export interface Conversation {
+  id: string;
+  user1_id: string;
+  user2_id: string;
+  last_message_at: string;
+  last_msg?: string;
+  time?: string;
+  other_user_name?: string;
+  other_user_avatar?: string;
+  contact_name?: string;
+  contact_avatar?: string;
 }
 
 export interface Notification {

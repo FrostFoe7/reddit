@@ -102,7 +102,7 @@ export const CreatePostPage: React.FC = () => {
           toast.success("Post submitted successfully!");
           setTimeout(() => navigate("/"), 1000);
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           toast.error(err.message || "Failed to create post");
         }
       },

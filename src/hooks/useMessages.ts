@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/useStore";
+import type { Conversation, Message } from "@/types";
 
 export function useConversations() {
   const user = useAuthStore((state) => state.user);
@@ -8,7 +9,7 @@ export function useConversations() {
 
   return useQuery({
     queryKey: ["conversations", userId],
-    queryFn: () => api.get<any[]>(`messages?user_id=${userId}`),
+    queryFn: () => api.get<Conversation[]>(`messages?user_id=${userId}`),
     enabled: !!userId,
   });
 }
@@ -19,7 +20,7 @@ export function useMessages(conversationId: string | null) {
 
   return useQuery({
     queryKey: ["messages", conversationId, userId],
-    queryFn: () => api.get<any[]>(`messages?user_id=${userId}&conversation_id=${conversationId}`),
+    queryFn: () => api.get<Message[]>(`messages?user_id=${userId}&conversation_id=${conversationId}`),
     enabled: !!userId && !!conversationId,
   });
 }

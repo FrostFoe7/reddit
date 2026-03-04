@@ -41,7 +41,7 @@ export const PostPage: React.FC = () => {
       onSuccess: () => {
         toast.success("Comment posted!");
       },
-      onError: (err: any) => {
+      onError: (err: Error) => {
         toast.error(err.message || "Failed to post comment");
       }
     });

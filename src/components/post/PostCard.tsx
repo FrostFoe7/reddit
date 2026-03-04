@@ -47,7 +47,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDetail = false }) =>
   const postImage = post.image_url || post.image;
   const subIcon = post.subreddit_icon || post.subIcon;
 
-  const subId = post.subreddit_id || (post as any).sub_id;
+  const subId = post.subreddit_id || post.sub_id;
   const isJoined = subId ? memberships.includes(subId) : false;
 
   const toggleJoin = (e: React.MouseEvent) => {

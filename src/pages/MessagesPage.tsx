@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useConversations, useMessages, useSendMessage } from "@/hooks";
 import { useAuthStore } from "@/store/useStore";
 import dayjs from "@/lib/dayjs";
+import type { Conversation, Message } from "@/types";
 
 export const MessagesPage: React.FC = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export const MessagesPage: React.FC = () => {
   const { data: messages = [], isLoading: msgLoading } = useMessages(selectedId);
   const { mutate: sendMessage } = useSendMessage();
 
-  const selectedConversation = conversations.find((c: any) => c.id === selectedId);
+  const selectedConversation = conversations.find((c: Conversation) => c.id === selectedId);
 
   const handleSend = () => {
     if (!messageText.trim() || !selectedId) return;
@@ -70,7 +71,7 @@ export const MessagesPage: React.FC = () => {
                 <div className="p-4 text-center">Loading...</div>
             ) : conversations.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">No conversations yet</div>
-            ) : conversations.map((conv: any) => (
+            ) : conversations.map((conv: Conversation) => (
               <div
                 key={conv.id}
                 onClick={() => setSelectedId(conv.id)}
@@ -156,7 +157,7 @@ export const MessagesPage: React.FC = () => {
               <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-muted/5">
                 {msgLoading ? (
                     <div className="text-center">Loading messages...</div>
-                ) : messages.map((msg: any) => (
+                ) : messages.map((msg: Message) => (
                     <div key={msg.id} className={cn("flex", msg.sender_id === user.id ? "justify-end" : "justify-start")}>
                         <div className={cn(
                             "max-w-[80%] px-4 py-2.5 rounded-[18px] shadow-sm",

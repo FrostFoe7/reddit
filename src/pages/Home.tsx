@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/incompatible-library */
 import React, { useRef, useState } from "react";
 import { usePosts } from "@/hooks";
 import { PostCard } from "@/components/post/PostCard";

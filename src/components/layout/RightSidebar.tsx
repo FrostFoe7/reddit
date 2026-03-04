@@ -29,7 +29,7 @@ export const RightSidebar = () => {
   const isProfilePage = location.pathname.startsWith("/u/");
 
   let communityContext: Community | null = null;
-  let profileUsername = isProfilePage ? location.pathname.split("/")[2] : null;
+  const profileUsername = isProfilePage ? location.pathname.split("/")[2] : null;
   const { data: profileUser } = useUser(profileUsername || undefined);
 
   if (isSubredditPage) {
@@ -265,13 +265,13 @@ export const RightSidebar = () => {
           </div>
         )}
 
-        {showCommunityInfo && (communityContext as any)?.rules?.length > 0 && (
+        {showCommunityInfo && (communityContext?.rules?.length ?? 0) > 0 && (
           <div className="flex flex-col space-y-3">
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-2">
               r/{communityContext?.name} Rules
             </h3>
             <div className="space-y-1">
-              {(communityContext as any).rules.map((rule: any, i: number) => (
+              {communityContext?.rules?.map((rule, i: number) => (
                 <div
                   key={i}
                   className="flex items-start gap-3 p-2 hover:bg-muted rounded-xl cursor-pointer transition-colors group"
@@ -288,7 +288,7 @@ export const RightSidebar = () => {
           </div>
         )}
 
-        {showCommunityInfo && (communityContext as any)?.moderators?.length > 0 && (
+        {showCommunityInfo && (communityContext?.moderators?.length ?? 0) > 0 && (
           <div className="flex flex-col space-y-3">
             <div className="flex justify-between items-center px-2">
               <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
@@ -304,7 +304,7 @@ export const RightSidebar = () => {
               </Button>
             </div>
             <div className="flex flex-col space-y-1 px-1">
-              {(communityContext as any).moderators.map((mod: any) => (
+              {communityContext?.moderators?.map((mod) => (
                 <Link
                   key={mod.id}
                   to={`/u/${mod.username}`}

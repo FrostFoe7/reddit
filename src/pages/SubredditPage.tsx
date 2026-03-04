@@ -120,7 +120,7 @@ export const SubredditPage: React.FC = () => {
               </h2>
             </div>
             <div className="space-y-1">
-              {(sub as any).rules?.length > 0 ? (sub as any).rules.map((rule: any, i: number) => (
+              {(sub.rules?.length ?? 0) > 0 ? sub.rules?.map((rule, i: number) => (
                 <div
                   key={i}
                   className="py-5 border-b border-border/50 last:border-0 flex gap-4 sm:gap-6 group transition-colors hover:bg-muted/30 -mx-6 px-6"
@@ -133,7 +133,7 @@ export const SubredditPage: React.FC = () => {
                       {rule.title}
                     </h3>
                     <p className="text-muted-foreground text-sm leading-relaxed font-medium">
-                      {rule.description}
+                      {rule.content}
                     </p>
                   </div>
                 </div>
@@ -153,7 +153,7 @@ export const SubredditPage: React.FC = () => {
               Wiki
             </h2>
             <p className="text-muted-foreground leading-relaxed text-base max-w-md font-medium">
-              {(sub as any).wiki || "Welcome to the community wiki. Our moderators are currently working on compiling the best resources and FAQs for you."}
+              {sub.wiki || "Welcome to the community wiki. Our moderators are currently working on compiling the best resources and FAQs for you."}
             </p>
           </div>
         </TabsContent>

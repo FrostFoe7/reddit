@@ -26,7 +26,7 @@ export function useVotes() {
         queryClient.invalidateQueries({ queryKey: ["comments"] });
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || "Failed to process vote");
     },
   });

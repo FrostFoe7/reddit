@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/useStore";
 import { toast } from "sonner";
 import { X, ArrowLeft } from "lucide-react";
+import type { User } from "@/types";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -28,7 +29,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const response = await api.post<{ success: boolean; user: any }>("auth/register", {
+      const response = await api.post<{ success: boolean; user: User }>("auth/register", {
         username,
         email,
         password,
@@ -39,8 +40,9 @@ export default function RegisterPage() {
         toast.success("Account created successfully!");
         navigate("/");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Registration failed. Try again.");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Registration failed. Try again.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
