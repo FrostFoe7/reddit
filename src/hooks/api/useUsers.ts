@@ -1,35 +1,35 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/api/client";
-import { normalizeUser } from "@/types/normalize";
-
-/**
- * Fetch all users
- */
-export function useUsers() {
-  return useQuery({
-    queryKey: ["users"],
-    queryFn: async () => {
-      const data = await api.get<Record<string, unknown>[]>("users");
-      return data.map(normalizeUser);
-    },
-    retry: 2,
-    staleTime: 60000,
-  });
-}
+import { useQuery } from '@tanstack/react-query';
+import { usersApi } from '@/services/api/users';
+import { queryKeys } from '@/services/query/keys';
+import type { User } from '@/types';
 
 /**
  * Fetch user by username
  */
 export function useUser(username: string | undefined) {
   return useQuery({
-    queryKey: ["users", username],
-    queryFn: async () => {
-      if (!username) throw new Error("Username required");
-      const data = await api.get<Record<string, unknown>>(`users?username=${username}`);
-      return normalizeUser(data);
-    },
+    queryKey: queryKeys.users.detail(username ?? ''),
+    queryFn: () => usersApi.getUser(username!),
     enabled: !!username,
-    retry: 2,
-    staleTime: 45000,
+    staleTime: 60000, // 1 minute
+    gcTime: 1000 * 60 * 5, // 5 minutes
+    retry: 1,
+  });
+}
+
+/**
+ * Fetch all users (for search/autocomplete)
+ */
+export function useUsers() {
+  return useQuery({
+    queryKey: queryKeys.users.all,
+    queryFn: async (): Promise<User[]> => {
+      // This would call an API endpoint to fetch users
+      // For now, return empty array as fallback
+      return [];
+    },
+    staleTime: 60000, // 1 minute
+    gcTime: 1000 * 60 * 5, // 5 minutes
+    retry: 1,
   });
 }

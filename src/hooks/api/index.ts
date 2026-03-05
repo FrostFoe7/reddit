@@ -1,13 +1,13 @@
 /**
- * API Hooks - Data fetching and mutations
- * All hooks in this directory handle API communication
+ * API Hooks
+ * All data fetching hooks using React Query
  */
 
-export * from "./useAuth";
-export * from "./usePosts";
-export * from "./useComments";
-export * from "./useVotes";
-export * from "./useUsers";
-export * from "./useCommunities";
-export * from "./useNotifications";
-export * from "./useMessages";
+export * from './usePosts';
+export * from './useComments';
+export * from './useUsers';
+export * from './useVotes';
+export * from './useCommunities';
+export * from './useMessages';
+export * from './useNotifications';
+export * from './useAuth';

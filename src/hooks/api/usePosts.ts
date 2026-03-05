@@ -1,27 +1,23 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type ApiError } from "@/api/client";
-import type { Post } from "@/types";
-import { normalizePost } from "@/types/normalize";
-import { useAuthStore } from "@/store/useStore";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { postsApi } from '@/services/api/posts';
+import { queryKeys } from '@/services/query/keys';
+import type { Post } from '@/types';
+import { useAuthStore } from '@/store/useStore';
+import { toast } from 'sonner';
 
 /**
  * Fetch all posts with optional sorting and user context
  */
 export function usePosts(sort: string = 'new') {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const userId = user?.id;
 
   return useQuery({
-    queryKey: ["posts", userId, sort],
-    queryFn: async () => {
-      const params = new URLSearchParams({ sort });
-      if (userId) params.append("user_id", userId);
-      const endpoint = `posts?${params.toString()}`;
-      const data = await api.get<Record<string, unknown>[]>(endpoint);
-      return data.map(normalizePost);
-    },
-    retry: 2,
+    queryKey: queryKeys.posts.list(sort, userId),
+    queryFn: () => postsApi.getPosts(sort, userId),
     staleTime: 30000, // 30 seconds
+    gcTime: 1000 * 60 * 5, // 5 minutes (renamed from cacheTime)
+    retry: 1,
   });
 }
 
@@ -29,21 +25,16 @@ export function usePosts(sort: string = 'new') {
  * Search posts by query
  */
 export function useSearchPosts(query: string) {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const userId = user?.id;
 
   return useQuery({
-    queryKey: ["posts", "search", query, userId],
-    queryFn: async () => {
-      const params = new URLSearchParams({ q: query });
-      if (userId) params.append("user_id", userId);
-      const endpoint = `posts?${params.toString()}`;
-      const data = await api.get<Record<string, unknown>[]>(endpoint);
-      return data.map(normalizePost);
-    },
+    queryKey: queryKeys.posts.search(query, userId),
+    queryFn: () => postsApi.searchPosts(query, userId),
     enabled: !!query && query.length > 0,
-    retry: 2,
     staleTime: 20000, // 20 seconds
+    gcTime: 1000 * 60 * 5,
+    retry: 1,
   });
 }
 
@@ -51,20 +42,16 @@ export function useSearchPosts(query: string) {
  * Fetch single post by ID
  */
 export function usePost(id: string | undefined) {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const userId = user?.id;
 
   return useQuery({
-    queryKey: ["posts", id, userId],
-    queryFn: async () => {
-      if (!id) throw new Error("Post ID is required");
-      const params = userId ? `?user_id=${userId}` : "";
-      const data = await api.get<Record<string, unknown>>(`posts/${id}${params}`);
-      return normalizePost(data);
-    },
+    queryKey: queryKeys.posts.detail(id ?? '', userId),
+    queryFn: () => postsApi.getPost(id!, userId),
     enabled: !!id,
-    retry: 2,
     staleTime: 45000, // 45 seconds
+    gcTime: 1000 * 60 * 5,
+    retry: 1,
   });
 }
 
@@ -75,15 +62,55 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newPost: Partial<Post>) => {
-      const data = await api.post<Record<string, unknown>>("posts", newPost);
-      return normalizePost(data);
-    },
+    mutationFn: (newPost: Partial<Post>) => postsApi.createPost(newPost),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      // Invalidate all post queries to refetch
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
+      toast.success('Post created successfully!');
     },
-    onError: (error: ApiError) => {
-      console.error("Failed to create post:", error.message);
+    onError: (error: Error) => {
+      console.error('Create post error:', error);
+      toast.error(error.message || 'Failed to create post');
+    },
+  });
+}
+
+/**
+ * Update post
+ */
+export function useUpdatePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Post> }) =>
+      postsApi.updatePost(id, updates),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.lists() });
+      toast.success('Post updated successfully!');
+    },
+    onError: (error: Error) => {
+      console.error('Update post error:', error);
+      toast.error(error.message || 'Failed to update post');
+    },
+  });
+}
+
+/**
+ * Delete post
+ */
+export function useDeletePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => postsApi.deletePost(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
+      toast.success('Post deleted successfully');
+    },
+    onError: (error: Error) => {
+      console.error('Delete post error:', error);
+      toast.error(error.message || 'Failed to delete post');
     },
   });
 }

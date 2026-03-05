@@ -1,14 +1,16 @@
-/* eslint-disable react-hooks/incompatible-library */
-import React, { useRef, useState } from "react";
-import { usePosts } from "@/hooks";
-import { PostCard } from "@/components/post/PostCard";
-import { CreatePostPrompt } from "@/components/common/CreatePostPrompt";
-import { SortBar } from "@/components/common/SortBar";
+import React, { useRef, useState } from 'react';
+import { usePosts } from '@/hooks';
+import { PostCard } from '@/components/post/PostCard';
+import { CreatePostPrompt } from '@/components/common/CreatePostPrompt';
+import { SortBar } from '@/components/common/SortBar';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Separator } from "@/components/ui/separator";
+import { Separator } from '@/components/ui/separator';
 
+// Note: React Compiler may skip memoization of useVirtualizer due to incompatible API
+// This is a known limitation and doesn't affect functionality
+/* eslint-disable react-hooks/incompatible-library */
 export const Home: React.FC = () => {
   const [currentSort, setCurrentSort] = useState('new');
   const { data: posts = [], isLoading, error } = usePosts(currentSort);
