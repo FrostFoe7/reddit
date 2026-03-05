@@ -3,20 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { api } from "@/lib/api";
-import { useAuthStore } from "@/store/useStore";
+import { useRegister } from "@/hooks/api/useAuth";
 import { toast } from "sonner";
 import { X, ArrowLeft } from "lucide-react";
-import type { User } from "@/types";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const { mutate: register, isPending: isLoading } = useRegister();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,26 +23,19 @@ export default function RegisterPage() {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const response = await api.post<{ success: boolean; user: User }>("auth/register", {
-        username,
-        email,
-        password,
-      });
-
-      if (response.success) {
-        login(response.user);
-        toast.success("Account created successfully!");
-        navigate("/");
+    register(
+      { username, email, password },
+      {
+        onSuccess: () => {
+          toast.success("Account created successfully!");
+          navigate("/");
+        },
+        onError: (error) => {
+          const message = error instanceof Error ? error.message : "Registration failed. Try again.";
+          toast.error(message);
+        },
       }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Registration failed. Try again.";
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
+    );
   };
 
   return (

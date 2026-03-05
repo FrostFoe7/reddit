@@ -3,40 +3,32 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { api } from "@/lib/api";
-import { useAuthStore } from "@/store/useStore";
+import { useLogin } from "@/hooks/api/useAuth";
 import { toast } from "sonner";
 import { X, ArrowLeft } from "lucide-react";
-import type { User } from "@/types";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const { mutate: login, isPending: isLoading } = useLogin();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const response = await api.post<{ success: boolean; user: User }>("auth/login", {
-        username,
-        password,
-      });
-
-      if (response.success) {
-        login(response.user);
-        toast.success("Welcome back!");
-        navigate("/");
+    
+    login(
+      { username, password },
+      {
+        onSuccess: () => {
+          toast.success("Welcome back!");
+          navigate("/");
+        },
+        onError: (error) => {
+          const message = error instanceof Error ? error.message : "Invalid username or password";
+          toast.error(message);
+        },
       }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Invalid username or password";
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
+    );
   };
 
   return (
@@ -90,6 +82,7 @@ export default function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -104,6 +97,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
           </form>
