@@ -27,7 +27,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { useCommunities, useCreateCommunity } from '@/hooks';
+import { useCommunities } from '@/hooks';
 import type { Community } from '@/types';
 import { cn } from '@/lib/utils';
 import { SidebarNavItem } from './SidebarNavItem';
@@ -62,7 +62,6 @@ export const LeftSidebar = () => {
   const navigate = useNavigate();
   const { sidebarCollapsed } = useUIStore();
   const { data: communities = [] } = useCommunities();
-  const { mutate: createCommunity } = useCreateCommunity();
 
   const handleExternalClick = (label: string) => {
     toast.info(`Redirecting to ${label}...`, {
@@ -71,32 +70,11 @@ export const LeftSidebar = () => {
   };
 
   const handleCreateCommunity = () => {
-    const nameInput = window.prompt('Community name (3-21 chars, letters/numbers/underscore):');
-    if (!nameInput) return;
-
-    const name = nameInput.trim();
-    if (!/^[A-Za-z0-9_]{3,21}$/.test(name)) {
-      toast.error('Invalid name format');
-      return;
-    }
-
-    const descriptionInput = window.prompt('Community description (optional):') || '';
-
-    createCommunity(
-      {
-        name,
-        description: descriptionInput.trim() || undefined,
-      },
-      {
-        onSuccess: created => {
-          navigate(`/r/${created.name}`);
-        },
-      },
-    );
+    navigate('/r/create');
   };
 
   const handleManageCommunities = () => {
-    navigate('/settings');
+    navigate('/r/create');
   };
 
   return (
@@ -235,7 +213,7 @@ export const LeftSidebar = () => {
                   {communities?.map((community: Community) => (
                     <NavItem
                       key={community.id}
-                      to={`/r/${community.id}`}
+                      to={`/r/${community.name}`}
                       icon={() => (
                         <div
                           className={cn(
@@ -261,7 +239,7 @@ export const LeftSidebar = () => {
                 <div className="flex flex-col space-y-0.5">
                   <NavItem to="/r/GamesOnReddit" icon={Gamepad2} label="Discover Games" />
                   <NavItem
-                    to="/post/post1"
+                    to="/r/GamesOnReddit"
                     icon={() => (
                       <Avatar className="w-6 h-6">
                         <AvatarImage src="https://styles.redditmedia.com/t5_g4t9vd/styles/communityIcon_jejg2erkc48g1.png" />
@@ -270,7 +248,7 @@ export const LeftSidebar = () => {
                     label="BattleBirds"
                   />
                   <NavItem
-                    to="/post/post2"
+                    to="/r/GamesOnReddit"
                     icon={() => (
                       <Avatar className="w-6 h-6">
                         <AvatarImage src="https://styles.redditmedia.com/t5_gikv8d/styles/communityIcon_nz4nl06rg4hg1.png" />

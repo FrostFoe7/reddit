@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { usePosts } from '@/hooks';
-import { PostCard } from '@/components/post/PostCard';
+import { PostCard } from '@/pages/posts/components/PostCard';
 import { CreatePostPrompt } from '@/components/common/CreatePostPrompt';
 import { SortBar } from '@/components/common/SortBar';
 import Skeleton from 'react-loading-skeleton';

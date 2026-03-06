@@ -160,6 +160,36 @@ export function useDeleteCommunity() {
 }
 
 /**
+ * Update a community
+ */
+export function useUpdateCommunity() {
+  const queryClient = useQueryClient();
+  const user = useAuthStore(state => state.user);
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: { description?: string; icon_url?: string; banner_url?: string };
+    }) => {
+      if (!user) throw new Error('Must be logged in to update community');
+      return communitiesApi.updateCommunity(id, { ...updates, user_id: user.id });
+    },
+    onSuccess: updated => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.communities.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.communities.detail(updated.name) });
+      toast.success('Community updated');
+    },
+    onError: (error: Error) => {
+      console.error('Update community error:', error);
+      toast.error(error.message || 'Failed to update community');
+    },
+  });
+}
+
+/**
  * Get user's community memberships
  */
 export function useUserMemberships() {

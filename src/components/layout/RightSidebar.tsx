@@ -32,8 +32,8 @@ export const RightSidebar = () => {
 
   const isSubredditPage =
     location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
-  const isPostPage = location.pathname.startsWith('/post/');
-  const isProfilePage = location.pathname.startsWith('/u/');
+  const isPostPage = location.pathname.startsWith('/posts/');
+  const isProfilePage = location.pathname.startsWith('/profile/');
 
   let communityContext: Community | null = null;
   const profileUsername = isProfilePage ? location.pathname.split('/')[2] : null;
@@ -51,7 +51,7 @@ export const RightSidebar = () => {
     }
   }
 
-  const isCreatePage = location.pathname === '/create';
+  const isCreatePage = location.pathname === '/posts/create';
   const showCommunityInfo = isSubredditPage || isPostPage;
 
   const handleAction = (label: string) => {
@@ -84,7 +84,7 @@ export const RightSidebar = () => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      navigate('/login');
+      navigate('/auth/login');
       return;
     }
     if (memberships.includes(subId)) {
@@ -257,7 +257,7 @@ export const RightSidebar = () => {
                   {isContextJoined ? 'Joined' : 'Join'}
                 </Button>
                 <Button
-                  onClick={() => navigate('/create', { state: { subredditId: communityContext?.id } })}
+                  onClick={() => navigate('/posts/create', { state: { subredditId: communityContext?.id } })}
                   variant="outline"
                   className="w-full rounded-full font-bold h-10 border-primary text-primary hover:bg-primary/5"
                 >
@@ -310,7 +310,7 @@ export const RightSidebar = () => {
               {communityContext?.moderators?.map(mod => (
                 <Link
                   key={mod.id}
-                  to={`/u/${mod.username}`}
+                  to={`/profile/${mod.username}`}
                   className="flex items-center gap-3 p-2 hover:bg-muted rounded-xl transition-colors group"
                 >
                   <Avatar className="h-7 w-7 border border-border/50">
@@ -343,7 +343,7 @@ export const RightSidebar = () => {
                 {posts.slice(0, 4).map((post: Post) => (
                   <Link
                     key={post.id}
-                    to={`/post/${post.id}`}
+                    to={`/posts/${post.id}`}
                     className="px-2 py-2.5 hover:bg-muted rounded-xl transition-colors flex flex-col gap-1 group"
                   >
                     <div className="flex items-center gap-2 text-[11px] text-muted-foreground">

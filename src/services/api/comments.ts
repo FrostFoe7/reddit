@@ -50,14 +50,15 @@ export const commentsApi = {
   /**
    * Update comment
    */
-  async updateComment(id: string, updates: Partial<Comment>): Promise<Comment> {
-    return api.put<Comment>(`comments/${id}`, updates);
+  async updateComment(id: string, updates: Partial<Comment> & { user_id?: string }): Promise<Comment> {
+    const data = await api.put<Record<string, unknown>>(`comments/${id}`, updates);
+    return normalizeComment(data);
   },
 
   /**
    * Delete comment
    */
-  async deleteComment(id: string): Promise<void> {
-    await api.delete(`comments/${id}`);
+  async deleteComment(id: string, userId: string): Promise<void> {
+    await api.delete(`comments/${id}?user_id=${encodeURIComponent(userId)}`);
   },
 };

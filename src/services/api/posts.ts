@@ -63,7 +63,7 @@ export const postsApi = {
   /**
    * Update post
    */
-  async updatePost(id: string, updates: Partial<Post>): Promise<Post> {
+  async updatePost(id: string, updates: Partial<Post> & { user_id?: string }): Promise<Post> {
     const data = await api.put<Record<string, unknown>>(`posts/${id}`, updates);
     return normalizePost(data);
   },

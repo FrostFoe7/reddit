@@ -52,7 +52,10 @@ export const communitiesApi = {
   /**
    * Update community
    */
-  async updateCommunity(id: string, updates: Partial<Community>): Promise<Community> {
+  async updateCommunity(
+    id: string,
+    updates: Partial<Community> & { user_id?: string },
+  ): Promise<Community> {
     const data = await api.put<Record<string, unknown>>(`communities/${id}`, updates);
     return normalizeCommunity(data);
   },

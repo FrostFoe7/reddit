@@ -120,6 +120,82 @@ if ($method === 'POST') {
     }
 }
 
+if ($method === 'PUT' || $method === 'PATCH') {
+    if (!preg_match('/^posts\/([^\/]+)/', $route, $matches)) {
+        sendResponse(['error' => 'Invalid update route'], 400);
+    }
+
+    $postId = $matches[1];
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $userId = $input['user_id'] ?? $_GET['user_id'] ?? null;
+
+    if (!$userId) {
+        sendResponse(['error' => 'Missing user_id'], 400);
+    }
+
+    try {
+        $postStmt = $pdo->prepare('SELECT id, author_id FROM posts WHERE id = ? LIMIT 1');
+        $postStmt->execute([$postId]);
+        $post = $postStmt->fetch();
+
+        if (!$post) {
+            sendResponse(['error' => 'Post not found'], 404);
+        }
+
+        if (($post['author_id'] ?? null) !== $userId) {
+            sendResponse(['error' => 'Insufficient permissions'], 403);
+        }
+
+        $fields = [];
+        $params = [];
+
+        if (array_key_exists('title', $input)) {
+            $title = trim((string)$input['title']);
+            if ($title === '') {
+                sendResponse(['error' => 'Title cannot be empty'], 400);
+            }
+            $fields[] = 'title = ?';
+            $params[] = $title;
+        }
+
+        if (array_key_exists('content', $input)) {
+            $fields[] = 'content = ?';
+            $params[] = $input['content'];
+        }
+
+        if (array_key_exists('image_url', $input)) {
+            $fields[] = 'image_url = ?';
+            $params[] = $input['image_url'];
+        }
+
+        if (array_key_exists('link_url', $input)) {
+            $fields[] = 'link_url = ?';
+            $params[] = $input['link_url'];
+        }
+
+        if (array_key_exists('post_type', $input)) {
+            $fields[] = 'post_type = ?';
+            $params[] = $input['post_type'];
+        }
+
+        if (empty($fields)) {
+            sendResponse(['error' => 'No valid fields to update'], 400);
+        }
+
+        $params[] = $postId;
+        $stmtUpdate = $pdo->prepare('UPDATE posts SET ' . implode(', ', $fields) . ' WHERE id = ?');
+        $stmtUpdate->execute($params);
+
+        $stmtFetch = $pdo->prepare('SELECT pd.*, 0 as user_vote FROM post_details pd WHERE pd.id = ? LIMIT 1');
+        $stmtFetch->execute([$postId]);
+        $updated = $stmtFetch->fetch();
+
+        sendResponse($updated ?: ['success' => true, 'id' => $postId]);
+    } catch (\Exception $e) {
+        sendResponse(['error' => 'Failed to update post: ' . $e->getMessage()], 500);
+    }
+}
+
 if ($method === 'DELETE') {
     if (!preg_match('/^posts\/([^\/]+)/', $route, $matches)) {
         sendResponse(['error' => 'Invalid delete route'], 400);

@@ -20,7 +20,7 @@ export const CreatePostPrompt: React.FC<CreatePostPromptProps> = ({ className })
           'hidden sm:flex items-center gap-4 p-4.5 bg-card border border-border rounded-3xl shadow-ios-subtle dark:shadow-none transition-all duration-400 cursor-pointer group',
           className,
         )}
-        onClick={() => navigate('/create')}
+        onClick={() => navigate('/posts/create')}
       >
         <Avatar className="h-11 w-11 shrink-0 shadow-sm border border-border">
           <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=ff4500" />

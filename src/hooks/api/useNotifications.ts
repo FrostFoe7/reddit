@@ -43,3 +43,25 @@ export function useMarkNotificationsRead() {
     },
   });
 }
+
+/**
+ * Mark one notification as read
+ */
+export function useMarkNotificationRead() {
+  const queryClient = useQueryClient();
+  const user = useAuthStore(state => state.user);
+
+  return useMutation({
+    mutationFn: (notificationId: string) => {
+      if (!user) throw new Error('Must be logged in');
+      return notificationsApi.markAsRead(notificationId, user.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
+    },
+    onError: (error: Error) => {
+      console.error('Mark notification read error:', error);
+      toast.error(error.message || 'Failed to update notification');
+    },
+  });
+}

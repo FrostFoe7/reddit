@@ -23,7 +23,7 @@ export const SearchBar = () => {
     location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
   const subName = isSubreddit ? location.pathname.split('/')[2] : null;
 
-  const isProfile = location.pathname.startsWith('/u/');
+  const isProfile = location.pathname.startsWith('/profile/');
   const profileName = isProfile ? location.pathname.split('/')[2] : null;
 
   const [searchInContext, setSearchInContext] = useState(true);
@@ -240,7 +240,7 @@ export const SearchBar = () => {
                 <button
                   key={p.id}
                   className="flex items-center justify-between px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors w-full text-left"
-                  onClick={() => navigate(`/u/${p.username}`)}
+                  onClick={() => navigate(`/profile/${p.username}`)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar className="h-10 w-10">

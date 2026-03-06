@@ -8,12 +8,13 @@ import {
   useJoinCommunity,
   useLeaveCommunity,
 } from '@/hooks';
-import { PostCard } from '@/components/post/PostCard';
+import { PostCard } from '@/pages/posts/components/PostCard';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { useAuthStore } from '@/store/useStore';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 export const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -22,6 +23,7 @@ export const SearchPage: React.FC = () => {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
   const [activeTab, setActiveTab] = useState<'posts' | 'communities'>('posts');
+  const listRef = React.useRef<HTMLDivElement>(null);
 
   const { data: posts = [], isLoading: postsLoading, error: postsError } = useSearchPosts(query);
   const { data: communities = [], isLoading: communitiesLoading, error: communitiesError } =
@@ -29,6 +31,13 @@ export const SearchPage: React.FC = () => {
   const { data: memberships = [] } = useUserMemberships();
   const { mutate: joinMutate } = useJoinCommunity();
   const { mutate: leaveMutate } = useLeaveCommunity();
+
+  const virtualizer = useVirtualizer({
+    count: posts.length,
+    getScrollElement: () => listRef.current,
+    estimateSize: () => 220,
+    overscan: 5,
+  });
 
   const filteredCommunities = communities.filter(
     (c: Community) =>
@@ -40,7 +49,7 @@ export const SearchPage: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      navigate('/login');
+      navigate('/auth/login');
       return;
     }
     if (memberships.includes(subId)) {
@@ -148,19 +157,50 @@ export const SearchPage: React.FC = () => {
         )}
 
         {activeTab === 'posts' && (
-          <div id="search-results-container" className="flex flex-col">
+          <div
+            id="search-results-container"
+            className="flex flex-col overflow-y-auto h-[calc(100vh-220px)]"
+            ref={listRef}
+          >
             {postsLoading && (
-              <div className="p-12 text-center text-muted-foreground">Loading posts...</div>
+              <div className="p-6 space-y-4">
+                {[0, 1, 2].map(item => (
+                  <div key={item} className="h-36 rounded-2xl border border-border animate-pulse bg-muted/30" />
+                ))}
+              </div>
             )}
             {postsError && (
               <div className="p-12 text-center text-destructive">Failed to load posts.</div>
             )}
-            {posts.map((post, index) => (
-              <React.Fragment key={post.id}>
-                <PostCard post={post} />
-                {index < posts.length - 1 && <Separator className="my-4 opacity-50" />}
-              </React.Fragment>
-            ))}
+            {!postsLoading && posts.length > 0 && (
+              <div
+                style={{
+                  height: `${virtualizer.getTotalSize()}px`,
+                  width: '100%',
+                  position: 'relative',
+                }}
+              >
+                {virtualizer.getVirtualItems().map(virtualRow => {
+                  const post = posts[virtualRow.index];
+                  return (
+                    <div
+                      key={post.id}
+                      ref={virtualizer.measureElement}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                    >
+                      <PostCard post={post} />
+                      <Separator className="my-4 opacity-50" />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             {!postsLoading && !postsError && posts.length === 0 && (
               <div className="p-16 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm flex flex-col items-center gap-4">
                 <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center text-muted-foreground">

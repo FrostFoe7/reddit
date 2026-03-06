@@ -25,7 +25,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useNotifications } from '@/hooks';
+import { useMarkNotificationRead, useMarkNotificationsRead, useNotifications } from '@/hooks';
 import type { Notification } from '@/types';
 import { useTheme } from 'next-themes';
 import { SearchBar } from './SearchBar';
@@ -38,17 +38,21 @@ export const Navbar = () => {
   const { toggleSidebar } = useUIStore();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { data: notifications = [] } = useNotifications();
+  const { mutate: markAllNotificationsRead } = useMarkNotificationsRead();
+  const { mutate: markNotificationRead } = useMarkNotificationRead();
   const unreadCount = notifications.filter((n: Notification) => !n.is_read).length;
 
   const handleAction = (label: string) => {
-    toast.success(`${label} clicked!`, {
-      description: 'Functional implementation coming in the next sprint.',
-    });
+    toast.info(label);
   };
 
   const handleMarkAllRead = () => {
-    toast.success('All notifications marked as read', {
-      icon: <CheckCircle2 className="h-4 w-4 text-green-500" />,
+    markAllNotificationsRead(undefined, {
+      onSuccess: () => {
+        toast.success('All notifications marked as read', {
+          icon: <CheckCircle2 className="h-4 w-4 text-green-500" />,
+        });
+      },
     });
   };
 
@@ -150,7 +154,7 @@ export const Navbar = () => {
                       variant="ghost"
                       size="icon"
                       className="rounded-full h-10 w-10"
-                      onClick={() => navigate('/create')}
+                      onClick={() => navigate('/posts/create')}
                     >
                       <SquarePlus size={20} />
                     </Button>
@@ -187,8 +191,10 @@ export const Navbar = () => {
                         <div
                           key={n.id}
                           onClick={() => {
+                            if (!n.is_read) {
+                              markNotificationRead(n.id);
+                            }
                             navigate('/notifications');
-                            handleAction(`Notification from ${n.user || n.sub}`);
                           }}
                           className="p-4 flex gap-3 hover:bg-muted cursor-pointer transition-colors border-b border-border last:border-0 relative"
                         >
@@ -269,7 +275,7 @@ export const Navbar = () => {
                       </div>
                     </div>
                     <DropdownMenuItem
-                      onClick={() => navigate(`/u/${user?.username}`)}
+                      onClick={() => navigate(`/profile/${user?.username}`)}
                       className="rounded-xl py-3 font-semibold px-3"
                     >
                       <User size={20} className="mr-3 text-muted-foreground" /> View Profile
@@ -307,18 +313,18 @@ export const Navbar = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/auth/login')}
                   className="rounded-full hidden sm:flex"
                 >
                   Log In
                 </Button>
-                <Button size="sm" onClick={() => navigate('/register')} className="rounded-full">
+                <Button size="sm" onClick={() => navigate('/auth/register')} className="rounded-full">
                   Sign Up
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/auth/login')}
                   className="rounded-full h-10 w-10 sm:hidden"
                 >
                   <User size={20} />

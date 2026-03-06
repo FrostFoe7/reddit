@@ -105,3 +105,81 @@ if ($method === 'POST') {
         sendResponse(['error' => 'Failed to create comment: ' . $e->getMessage()], 500);
     }
 }
+
+if ($method === 'PUT' || $method === 'PATCH') {
+    if (!preg_match('/^comments\/([^\/]+)/', $route, $matches)) {
+        sendResponse(['error' => 'Invalid update route'], 400);
+    }
+
+    $commentId = $matches[1];
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $userId = $input['user_id'] ?? $_GET['user_id'] ?? null;
+    $content = trim((string)($input['content'] ?? ''));
+
+    if (!$userId) {
+        sendResponse(['error' => 'Missing user_id'], 400);
+    }
+
+    if ($content === '') {
+        sendResponse(['error' => 'Missing content'], 400);
+    }
+
+    try {
+        $stmtComment = $pdo->prepare('SELECT id, author_id FROM comments WHERE id = ? LIMIT 1');
+        $stmtComment->execute([$commentId]);
+        $comment = $stmtComment->fetch();
+
+        if (!$comment) {
+            sendResponse(['error' => 'Comment not found'], 404);
+        }
+
+        if (($comment['author_id'] ?? null) !== $userId) {
+            sendResponse(['error' => 'Insufficient permissions'], 403);
+        }
+
+        $stmt = $pdo->prepare('UPDATE comments SET content = ? WHERE id = ?');
+        $stmt->execute([$content, $commentId]);
+
+        $stmtFetch = $pdo->prepare('SELECT cd.*, 0 as user_vote FROM comment_details cd WHERE cd.id = ? LIMIT 1');
+        $stmtFetch->execute([$commentId]);
+        $updated = $stmtFetch->fetch();
+
+        sendResponse($updated ?: ['success' => true, 'id' => $commentId]);
+    } catch (\Exception $e) {
+        sendResponse(['error' => 'Failed to update comment: ' . $e->getMessage()], 500);
+    }
+}
+
+if ($method === 'DELETE') {
+    if (!preg_match('/^comments\/([^\/]+)/', $route, $matches)) {
+        sendResponse(['error' => 'Invalid delete route'], 400);
+    }
+
+    $commentId = $matches[1];
+    $userId = $_GET['user_id'] ?? null;
+
+    if (!$userId) {
+        sendResponse(['error' => 'Missing user_id'], 400);
+    }
+
+    try {
+        $stmtComment = $pdo->prepare('SELECT id, author_id FROM comments WHERE id = ? LIMIT 1');
+        $stmtComment->execute([$commentId]);
+        $comment = $stmtComment->fetch();
+
+        if (!$comment) {
+            sendResponse(['error' => 'Comment not found'], 404);
+        }
+
+        if (($comment['author_id'] ?? null) !== $userId) {
+            sendResponse(['error' => 'Insufficient permissions'], 403);
+        }
+
+        $stmtDelete = $pdo->prepare('DELETE FROM comments WHERE id = ?');
+        $stmtDelete->execute([$commentId]);
+
+        sendResponse(['success' => true]);
+    } catch (\Exception $e) {
+        sendResponse(['error' => 'Failed to delete comment: ' . $e->getMessage()], 500);
+    }
+}

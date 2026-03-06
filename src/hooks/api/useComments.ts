@@ -32,6 +32,7 @@ export function useCreateComment() {
     mutationFn: (comment: Partial<Comment>) => commentsApi.createComment(comment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.comments.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
       toast.success('Comment posted!');
     },
     onError: (error: Error) => {
@@ -46,10 +47,16 @@ export function useCreateComment() {
  */
 export function useUpdateComment() {
   const queryClient = useQueryClient();
+  const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<Comment> }) =>
-      commentsApi.updateComment(id, updates),
+    mutationFn: ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<Comment> & { user_id?: string };
+    }) => commentsApi.updateComment(id, { ...updates, user_id: user?.id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.comments.all });
       toast.success('Comment updated!');
@@ -66,11 +73,16 @@ export function useUpdateComment() {
  */
 export function useDeleteComment() {
   const queryClient = useQueryClient();
+  const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: (id: string) => commentsApi.deleteComment(id),
+    mutationFn: ({ id, postId }: { id: string; postId: string }) => {
+      if (!user) throw new Error('Must be logged in to delete comments');
+      return commentsApi.deleteComment(id, user.id).then(() => ({ postId }));
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.comments.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
       toast.success('Comment deleted');
     },
     onError: (error: Error) => {

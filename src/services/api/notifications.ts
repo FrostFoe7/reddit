@@ -29,8 +29,11 @@ export const notificationsApi = {
   /**
    * Mark notification as read
    */
-  async markAsRead(notificationId: string): Promise<{ message: string }> {
-    return api.put<{ message: string }>(`notifications/${notificationId}`, { is_read: true });
+  async markAsRead(notificationId: string, userId: string): Promise<{ success: boolean }> {
+    return api.post<{ success: boolean }>('notifications/mark-read', {
+      user_id: userId,
+      notification_id: notificationId,
+    });
   },
 
   /**

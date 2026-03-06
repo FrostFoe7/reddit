@@ -1,38 +1,54 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from 'next-themes';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { useAuthStore } from '@/store/useStore';
 
 // Lazy load pages for better bundle splitting
 const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
-const PostPage = lazy(() => import('@/pages/PostPage').then(m => ({ default: m.PostPage })));
+const PostPage = lazy(() => import('@/pages/posts/PostPage').then(m => ({ default: m.PostPage })));
 const SubredditPage = lazy(() =>
-  import('@/pages/SubredditPage').then(m => ({ default: m.SubredditPage })),
+  import('@/pages/community/SubredditPage').then(m => ({ default: m.SubredditPage })),
 );
 const ProfilePage = lazy(() =>
-  import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })),
+  import('@/pages/profile/ProfilePage').then(m => ({ default: m.ProfilePage })),
 );
 const CreatePostPage = lazy(() =>
-  import('@/pages/CreatePostPage').then(m => ({ default: m.CreatePostPage })),
+  import('@/pages/posts/CreatePostPage').then(m => ({ default: m.CreatePostPage })),
 );
 const SearchPage = lazy(() => import('@/pages/SearchPage').then(m => ({ default: m.SearchPage })));
 const NotificationsPage = lazy(() =>
-  import('@/pages/NotificationsPage').then(m => ({
+  import('@/pages/notifications/NotificationsPage').then(m => ({
     default: m.NotificationsPage,
   })),
 );
 const MessagesPage = lazy(() =>
-  import('@/pages/MessagesPage').then(m => ({ default: m.MessagesPage })),
+  import('@/pages/messages/MessagesPage').then(m => ({ default: m.MessagesPage })),
 );
 const SettingsPage = lazy(() =>
-  import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })),
+  import('@/pages/settings/SettingsPage').then(m => ({ default: m.SettingsPage })),
 );
-const LoginPage = lazy(() => import('@/pages/(auth)/Login').then(m => ({ default: m.default })));
+const CommunityCreatePage = lazy(() =>
+  import('@/pages/community/CommunityCreatePage').then(m => ({ default: m.CommunityCreatePage })),
+);
+const UserEditProfilePage = lazy(() =>
+  import('@/pages/profile/UserEditProfilePage').then(m => ({ default: m.UserEditProfilePage })),
+);
+const PostEditPage = lazy(() =>
+  import('@/pages/posts/PostEditPage').then(m => ({ default: m.PostEditPage })),
+);
+const CommunitySettingsPage = lazy(() =>
+  import('@/pages/community/CommunitySettingsPage').then(m => ({ default: m.CommunitySettingsPage })),
+);
+const ModeratorPage = lazy(() =>
+  import('@/pages/community/ModeratorPage').then(m => ({ default: m.ModeratorPage })),
+);
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage').then(m => ({ default: m.default })));
 const RegisterPage = lazy(() =>
-  import('@/pages/(auth)/Register').then(m => ({ default: m.default })),
+  import('@/pages/auth/RegisterPage').then(m => ({ default: m.default })),
 );
 const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.NotFound })));
 
@@ -45,15 +61,15 @@ const PageLoader = () => (
 
 function AppContent() {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const isAuthPage = location.pathname === '/auth/login' || location.pathname === '/auth/register';
 
   if (isAuthPage) {
     return (
       <div className="min-h-screen bg-background">
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/auth/login" element={<LoginPage />} />
+            <Route path="/auth/register" element={<RegisterPage />} />
           </Routes>
         </Suspense>
       </div>
@@ -65,19 +81,96 @@ function AppContent() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/post/:id" element={<PostPage />} />
+          <Route path="/posts/:id" element={<PostPage />} />
           <Route path="/r/:name" element={<SubredditPage />} />
-          <Route path="/u/:username" element={<ProfilePage />} />
-          <Route path="/create" element={<CreatePostPage />} />
+          <Route path="/profile/:username" element={<ProfilePage />} />
+          <Route
+            path="/posts/create"
+            element={
+              <ProtectedRoute>
+                <CreatePostPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/r/create"
+            element={
+              <ProtectedRoute>
+                <CommunityCreatePage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/messages" element={<MessagesPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/explore" element={<SearchPage />} />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <MessagesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/edit"
+            element={
+              <ProtectedRoute>
+                <UserEditProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/posts/edit/:id"
+            element={
+              <ProtectedRoute>
+                <PostEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/r/settings/:subreddit"
+            element={
+              <ProtectedRoute>
+                <CommunitySettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/r/mod/:subreddit"
+            element={
+              <ProtectedRoute>
+                <ModeratorPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </MainLayout>
   );
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" replace />;
+  }
+  return <>{children}</>;
 }
 
 function App() {

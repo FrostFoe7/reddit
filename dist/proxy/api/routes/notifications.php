@@ -26,14 +26,20 @@ if ($method === 'GET') {
 if ($method === 'POST' && strpos($route, 'notifications/mark-read') === 0) {
     $input = json_decode(file_get_contents('php://input'), true);
     $user_id = $input['user_id'] ?? null;
+    $notification_id = $input['notification_id'] ?? null;
 
     if (!$user_id) {
         sendResponse(['error' => 'Missing user_id'], 400);
     }
 
     try {
-        $stmt = $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE recipient_id = ?");
-        $stmt->execute([$user_id]);
+        if ($notification_id) {
+            $stmt = $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE recipient_id = ? AND id = ?");
+            $stmt->execute([$user_id, $notification_id]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE recipient_id = ?");
+            $stmt->execute([$user_id]);
+        }
         
         sendResponse(['success' => true]);
     } catch (\Exception $e) {

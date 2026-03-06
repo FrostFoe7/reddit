@@ -308,3 +308,73 @@ if ($method === 'DELETE') {
         sendResponse(['error' => 'Failed to delete community: ' . $e->getMessage()], 500);
     }
 }
+
+if ($method === 'PUT' || $method === 'PATCH') {
+    if (!preg_match('/^communities\/([^\/]+)/', $route, $matches)) {
+        sendResponse(['error' => 'Invalid update route'], 400);
+    }
+
+    $communityId = $matches[1];
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $userId = $input['user_id'] ?? $_GET['user_id'] ?? null;
+
+    if (!$userId) {
+        sendResponse(['error' => 'Missing user_id'], 400);
+    }
+
+    try {
+        $community = findSubreddit($pdo, $communityId);
+        if (!$community) {
+            sendResponse(['error' => 'Community not found'], 404);
+        }
+
+        $role = getMembershipRole($pdo, $community['id'], $userId);
+        if (!canManageCommunity($community, $role, $userId)) {
+            sendResponse(['error' => 'Insufficient permissions'], 403);
+        }
+
+        $fields = [];
+        $params = [];
+
+        if (array_key_exists('description', $input)) {
+            $fields[] = 'description = ?';
+            $params[] = trim((string)$input['description']) ?: null;
+        }
+
+        if (array_key_exists('icon_url', $input)) {
+            $fields[] = 'icon_url = ?';
+            $params[] = $input['icon_url'];
+        }
+
+        if (array_key_exists('banner_url', $input)) {
+            $fields[] = 'banner_url = ?';
+            $params[] = $input['banner_url'];
+        }
+
+        if (empty($fields)) {
+            sendResponse(['error' => 'No valid fields to update'], 400);
+        }
+
+        $params[] = $community['id'];
+        $stmt = $pdo->prepare('UPDATE subreddits SET ' . implode(', ', $fields) . ' WHERE id = ?');
+        $stmt->execute($params);
+
+        $updated = findSubreddit($pdo, $community['id']);
+        if (!$updated) {
+            sendResponse(['error' => 'Community not found after update'], 404);
+        }
+
+        $stmtCount = $pdo->prepare('SELECT COUNT(*) FROM subreddit_members WHERE subreddit_id = ?');
+        $stmtCount->execute([$updated['id']]);
+        $updated['members'] = (int)$stmtCount->fetchColumn();
+
+        $updatedRole = getMembershipRole($pdo, $updated['id'], $userId);
+        $updated['is_joined'] = $updatedRole !== null;
+        $updated['current_user_role'] = $updatedRole;
+        $updated['can_manage'] = canManageCommunity($updated, $updatedRole, $userId);
+
+        sendResponse($updated);
+    } catch (\Exception $e) {
+        sendResponse(['error' => 'Failed to update community: ' . $e->getMessage()], 500);
+    }
+}

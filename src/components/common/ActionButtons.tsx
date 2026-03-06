@@ -41,6 +41,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           variant="secondary"
           className="h-8 rounded-full px-3 gap-2 bg-secondary-background hover:bg-muted border border-transparent hover:border-border transition-all"
           onClick={onCommentClick}
+          aria-label="Open comments"
         >
           <MessageSquare size={18} />
           <span className="text-xs font-bold">{formatNumber(commentsCount)}</span>
@@ -52,6 +53,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           variant="ghost"
           className="h-8 rounded-full px-3 gap-2 hover:bg-muted"
           onClick={onCommentClick}
+          aria-label="Reply to comment"
         >
           <MessageSquare size={18} />
           <span className="text-xs font-bold">Reply</span>
@@ -61,6 +63,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       <Button
         variant="secondary"
         className="h-8 rounded-full px-3 bg-secondary-background hover:bg-muted border border-transparent hover:border-border transition-all"
+        aria-label="Give award"
       >
         <Award size={18} />
       </Button>
@@ -72,6 +75,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           e.stopPropagation();
           openShare(shareUrl);
         }}
+        aria-label="Share"
       >
         <Share2 size={18} />
         {showShareLabel && <span className="text-xs font-bold">Share</span>}
@@ -83,6 +87,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
             variant="ghost"
             size="icon"
             className="h-8 w-8 rounded-full text-muted-foreground hover:bg-muted"
+            aria-label="Open actions"
           >
             <MoreHorizontal size={18} />
           </Button>

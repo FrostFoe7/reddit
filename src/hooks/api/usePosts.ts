@@ -82,11 +82,16 @@ export function useUpdatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<Post> }) =>
+    mutationFn: ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<Post> & { user_id?: string };
+    }) =>
       postsApi.updatePost(id, updates),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts.detail(id) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts.lists() });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
       toast.success('Post updated successfully!');
     },
     onError: (error: Error) => {
