@@ -1,49 +1,54 @@
-import type { Comment } from "@/types";
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { usePost, useComments, useCreateComment } from "@/hooks";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { PostCard } from "@/components/post/PostCard";
-import { CommentThread } from "@/components/post/CommentThread";
-import { CommentComposer } from "@/components/post/CommentComposer";
-import { CommentControls } from "@/components/post/CommentControls";
-import { useAuthStore } from "@/store/useStore";
-import { toast } from "sonner";
+import type { Comment } from '@/types';
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { usePost, useComments, useCreateComment } from '@/hooks';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { PostCard } from '@/components/post/PostCard';
+import { CommentThread } from '@/components/post/CommentThread';
+import { CommentComposer } from '@/components/post/CommentComposer';
+import { CommentControls } from '@/components/post/CommentControls';
+import { useAuthStore } from '@/store/useStore';
+import { toast } from 'sonner';
 
 export const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const { mutate: createComment } = useCreateComment();
 
-  const { data: post, isLoading: postLoading } = usePost(id);
-  const { data: comments = [], isLoading: commentsLoading } = useComments(id);
+  const { data: post, isLoading: postLoading, error: postError } = usePost(id);
+  const { data: comments = [], isLoading: commentsLoading, error: commentsError } = useComments(id);
 
   const topLevelComments = comments.filter((c: Comment) => !c.parent_id);
 
   const handleCommentSubmit = (content: string) => {
     if (!user) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
     if (!id) return;
 
     const newComment: Partial<Comment> = {
-      id: Math.random().toString(36).substring(2, 5) + "-" + Math.random().toString(36).substring(2, 5) + "-" + Math.random().toString(36).substring(2, 5),
+      id:
+        Math.random().toString(36).substring(2, 5) +
+        '-' +
+        Math.random().toString(36).substring(2, 5) +
+        '-' +
+        Math.random().toString(36).substring(2, 5),
       post_id: id,
       author_id: user.id,
       content: content,
-      parent_id: undefined
+      parent_id: undefined,
     };
 
     createComment(newComment, {
       onSuccess: () => {
-        toast.success("Comment posted!");
+        toast.success('Comment posted!');
       },
       onError: (err: Error) => {
-        toast.error(err.message || "Failed to post comment");
-      }
+        toast.error(err.message || 'Failed to post comment');
+      },
     });
   };
 
@@ -51,6 +56,23 @@ export const PostPage: React.FC = () => {
     return (
       <div className="flex justify-center py-24">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (postError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
+        <h1 className="text-3xl font-bold text-foreground tracking-tight mb-3">Failed to load post</h1>
+        <p className="text-base text-muted-foreground font-medium mb-10 max-w-72">
+          Please refresh and try again.
+        </p>
+        <Button
+          onClick={() => navigate('/')}
+          className="rounded-full px-10 h-12 font-bold bg-primary text-primary-foreground shadow-md transition-all active:scale-95"
+        >
+          Back to Home
+        </Button>
       </div>
     );
   }
@@ -74,14 +96,12 @@ export const PostPage: React.FC = () => {
             <line x1="9" y1="11" x2="15" y2="11" />
           </svg>
         </div>
-        <h1 className="text-3xl font-bold text-foreground tracking-tight mb-3">
-          Post not found
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground tracking-tight mb-3">Post not found</h1>
         <p className="text-base text-muted-foreground font-medium mb-10 max-w-72">
           This post may have been removed or the link might be broken.
         </p>
         <Button
-          onClick={() => navigate("/")}
+          onClick={() => navigate('/')}
           className="rounded-full px-10 h-12 font-bold bg-primary text-primary-foreground shadow-md transition-all active:scale-95"
         >
           Back to Home
@@ -106,12 +126,16 @@ export const PostPage: React.FC = () => {
           </div>
 
           <div className="space-y-1 sm:space-y-4 pb-20 pt-2">
+            {commentsError && (
+              <div className="px-4 py-3 text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-xl">
+                Failed to load comments.
+              </div>
+            )}
+            {commentsLoading && (
+              <div className="px-4 py-3 text-sm text-muted-foreground">Loading comments...</div>
+            )}
             {topLevelComments.map((comment: Comment) => (
-              <CommentThread
-                key={comment.id}
-                comment={comment}
-                allComments={comments}
-              />
+              <CommentThread key={comment.id} comment={comment} allComments={comments} />
             ))}
             {!commentsLoading && topLevelComments.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center gap-4">

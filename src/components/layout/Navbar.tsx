@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Bell,
   MessageSquare,
@@ -13,29 +13,24 @@ import {
   Star,
   Search,
   CheckCircle2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useNotifications } from "@/hooks";
-import type { Notification } from "@/types";
-import { useTheme } from "next-themes";
-import { SearchBar } from "./SearchBar";
-import { useUIStore, useAuthStore } from "@/store/useStore";
-import { toast } from "sonner";
+} from '@/components/ui/dropdown-menu';
+import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useNotifications } from '@/hooks';
+import type { Notification } from '@/types';
+import { useTheme } from 'next-themes';
+import { SearchBar } from './SearchBar';
+import { useUIStore, useAuthStore } from '@/store/useStore';
+import { toast } from 'sonner';
 
 export const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -43,26 +38,24 @@ export const Navbar = () => {
   const { toggleSidebar } = useUIStore();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { data: notifications = [] } = useNotifications();
-  const unreadCount = notifications.filter(
-    (n: Notification) => !n.is_read,
-  ).length;
+  const unreadCount = notifications.filter((n: Notification) => !n.is_read).length;
 
   const handleAction = (label: string) => {
     toast.success(`${label} clicked!`, {
-      description: "Functional implementation coming in the next sprint.",
+      description: 'Functional implementation coming in the next sprint.',
     });
   };
 
   const handleMarkAllRead = () => {
-    toast.success("All notifications marked as read", {
+    toast.success('All notifications marked as read', {
       icon: <CheckCircle2 className="h-4 w-4 text-green-500" />,
     });
   };
 
   const handleLogout = () => {
     logout();
-    toast.success("Logged out successfully");
-    navigate("/");
+    toast.success('Logged out successfully');
+    navigate('/');
   };
 
   return (
@@ -114,7 +107,7 @@ export const Navbar = () => {
             variant="ghost"
             size="icon"
             className="rounded-full h-10 w-10 md:hidden"
-            onClick={() => navigate("/search")}
+            onClick={() => navigate('/search')}
           >
             <Search size={20} />
           </Button>
@@ -123,7 +116,7 @@ export const Navbar = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  onClick={() => handleAction("Advertise")}
+                  onClick={() => handleAction('Advertise')}
                   variant="ghost"
                   size="icon"
                   className="rounded-full h-10 w-10 hidden sm:flex"
@@ -139,7 +132,7 @@ export const Navbar = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      onClick={() => navigate("/messages")}
+                      onClick={() => navigate('/messages')}
                       variant="ghost"
                       size="icon"
                       className="rounded-full h-10 w-10 relative"
@@ -157,7 +150,7 @@ export const Navbar = () => {
                       variant="ghost"
                       size="icon"
                       className="rounded-full h-10 w-10"
-                      onClick={() => navigate("/create")}
+                      onClick={() => navigate('/create')}
                     >
                       <SquarePlus size={20} />
                     </Button>
@@ -167,11 +160,7 @@ export const Navbar = () => {
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-full h-10 w-10 relative"
-                    >
+                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 relative">
                       <Bell size={20} />
                       {unreadCount > 0 && (
                         <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-background"></span>
@@ -198,7 +187,7 @@ export const Navbar = () => {
                         <div
                           key={n.id}
                           onClick={() => {
-                            navigate("/notifications");
+                            navigate('/notifications');
                             handleAction(`Notification from ${n.user || n.sub}`);
                           }}
                           className="p-4 flex gap-3 hover:bg-muted cursor-pointer transition-colors border-b border-border last:border-0 relative"
@@ -214,8 +203,7 @@ export const Navbar = () => {
                           </Avatar>
                           <div className="flex flex-col min-w-0 justify-center">
                             <p className="text-sm leading-snug">
-                              <span className="font-bold">{n.user || n.sub}</span>{" "}
-                              {n.text}
+                              <span className="font-bold">{n.user || n.sub}</span> {n.text}
                             </p>
                             <span className="text-xs text-muted-foreground mt-1 font-medium">
                               {n.created_at}
@@ -226,7 +214,7 @@ export const Navbar = () => {
                     </div>
                     <div className="p-3 bg-muted/10 border-t border-border text-center">
                       <Button
-                        onClick={() => navigate("/notifications")}
+                        onClick={() => navigate('/notifications')}
                         variant="ghost"
                         size="sm"
                         className="w-full text-xs font-bold text-primary"
@@ -245,7 +233,13 @@ export const Navbar = () => {
                     >
                       <div className="relative">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user?.avatar_url || user?.avatar || "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png"} />
+                          <AvatarImage
+                            src={
+                              user?.avatar_url ||
+                              user?.avatar ||
+                              'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png'
+                            }
+                          />
                           <AvatarFallback>U</AvatarFallback>
                         </Avatar>
                         <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background"></span>
@@ -258,13 +252,19 @@ export const Navbar = () => {
                   >
                     <div className="flex items-center gap-3 p-3 mb-2 border-b border-border pb-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={user?.avatar_url || user?.avatar || "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png"} />
+                        <AvatarImage
+                          src={
+                            user?.avatar_url ||
+                            user?.avatar ||
+                            'https://www.redditstatic.com/avatars/defaults/v2/avatar_default_0.png'
+                          }
+                        />
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="font-bold text-base">{user?.username}</span>
                         <span className="text-xs text-muted-foreground font-medium flex items-center gap-1.5 mt-0.5">
-                          <Star size={12} className="text-primary fill-current" />{" "}
-                          {user?.karma} karma
+                          <Star size={12} className="text-primary fill-current" /> {user?.karma}{' '}
+                          karma
                         </span>
                       </div>
                     </div>
@@ -272,27 +272,25 @@ export const Navbar = () => {
                       onClick={() => navigate(`/u/${user?.username}`)}
                       className="rounded-xl py-3 font-semibold px-3"
                     >
-                      <User size={20} className="mr-3 text-muted-foreground" /> View
-                      Profile
+                      <User size={20} className="mr-3 text-muted-foreground" /> View Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => navigate("/settings")}
+                      onClick={() => navigate('/settings')}
                       className="rounded-xl py-3 font-semibold px-3"
                     >
-                      <Settings size={20} className="mr-3 text-muted-foreground" />{" "}
-                      Settings
+                      <Settings size={20} className="mr-3 text-muted-foreground" /> Settings
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="my-1.5" />
                     <DropdownMenuItem
-                      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                       className="rounded-xl py-3 font-semibold px-3"
                     >
-                      {theme === "dark" ? (
+                      {theme === 'dark' ? (
                         <Sun size={20} className="mr-3" />
                       ) : (
                         <Moon size={20} className="mr-3" />
                       )}
-                      {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                      {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="my-1.5" />
                     <DropdownMenuItem
@@ -306,13 +304,23 @@ export const Navbar = () => {
               </>
             ) : (
               <div className="flex items-center gap-2 px-2">
-                <Button variant="outline" size="sm" onClick={() => navigate("/login")} className="rounded-full hidden sm:flex">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/login')}
+                  className="rounded-full hidden sm:flex"
+                >
                   Log In
                 </Button>
-                <Button size="sm" onClick={() => navigate("/register")} className="rounded-full">
+                <Button size="sm" onClick={() => navigate('/register')} className="rounded-full">
                   Sign Up
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => navigate("/login")} className="rounded-full h-10 w-10 sm:hidden">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate('/login')}
+                  className="rounded-full h-10 w-10 sm:hidden"
+                >
                   <User size={20} />
                 </Button>
               </div>

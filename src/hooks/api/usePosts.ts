@@ -8,13 +8,13 @@ import { toast } from 'sonner';
 /**
  * Fetch all posts with optional sorting and user context
  */
-export function usePosts(sort: string = 'new') {
+export function usePosts(sort: string = 'new', subredditId?: string) {
   const user = useAuthStore(state => state.user);
   const userId = user?.id;
 
   return useQuery({
-    queryKey: queryKeys.posts.list(sort, userId),
-    queryFn: () => postsApi.getPosts(sort, userId),
+    queryKey: queryKeys.posts.list(sort, userId, subredditId),
+    queryFn: () => postsApi.getPosts(sort, userId, subredditId),
     staleTime: 30000, // 30 seconds
     gcTime: 1000 * 60 * 5, // 5 minutes (renamed from cacheTime)
     retry: 1,
@@ -101,9 +101,13 @@ export function useUpdatePost() {
  */
 export function useDeletePost() {
   const queryClient = useQueryClient();
+  const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: (id: string) => postsApi.deletePost(id),
+    mutationFn: (id: string) => {
+      if (!user) throw new Error('Must be logged in to delete posts');
+      return postsApi.deletePost(id, user.id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
       toast.success('Post deleted successfully');

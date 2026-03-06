@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   ChevronDown,
   Image as ImageIcon,
@@ -16,9 +16,9 @@ import {
   Bold,
   Italic,
   List,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useCommunities, useCreatePost } from "@/hooks";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useCommunities, useCreatePost } from '@/hooks';
 import {
   Command,
   CommandEmpty,
@@ -26,18 +26,14 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { toast } from "sonner";
+} from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { toast } from 'sonner';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { z } from 'zod';
-import type { Community, Post } from "@/types";
-import { useAuthStore } from "@/store/useStore";
+import type { Community, Post } from '@/types';
+import { useAuthStore } from '@/store/useStore';
 
 const postSchema = z.object({
   title: z.string().min(1, 'Title is required').max(300),
@@ -46,35 +42,47 @@ const postSchema = z.object({
 });
 
 export const CreatePostPage: React.FC = () => {
-  const [title, setTitle] = useState("");
-  const [activeTab, setActiveTab] = useState("text");
+  const [title, setTitle] = useState('');
+  const [activeTab, setActiveTab] = useState('text');
   const [open, setOpen] = useState(false);
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
 
-  const { data: communities } = useCommunities();
+  const { data: communities, isLoading: communitiesLoading, error: communitiesError } = useCommunities();
   const createPostMutation = useCreatePost();
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  React.useEffect(() => {
+    const requestedSubredditId = (location.state as { subredditId?: string } | null)?.subredditId;
+    if (!requestedSubredditId || !communities?.length) return;
+
+    const match = communities.find(c => c.id === requestedSubredditId);
+    if (match) {
+      setSelectedCommunity(match);
+    }
+  }, [communities, location.state]);
 
   const editor = useEditor({
     extensions: [StarterKit],
     content: '',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm dark:prose-invert focus:outline-none max-w-none min-h-[180px] p-4 text-sm',
+        class:
+          'prose prose-sm dark:prose-invert focus:outline-none max-w-none min-h-[180px] p-4 text-sm',
       },
     },
   });
 
   const handlePost = () => {
     if (!user) {
-        navigate("/login");
-        return;
+      navigate('/login');
+      return;
     }
 
-    const content = editor?.getHTML() || "";
-    
+    const content = editor?.getHTML() || '';
+
     const validation = postSchema.safeParse({
       title,
       content,
@@ -90,21 +98,26 @@ export const CreatePostPage: React.FC = () => {
 
     createPostMutation.mutate(
       {
-        id: Math.random().toString(36).substring(2, 5) + "-" + Math.random().toString(36).substring(2, 5) + "-" + Math.random().toString(36).substring(2, 5),
+        id:
+          Math.random().toString(36).substring(2, 5) +
+          '-' +
+          Math.random().toString(36).substring(2, 5) +
+          '-' +
+          Math.random().toString(36).substring(2, 5),
         title,
         content,
         subreddit_id: selectedCommunity.id,
-        post_type: (activeTab === "media" ? "image" : activeTab) as Post['post_type'],
+        post_type: (activeTab === 'media' ? 'image' : activeTab) as Post['post_type'],
         author_id: user.id,
       },
       {
         onSuccess: () => {
-          toast.success("Post submitted successfully!");
-          setTimeout(() => navigate("/"), 1000);
+          toast.success('Post submitted successfully!');
+          setTimeout(() => navigate('/'), 1000);
         },
         onError: (err: Error) => {
-          toast.error(err.message || "Failed to create post");
-        }
+          toast.error(err.message || 'Failed to create post');
+        },
       },
     );
   };
@@ -120,10 +133,7 @@ export const CreatePostPage: React.FC = () => {
             variant="ghost"
             className="text-primary font-bold hover:bg-primary/10 rounded-full px-4 h-9 text-sm"
           >
-            Drafts{" "}
-            <span className="ml-1.5 bg-primary/10 px-2 py-0.5 rounded-full text-xs">
-              0
-            </span>
+            Drafts <span className="ml-1.5 bg-primary/10 px-2 py-0.5 rounded-full text-xs">0</span>
           </Button>
         </div>
         <Separator />
@@ -144,8 +154,8 @@ export const CreatePostPage: React.FC = () => {
                   {selectedCommunity ? (
                     <div
                       className={cn(
-                        "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm",
-                        selectedCommunity.icon_url || "bg-primary",
+                        'w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm',
+                        selectedCommunity.icon_url || 'bg-primary',
                       )}
                     >
                       r/
@@ -157,15 +167,13 @@ export const CreatePostPage: React.FC = () => {
                   )}
                   <span
                     className={cn(
-                      "text-sm font-bold transition-colors",
+                      'text-sm font-bold transition-colors',
                       selectedCommunity
-                        ? "text-foreground"
-                        : "text-muted-foreground group-hover:text-foreground",
+                        ? 'text-foreground'
+                        : 'text-muted-foreground group-hover:text-foreground',
                     )}
                   >
-                    {selectedCommunity
-                      ? `r/${selectedCommunity.name}`
-                      : "Select a community"}
+                    {selectedCommunity ? `r/${selectedCommunity.name}` : 'Select a community'}
                   </span>
                 </div>
                 <ChevronDown
@@ -185,14 +193,17 @@ export const CreatePostPage: React.FC = () => {
                   className="h-11 font-medium border-none focus:ring-0"
                 />
                 <CommandList className="max-h-[300px] no-scrollbar">
+                  {communitiesLoading && (
+                    <div className="p-4 text-sm text-muted-foreground text-center">Loading communities...</div>
+                  )}
+                  {communitiesError && (
+                    <div className="p-4 text-sm text-destructive text-center">Failed to load communities.</div>
+                  )}
                   <CommandEmpty className="p-4 text-sm text-muted-foreground font-medium text-center">
                     No community found.
                   </CommandEmpty>
-                  <CommandGroup
-                    heading="Your Communities"
-                    className="px-2 pt-2 pb-4"
-                  >
-                    {communities?.map((community) => (
+                  <CommandGroup heading="Your Communities" className="px-2 pt-2 pb-4">
+                    {communities?.map(community => (
                       <CommandItem
                         key={community.id}
                         value={community.name}
@@ -204,16 +215,14 @@ export const CreatePostPage: React.FC = () => {
                       >
                         <div
                           className={cn(
-                            "w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm",
-                            community.icon_url || "bg-primary",
+                            'w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm',
+                            community.icon_url || 'bg-primary',
                           )}
                         >
                           r/
                         </div>
                         <div className="flex flex-col flex-1 min-w-0">
-                          <span className="font-bold text-sm truncate">
-                            r/{community.name}
-                          </span>
+                          <span className="font-bold text-sm truncate">r/{community.name}</span>
                           <span className="text-xs text-muted-foreground truncate">
                             {community.members || 0} members
                           </span>
@@ -232,11 +241,7 @@ export const CreatePostPage: React.FC = () => {
 
         {/* Post Type Tabs */}
         <div className="bg-card border border-border rounded-2xl sm:rounded-[20px] shadow-sm overflow-hidden">
-          <Tabs
-            defaultValue="text"
-            className="w-full"
-            onValueChange={setActiveTab}
-          >
+          <Tabs defaultValue="text" className="w-full" onValueChange={setActiveTab}>
             <TabsList variant="line" className="w-full grid grid-cols-4">
               <TabsTrigger
                 value="text"
@@ -275,7 +280,7 @@ export const CreatePostPage: React.FC = () => {
                 <Textarea
                   placeholder="Title"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value.slice(0, 300))}
+                  onChange={e => setTitle(e.target.value.slice(0, 300))}
                   className="w-full bg-card border border-border rounded-xl px-4 py-3.5 min-h-14 h-auto text-base sm:text-lg font-bold text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary transition-all resize-none overflow-hidden shadow-sm"
                   rows={1}
                 />
@@ -291,7 +296,10 @@ export const CreatePostPage: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={cn("h-9 w-9 shrink-0 rounded-lg hover:bg-muted font-bold", editor?.isActive('bold') && "bg-muted")}
+                      className={cn(
+                        'h-9 w-9 shrink-0 rounded-lg hover:bg-muted font-bold',
+                        editor?.isActive('bold') && 'bg-muted',
+                      )}
                       onClick={() => editor?.chain().focus().toggleBold().run()}
                     >
                       <Bold size={16} />
@@ -299,7 +307,10 @@ export const CreatePostPage: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={cn("h-9 w-9 shrink-0 rounded-lg hover:bg-muted italic", editor?.isActive('italic') && "bg-muted")}
+                      className={cn(
+                        'h-9 w-9 shrink-0 rounded-lg hover:bg-muted italic',
+                        editor?.isActive('italic') && 'bg-muted',
+                      )}
                       onClick={() => editor?.chain().focus().toggleItalic().run()}
                     >
                       <Italic size={16} />
@@ -308,7 +319,10 @@ export const CreatePostPage: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={cn("h-9 w-9 shrink-0 rounded-lg hover:bg-muted", editor?.isActive('bulletList') && "bg-muted")}
+                      className={cn(
+                        'h-9 w-9 shrink-0 rounded-lg hover:bg-muted',
+                        editor?.isActive('bulletList') && 'bg-muted',
+                      )}
                       onClick={() => editor?.chain().focus().toggleBulletList().run()}
                     >
                       <List size={16} />
@@ -324,9 +338,7 @@ export const CreatePostPage: React.FC = () => {
                     <Plus size={28} className="text-muted-foreground" />
                   </div>
                   <div className="text-center">
-                    <p className="text-base sm:text-lg font-bold">
-                      Drag and drop images or video
-                    </p>
+                    <p className="text-base sm:text-lg font-bold">Drag and drop images or video</p>
                     <p className="text-sm text-muted-foreground font-medium mt-1">
                       Upload up to 20 images or videos
                     </p>
@@ -399,10 +411,10 @@ export const CreatePostPage: React.FC = () => {
                     disabled={!title.trim()}
                     onClick={handlePost}
                     className={cn(
-                      "px-10 h-10 rounded-full font-bold text-sm shadow-md transition-all active:scale-[0.95]",
+                      'px-10 h-10 rounded-full font-bold text-sm shadow-md transition-all active:scale-[0.95]',
                       title.trim()
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "bg-muted text-muted-foreground cursor-not-allowed opacity-50",
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
                     )}
                   >
                     Post

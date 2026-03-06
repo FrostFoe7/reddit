@@ -1,24 +1,19 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type ApiError } from "@/api/client";
-import { useAuthStore } from "@/store/useStore";
-import type { Message } from "@/types";
-import { normalizeConversation } from "@/types/normalize";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { messagesApi } from '@/services/api/messages';
+import { queryKeys } from '@/services/query/keys';
+import { useAuthStore } from '@/store/useStore';
+import { toast } from 'sonner';
 
 /**
  * Fetch user's conversations
  */
 export function useConversations() {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const userId = user?.id;
 
   return useQuery({
-    queryKey: ["conversations", userId],
-    queryFn: async () => {
-      if (!userId) throw new Error("User ID required");
-      const data = await api.get<Record<string, unknown>[]>(`messages?user_id=${userId}`);
-      return data.map(normalizeConversation);
-    },
+    queryKey: queryKeys.messages.conversations(userId),
+    queryFn: () => messagesApi.getConversations(userId!),
     enabled: !!userId,
     retry: 2,
     staleTime: 30000,
@@ -30,19 +25,14 @@ export function useConversations() {
  * Fetch messages in a conversation
  */
 export function useMessages(conversationId: string | null) {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const userId = user?.id;
 
   return useQuery({
-    queryKey: ["messages", conversationId, userId],
-    queryFn: async () => {
-      if (!userId || !conversationId) throw new Error("User ID and conversation ID required");
-      const params = new URLSearchParams({ 
-        user_id: userId,
-        conversation_id: conversationId 
-      });
-      const data = await api.get<Record<string, unknown>[]>(`messages?${params.toString()}`);
-      return (data as unknown as Message[]) || [];
+    queryKey: queryKeys.messages.conversation(conversationId),
+    queryFn: () => {
+      if (!conversationId) throw new Error('Conversation ID required');
+      return messagesApi.getMessages(conversationId, userId!);
     },
     enabled: !!userId && !!conversationId,
     retry: 2,
@@ -56,24 +46,22 @@ export function useMessages(conversationId: string | null) {
  */
 export function useSendMessage() {
   const queryClient = useQueryClient();
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
+  const userId = user?.id;
 
   return useMutation({
     mutationFn: async (variables: { conversation_id: string; content: string }) => {
-      if (!user) throw new Error("Must be logged in");
-      return api.post("messages", {
-        ...variables,
-        sender_id: user.id,
-      }, { timeout: 15000 });
+      if (!user) throw new Error('Must be logged in');
+      return messagesApi.sendMessage(variables.conversation_id, variables.content, user.id);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["messages", variables.conversation_id] });
-      queryClient.invalidateQueries({ queryKey: ["conversations", user?.id] });
-      toast.success("Message sent");
+      queryClient.invalidateQueries({ queryKey: queryKeys.messages.conversation(variables.conversation_id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.messages.conversations(userId) });
+      toast.success('Message sent');
     },
-    onError: (error: ApiError) => {
-      console.error("Send message error:", error);
-      toast.error(error.message || "Failed to send message");
+    onError: (error: Error) => {
+      console.error('Send message error:', error);
+      toast.error(error.message || 'Failed to send message');
     },
   });
 }

@@ -19,7 +19,7 @@ export const Home: React.FC = () => {
   const virtualizer = useVirtualizer({
     count: posts.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 200, 
+    estimateSize: () => 200,
     overscan: 5,
   });
 
@@ -28,11 +28,7 @@ export const Home: React.FC = () => {
       <CreatePostPrompt className="hidden sm:flex" />
 
       <div className="bg-card sm:bg-transparent border-y sm:border-none border-border">
-        <SortBar 
-            className="py-2 sm:py-0" 
-            activeSort={currentSort} 
-            onSortChange={setCurrentSort} 
-        />
+        <SortBar className="py-2 sm:py-0" activeSort={currentSort} onSortChange={setCurrentSort} />
       </div>
 
       <div
@@ -42,7 +38,7 @@ export const Home: React.FC = () => {
       >
         {isLoading && (
           <div className="space-y-4 px-4 sm:px-0">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="bg-card p-4 rounded-2xl border border-border">
                 <div className="flex items-center gap-2 mb-2">
                   <Skeleton circle width={32} height={32} />
@@ -69,7 +65,7 @@ export const Home: React.FC = () => {
               position: 'relative',
             }}
           >
-            {virtualizer.getVirtualItems().map((virtualItem) => (
+            {virtualizer.getVirtualItems().map(virtualItem => (
               <div
                 key={virtualItem.key}
                 data-index={virtualItem.index}
@@ -95,9 +91,7 @@ export const Home: React.FC = () => {
 
         {!isLoading && posts.length === 0 && (
           <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm mx-4">
-            <p className="text-lg font-bold text-foreground mb-1">
-              No posts found
-            </p>
+            <p className="text-lg font-bold text-foreground mb-1">No posts found</p>
             <p className="text-sm">Be the first to share something!</p>
           </div>
         )}
@@ -107,9 +101,9 @@ export const Home: React.FC = () => {
             id="scroll-trigger"
             className="h-32 flex flex-col items-center justify-center py-10 gap-4"
             style={{
-               position: 'relative',
-               bottom: 0,
-               width: '100%'
+              position: 'relative',
+              bottom: 0,
+              width: '100%',
             }}
           >
             <div

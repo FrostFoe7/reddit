@@ -31,13 +31,13 @@ interface RequestConfig {
 function parseApiError(response: Response, body: unknown): ApiError {
   const error = new Error() as ApiError;
   error.statusCode = response.status;
-  
+
   if (typeof body === 'object' && body !== null && 'error' in body) {
     error.message = (body as Record<string, unknown>).error as string;
   } else {
     error.message = `HTTP ${response.status}: ${response.statusText}`;
   }
-  
+
   error.originalError = body;
   return error;
 }
@@ -122,11 +122,7 @@ export const api = {
   /**
    * POST request
    */
-  async post<T>(
-    endpoint: string,
-    data: unknown,
-    config?: RequestConfig,
-  ): Promise<T> {
+  async post<T>(endpoint: string, data: unknown, config?: RequestConfig): Promise<T> {
     const url = `${BASE_URL}/${endpoint}`;
     const response = await fetchWithTimeout(url, {
       method: 'POST',
@@ -143,11 +139,7 @@ export const api = {
   /**
    * PUT request
    */
-  async put<T>(
-    endpoint: string,
-    data: unknown,
-    config?: RequestConfig,
-  ): Promise<T> {
+  async put<T>(endpoint: string, data: unknown, config?: RequestConfig): Promise<T> {
     const url = `${BASE_URL}/${endpoint}`;
     const response = await fetchWithTimeout(url, {
       method: 'PUT',

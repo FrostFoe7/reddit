@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
   TrendingUp,
@@ -17,32 +17,25 @@ import {
   Users,
   Star,
   ShieldCheck,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { useCommunities } from "@/hooks";
-import type { Community } from "@/types";
-import { cn } from "@/lib/utils";
-import { SidebarNavItem } from "./SidebarNavItem";
-import { useUIStore } from "@/store/useStore";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { toast } from "sonner";
+} from '@/components/ui/accordion';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { useCommunities, useCreateCommunity } from '@/hooks';
+import type { Community } from '@/types';
+import { cn } from '@/lib/utils';
+import { SidebarNavItem } from './SidebarNavItem';
+import { useUIStore } from '@/store/useStore';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
 
-type NavItemProps = Omit<
-  React.ComponentProps<typeof SidebarNavItem>,
-  "collapsed"
->;
+type NavItemProps = Omit<React.ComponentProps<typeof SidebarNavItem>, 'collapsed'>;
 
 const NavItem = (props: NavItemProps) => {
   const { sidebarCollapsed } = useUIStore();
@@ -69,19 +62,49 @@ export const LeftSidebar = () => {
   const navigate = useNavigate();
   const { sidebarCollapsed } = useUIStore();
   const { data: communities = [] } = useCommunities();
+  const { mutate: createCommunity } = useCreateCommunity();
 
   const handleExternalClick = (label: string) => {
     toast.info(`Redirecting to ${label}...`, {
-      description: "This feature would open an external Reddit page.",
+      description: 'This feature would open an external Reddit page.',
     });
+  };
+
+  const handleCreateCommunity = () => {
+    const nameInput = window.prompt('Community name (3-21 chars, letters/numbers/underscore):');
+    if (!nameInput) return;
+
+    const name = nameInput.trim();
+    if (!/^[A-Za-z0-9_]{3,21}$/.test(name)) {
+      toast.error('Invalid name format');
+      return;
+    }
+
+    const descriptionInput = window.prompt('Community description (optional):') || '';
+
+    createCommunity(
+      {
+        name,
+        description: descriptionInput.trim() || undefined,
+      },
+      {
+        onSuccess: created => {
+          navigate(`/r/${created.name}`);
+        },
+      },
+    );
+  };
+
+  const handleManageCommunities = () => {
+    navigate('/settings');
   };
 
   return (
     <aside
       id="left-sidebar"
       className={cn(
-        "hidden md:flex shrink-0 flex-col border-r border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-all duration-300",
-        sidebarCollapsed ? "w-20" : "md:w-60 lg:w-[270px]",
+        'hidden md:flex shrink-0 flex-col border-r border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto pb-8 styled-scrollbars no-scrollbar transition-all duration-300',
+        sidebarCollapsed ? 'w-20' : 'md:w-60 lg:w-[270px]',
       )}
     >
       <nav className="flex flex-col p-2 space-y-1" aria-label="Primary">
@@ -90,35 +113,30 @@ export const LeftSidebar = () => {
             to="/"
             icon={Home}
             label="Home"
-            active={
-              location.pathname === "/" &&
-              !location.search.includes("feed=news")
-            }
+            active={location.pathname === '/' && !location.search.includes('feed=news')}
           />
           <NavItem
             to="/r/popular"
             icon={TrendingUp}
             label="Popular"
-            active={location.pathname.includes("/r/popular")}
+            active={location.pathname.includes('/r/popular')}
           />
           <NavItem
             to="/?feed=news"
             icon={Newspaper}
             label="News"
-            active={location.search.includes("feed=news")}
+            active={location.search.includes('feed=news')}
           />
           <NavItem
             to="/explore"
             icon={Compass}
             label="Explore"
-            active={location.pathname === "/explore"}
+            active={location.pathname === '/explore'}
           />
         </div>
 
         {!sidebarCollapsed && <Separator className="my-3 mx-2 w-auto" />}
-        {sidebarCollapsed && (
-          <Separator className="my-2 mx-auto w-10" />
-        )}
+        {sidebarCollapsed && <Separator className="my-2 mx-auto w-10" />}
 
         {sidebarCollapsed ? (
           <div className="flex flex-col space-y-2 mt-2">
@@ -143,12 +161,18 @@ export const LeftSidebar = () => {
               label="r/Dhaka"
             />
             <Separator className="my-2 mx-auto w-10" />
-            <NavItem to="/create" icon={Plus} label="Create Community" />
+            <button
+              onClick={handleCreateCommunity}
+              className="flex items-center justify-center w-10 h-10 rounded-lg mx-auto text-foreground hover:bg-muted transition-colors"
+              title="Create Community"
+            >
+              <Plus size={20} />
+            </button>
           </div>
         ) : (
           <Accordion
             type="multiple"
-            defaultValue={["recent", "communities", "games", "resources"]}
+            defaultValue={['recent', 'communities', 'games', 'resources']}
             className="w-full space-y-1"
           >
             <AccordionItem value="recent" className="border-none">
@@ -188,23 +212,16 @@ export const LeftSidebar = () => {
               <AccordionContent className="pt-1 pb-2">
                 <div className="flex flex-col space-y-0.5">
                   <button
-                    onClick={() => navigate("/create")}
+                    onClick={handleCreateCommunity}
                     className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-muted transition-colors text-foreground group w-full text-left"
                   >
                     <div className="flex items-center justify-center w-8 h-8 shrink-0 bg-muted rounded-full group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700">
                       <Plus size={18} />
                     </div>
-                    <span className="text-sm font-medium">
-                      Create a community
-                    </span>
+                    <span className="text-sm font-medium">Create a community</span>
                   </button>
                   <button
-                    onClick={() =>
-                      toast.info("Manage Communities", {
-                        description:
-                          "Community management interface is coming soon!",
-                      })
-                    }
+                    onClick={handleManageCommunities}
                     className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-muted transition-colors text-foreground group w-full"
                   >
                     <div className="flex items-center justify-center w-8 h-8 shrink-0">
@@ -213,9 +230,7 @@ export const LeftSidebar = () => {
                         className="text-muted-foreground group-hover:text-foreground"
                       />
                     </div>
-                    <span className="text-sm font-medium text-left">
-                      Manage Communities
-                    </span>
+                    <span className="text-sm font-medium text-left">Manage Communities</span>
                   </button>
                   {communities?.map((community: Community) => (
                     <NavItem
@@ -224,8 +239,8 @@ export const LeftSidebar = () => {
                       icon={() => (
                         <div
                           className={cn(
-                            "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm",
-                            community.icon_url || "bg-primary",
+                            'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm',
+                            community.icon_url || 'bg-primary',
                           )}
                         >
                           r/
@@ -244,11 +259,7 @@ export const LeftSidebar = () => {
               </AccordionTrigger>
               <AccordionContent className="pt-1 pb-2">
                 <div className="flex flex-col space-y-0.5">
-                  <NavItem
-                    to="/r/GamesOnReddit"
-                    icon={Gamepad2}
-                    label="Discover Games"
-                  />
+                  <NavItem to="/r/GamesOnReddit" icon={Gamepad2} label="Discover Games" />
                   <NavItem
                     to="/post/post1"
                     icon={() => (
@@ -278,19 +289,19 @@ export const LeftSidebar = () => {
               <AccordionContent className="pt-1 pb-2">
                 <div className="flex flex-col space-y-0.5">
                   <button
-                    onClick={() => handleExternalClick("About Reddit")}
+                    onClick={() => handleExternalClick('About Reddit')}
                     className="w-full text-left"
                   >
                     <NavItem to="#" icon={Info} label="About Reddit" />
                   </button>
                   <button
-                    onClick={() => handleExternalClick("Advertise")}
+                    onClick={() => handleExternalClick('Advertise')}
                     className="w-full text-left"
                   >
                     <NavItem to="#" icon={Megaphone} label="Advertise" />
                   </button>
                   <button
-                    onClick={() => handleExternalClick("Reddit Pro")}
+                    onClick={() => handleExternalClick('Reddit Pro')}
                     className="w-full text-left"
                   >
                     <div className="relative">
@@ -303,52 +314,43 @@ export const LeftSidebar = () => {
                       </Badge>
                     </div>
                   </button>
-                  <button
-                    onClick={() => handleExternalClick("Help")}
-                    className="w-full text-left"
-                  >
+                  <button onClick={() => handleExternalClick('Help')} className="w-full text-left">
                     <NavItem to="#" icon={LifeBuoy} label="Help" />
                   </button>
-                  <button
-                    onClick={() => handleExternalClick("Blog")}
-                    className="w-full text-left"
-                  >
+                  <button onClick={() => handleExternalClick('Blog')} className="w-full text-left">
                     <NavItem to="#" icon={BookOpen} label="Blog" />
                   </button>
                   <button
-                    onClick={() => handleExternalClick("Careers")}
+                    onClick={() => handleExternalClick('Careers')}
                     className="w-full text-left"
                   >
                     <NavItem to="#" icon={Briefcase} label="Careers" />
                   </button>
-                  <button
-                    onClick={() => handleExternalClick("Press")}
-                    className="w-full text-left"
-                  >
+                  <button onClick={() => handleExternalClick('Press')} className="w-full text-left">
                     <NavItem to="#" icon={Mic2} label="Press" />
                   </button>
                   <Separator className="my-2 mx-4 w-auto" />
                   <NavItem to="/explore" icon={Users} label="Communities" />
                   <button
-                    onClick={() => handleExternalClick("Best of Reddit")}
+                    onClick={() => handleExternalClick('Best of Reddit')}
                     className="w-full text-left"
                   >
                     <NavItem to="#" icon={Star} label="Best of Reddit" />
                   </button>
                   <button
-                    onClick={() => handleExternalClick("Content Policy")}
+                    onClick={() => handleExternalClick('Content Policy')}
                     className="w-full text-left"
                   >
                     <NavItem to="#" icon={BookOpen} label="Content Policy" />
                   </button>
                   <button
-                    onClick={() => handleExternalClick("Privacy Policy")}
+                    onClick={() => handleExternalClick('Privacy Policy')}
                     className="w-full text-left"
                   >
                     <NavItem to="#" icon={ShieldCheck} label="Privacy Policy" />
                   </button>
                   <button
-                    onClick={() => handleExternalClick("User Agreement")}
+                    onClick={() => handleExternalClick('User Agreement')}
                     className="w-full text-left"
                   >
                     <NavItem to="#" icon={BookOpen} label="User Agreement" />

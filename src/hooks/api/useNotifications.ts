@@ -1,23 +1,19 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type ApiError } from "@/api/client";
-import { normalizeNotification } from "@/types/normalize";
-import { useAuthStore } from "@/store/useStore";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { notificationsApi } from '@/services/api/notifications';
+import { queryKeys } from '@/services/query/keys';
+import { useAuthStore } from '@/store/useStore';
+import { toast } from 'sonner';
 
 /**
  * Fetch user notifications
  */
 export function useNotifications() {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const userId = user?.id;
 
   return useQuery({
-    queryKey: ["notifications", userId],
-    queryFn: async () => {
-      if (!userId) throw new Error("User ID required");
-      const data = await api.get<Record<string, unknown>[]>(`notifications?user_id=${userId}`);
-      return data.map(normalizeNotification);
-    },
+    queryKey: queryKeys.notifications.list(userId),
+    queryFn: () => notificationsApi.getNotifications(userId!),
     enabled: !!userId,
     retry: 2,
     staleTime: 20000,
@@ -30,21 +26,20 @@ export function useNotifications() {
  */
 export function useMarkNotificationsRead() {
   const queryClient = useQueryClient();
-  const user = useAuthStore((state) => state.user);
-  const userId = user?.id;
+  const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: async () => {
-      if (!userId) throw new Error("User ID required");
-      return api.post("notifications/mark-read", { user_id: userId }, { timeout: 15000 });
+    mutationFn: () => {
+      if (!user) throw new Error('Must be logged in');
+      return notificationsApi.markAllAsRead(user.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
-      toast.success("Notifications marked as read");
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
+      toast.success('Notifications marked as read');
     },
-    onError: (error: ApiError) => {
-      console.error("Mark read error:", error);
-      toast.error(error.message || "Failed to mark notifications as read");
+    onError: (error: Error) => {
+      console.error('Mark read error:', error);
+      toast.error(error.message || 'Failed to mark notifications as read');
     },
   });
 }

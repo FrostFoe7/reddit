@@ -10,8 +10,31 @@ if ($method === 'GET') {
     $user_id = $_GET['user_id'] ?? null;
     $sort = $_GET['sort'] ?? 'new'; // 'new', 'top', 'hot'
     $search = $_GET['q'] ?? null;
+    $subreddit_id = $_GET['subreddit_id'] ?? null;
     
     try {
+        if (preg_match('/^posts\/([^\/]+)/', $route, $matches)) {
+            $post_id = $matches[1];
+            $stmt = $pdo->prepare(
+                "SELECT pd.*, COALESCE(pv.vote, 0) as user_vote
+                 FROM post_details pd
+                 LEFT JOIN post_votes pv ON pd.id = pv.post_id AND pv.user_id = :user_id
+                 WHERE pd.id = :post_id
+                 LIMIT 1"
+            );
+            $stmt->execute([
+                ':user_id' => $user_id,
+                ':post_id' => $post_id,
+            ]);
+            $post = $stmt->fetch();
+
+            if (!$post) {
+                sendResponse(['error' => 'Post not found'], 404);
+            }
+
+            sendResponse($post);
+        }
+
         $orderBy = "pd.created_at DESC";
         if ($sort === 'top') {
             $orderBy = "pd.upvotes DESC, pd.created_at DESC";
@@ -31,6 +54,15 @@ if ($method === 'GET') {
         if ($search) {
             $query .= " WHERE pd.title LIKE :search OR pd.content LIKE :search ";
             $params[':search'] = '%' . $search . '%';
+        }
+
+        if ($subreddit_id) {
+            if ($search) {
+                $query .= " AND pd.subreddit_id = :subreddit_id ";
+            } else {
+                $query .= " WHERE pd.subreddit_id = :subreddit_id ";
+            }
+            $params[':subreddit_id'] = $subreddit_id;
         }
 
         $query .= " ORDER BY $orderBy LIMIT 50";
@@ -69,8 +101,68 @@ if ($method === 'POST') {
             $input['post_type'] ?? 'text'
         ]);
 
-        sendResponse(['success' => true, 'id' => $input['id']], 201);
+        $stmtFetch = $pdo->prepare(
+            "SELECT pd.*, 0 as user_vote
+             FROM post_details pd
+             WHERE pd.id = ?
+             LIMIT 1"
+        );
+        $stmtFetch->execute([$input['id']]);
+        $createdPost = $stmtFetch->fetch();
+
+        if (!$createdPost) {
+            sendResponse(['success' => true, 'id' => $input['id']], 201);
+        }
+
+        sendResponse($createdPost, 201);
     } catch (\Exception $e) {
         sendResponse(['error' => 'Failed to create post: ' . $e->getMessage()], 500);
+    }
+}
+
+if ($method === 'DELETE') {
+    if (!preg_match('/^posts\/([^\/]+)/', $route, $matches)) {
+        sendResponse(['error' => 'Invalid delete route'], 400);
+    }
+
+    $postId = $matches[1];
+    $userId = $_GET['user_id'] ?? null;
+
+    if (!$userId) {
+        sendResponse(['error' => 'Missing user_id'], 400);
+    }
+
+    try {
+        $postStmt = $pdo->prepare('SELECT id, author_id, subreddit_id FROM posts WHERE id = ? LIMIT 1');
+        $postStmt->execute([$postId]);
+        $post = $postStmt->fetch();
+
+        if (!$post) {
+            sendResponse(['error' => 'Post not found'], 404);
+        }
+
+        $isAuthor = $post['author_id'] === $userId;
+
+        $roleStmt = $pdo->prepare('SELECT role FROM subreddit_members WHERE subreddit_id = ? AND user_id = ? LIMIT 1');
+        $roleStmt->execute([$post['subreddit_id'], $userId]);
+        $role = $roleStmt->fetchColumn();
+
+        $subStmt = $pdo->prepare('SELECT owner_id, creator_id FROM subreddits WHERE id = ? LIMIT 1');
+        $subStmt->execute([$post['subreddit_id']]);
+        $sub = $subStmt->fetch();
+
+        $isOwnerOrCreator = $sub && (($sub['owner_id'] ?? null) === $userId || ($sub['creator_id'] ?? null) === $userId);
+        $isModerator = in_array($role, ['moderator', 'admin'], true);
+
+        if (!$isAuthor && !$isOwnerOrCreator && !$isModerator) {
+            sendResponse(['error' => 'Insufficient permissions'], 403);
+        }
+
+        $deleteStmt = $pdo->prepare('DELETE FROM posts WHERE id = ?');
+        $deleteStmt->execute([$postId]);
+
+        sendResponse(['success' => true]);
+    } catch (\Exception $e) {
+        sendResponse(['error' => 'Failed to delete post: ' . $e->getMessage()], 500);
     }
 }

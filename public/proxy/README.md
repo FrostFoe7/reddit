@@ -5,7 +5,8 @@ This folder contains the MySQL database schema and initial seed data for the Red
 ## Files
 
 1.  `001_initial_schema.sql`: Creates all necessary tables, indexes, and views.
-2.  `002_seed_data.sql`: Populates the database with initial mock data using the custom ID format.
+2.  `002_seed_data.sql`: Populates the database with initial sample data using the custom ID format.
+3.  `003_add_subreddits_creator_id.sql`: Backward-compatible migration that adds and backfills `subreddits.creator_id` for existing databases.
 
 ## How to use on cPanel
 
@@ -23,6 +24,7 @@ To set up the database on a cPanel hosting environment:
     - Click on the **Import** tab.
     - Upload and execute `001_initial_schema.sql` first.
     - Then, upload and execute `002_seed_data.sql`.
+    - If upgrading an existing deployment, upload and execute `003_add_subreddits_creator_id.sql`.
 
 ## Schema Highlights
 

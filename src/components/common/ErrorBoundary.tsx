@@ -37,7 +37,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      return (<ErrorFallback error={this.state.error} onReset={this.resetError} />);
+      return <ErrorFallback error={this.state.error} onReset={this.resetError} />;
     }
 
     return this.props.children;
@@ -76,25 +76,16 @@ function ErrorFallback({ error, onReset }: ErrorFallbackProps) {
         {/* Error Details (Debug) */}
         {error && (
           <div className="rounded-lg bg-muted p-4 text-left">
-            <p className="text-xs font-mono text-muted-foreground break-all">
-              {error.message}
-            </p>
+            <p className="text-xs font-mono text-muted-foreground break-all">{error.message}</p>
           </div>
         )}
 
         {/* Actions */}
         <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={onReset}
-          >
+          <Button variant="outline" className="flex-1" onClick={onReset}>
             Try Again
           </Button>
-          <Button
-            className="flex-1 gap-2"
-            onClick={() => navigate('/')}
-          >
+          <Button className="flex-1 gap-2" onClick={() => navigate('/')}>
             <Home className="h-4 w-4" />
             Go Home
           </Button>

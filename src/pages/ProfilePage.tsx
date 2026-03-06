@@ -1,61 +1,54 @@
-import type { Post, Comment } from "@/types";
-import React from "react";
-import { useParams, Link, useSearchParams } from "react-router-dom";
-import { useUser, usePosts, useComments } from "@/hooks";
-import { useUIStore, useAuthStore } from "@/store/useStore";
-import { PostCard } from "@/components/post/PostCard";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  MoreHorizontal,
-  MessageSquare,
-  Share2,
-  Flag,
-  Ban,
-  UserPlus,
-  Mail,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import type { Post, Comment } from '@/types';
+import React from 'react';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useUser, usePosts, useComments } from '@/hooks';
+import { useUIStore, useAuthStore } from '@/store/useStore';
+import { PostCard } from '@/components/post/PostCard';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MoreHorizontal, MessageSquare, Share2, Flag, Ban, UserPlus, Mail } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 export const ProfilePage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const [searchParams] = useSearchParams();
-  const defaultTab = searchParams.get("tab") || "posts";
+  const navigate = useNavigate();
+  const defaultTab = searchParams.get('tab') || 'posts';
   const { openShare, openReport } = useUIStore();
   const [isFollowing, setIsFollowing] = React.useState(false);
-  const currentUser = useAuthStore((state) => state.user);
+  const currentUser = useAuthStore(state => state.user);
 
   const { data: user, isLoading: userLoading } = useUser(username);
-  
+
   // Fetch posts with current user's votes
-  const { data: posts = [] } = usePosts();
-  
+  const { data: posts = [], isLoading: postsLoading, error: postsError } = usePosts();
+
   // Filter posts for this user
   const userPosts = posts.filter(
     (p: Post) => (p.author_username || p.author) === username || (user && p.author_id === user.id),
   );
-  
+
   // In a real app, we'd have a specific API for user's comments
-  const { data: allComments = [] } = useComments(undefined); 
+  const { data: allComments = [], isLoading: commentsLoading, error: commentsError } =
+    useComments(undefined);
   const userComments = allComments.filter(
-    (c: Comment) => (c.author_username || c.author) === username || (user && c.author_id === user.id),
+    (c: Comment) =>
+      (c.author_username || c.author) === username || (user && c.author_id === user.id),
   );
 
   const toggleFollow = () => {
     setIsFollowing(!isFollowing);
-    toast.success(
-      isFollowing ? `Unfollowed u/${username}` : `Following u/${username}`,
-    );
+    toast.success(isFollowing ? `Unfollowed u/${username}` : `Following u/${username}`);
   };
 
   if (userLoading) {
@@ -67,12 +60,14 @@ export const ProfilePage: React.FC = () => {
   }
 
   if (!user) {
-      return (
-        <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
-          <h1 className="text-2xl font-bold">User not found</h1>
-          <Link to="/" className="text-primary hover:underline mt-4">Go Home</Link>
-        </div>
-      );
+    return (
+      <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
+        <h1 className="text-2xl font-bold">User not found</h1>
+        <Link to="/" className="text-primary hover:underline mt-4">
+          Go Home
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -98,27 +93,25 @@ export const ProfilePage: React.FC = () => {
                   className="rounded-xl p-3 font-semibold flex justify-between"
                   onClick={() => openShare(window.location.href)}
                 >
-                  Share Profile{" "}
-                  <Share2 size={18} className="text-muted-foreground" />
+                  Share Profile <Share2 size={18} className="text-muted-foreground" />
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="rounded-xl p-3 font-semibold flex justify-between"
                   onClick={toggleFollow}
                 >
-                  {isFollowing ? "Unfollow" : "Follow"}{" "}
+                  {isFollowing ? 'Unfollow' : 'Follow'}{' '}
                   <UserPlus size={18} className="text-muted-foreground" />
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="rounded-xl p-3 font-semibold flex justify-between"
-                  onClick={() => toast.info("Chat feature coming soon!")}
+                  onClick={() => navigate('/messages')}
                 >
-                  Send Message{" "}
-                  <Mail size={18} className="text-muted-foreground" />
+                  Send Message <Mail size={18} className="text-muted-foreground" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-border my-1.5 mx-1" />
                 <DropdownMenuItem
                   className="rounded-xl p-3 font-semibold flex justify-between text-destructive focus:text-destructive"
-                  onClick={() => toast.error("User blocked")}
+                  onClick={() => toast.error('User blocked')}
                 >
                   Block User <Ban size={18} />
                 </DropdownMenuItem>
@@ -136,11 +129,12 @@ export const ProfilePage: React.FC = () => {
           <div className="relative -mt-[52px] sm:-mt-[60px] mb-4">
             <Avatar className="w-[104px] h-[104px] sm:w-[130px] sm:h-[130px] border-[5px] border-card shadow-lg">
               <AvatarImage
-                src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=ff4500`}
+                src={
+                  user.avatar_url ||
+                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}&backgroundColor=ff4500`
+                }
               />
-              <AvatarFallback className="text-2xl font-bold">
-                {username?.[0]}
-              </AvatarFallback>
+              <AvatarFallback className="text-2xl font-bold">{username?.[0]}</AvatarFallback>
             </Avatar>
             <div className="absolute bottom-1 right-1 w-7 h-7 bg-green-500 rounded-full border-4 border-card shadow-sm"></div>
           </div>
@@ -161,28 +155,28 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
             {currentUser?.id !== user.id && (
-                <div className="flex gap-3 mt-2 sm:mt-0">
+              <div className="flex gap-3 mt-2 sm:mt-0">
                 <Button
-                    onClick={toggleFollow}
-                    variant={isFollowing ? "outline" : "default"}
-                    className={cn(
-                    "rounded-full px-8 font-bold h-11 shadow-md transition-all active:scale-95",
+                  onClick={toggleFollow}
+                  variant={isFollowing ? 'outline' : 'default'}
+                  className={cn(
+                    'rounded-full px-8 font-bold h-11 shadow-md transition-all active:scale-95',
                     isFollowing
-                        ? "border-primary text-primary hover:bg-primary/5"
-                        : "bg-primary text-primary-foreground hover:opacity-90",
-                    )}
+                      ? 'border-primary text-primary hover:bg-primary/5'
+                      : 'bg-primary text-primary-foreground hover:opacity-90',
+                  )}
                 >
-                    {isFollowing ? "Following" : "Follow"}
+                  {isFollowing ? 'Following' : 'Follow'}
                 </Button>
                 <Button
-                    onClick={() => toast.info("Chat feature coming soon!")}
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full h-11 w-11 border-border hover:bg-muted shadow-sm transition-all active:scale-95"
+                  onClick={() => navigate('/messages')}
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full h-11 w-11 border-border hover:bg-muted shadow-sm transition-all active:scale-95"
                 >
-                    <Mail size={20} />
+                  <Mail size={20} />
                 </Button>
-                </div>
+              </div>
             )}
           </div>
 
@@ -199,9 +193,7 @@ export const ProfilePage: React.FC = () => {
               </div>
               <div className="flex flex-col items-center sm:items-start">
                 <span className="font-bold text-foreground text-xl tracking-tight">
-                  {user?.cake_day
-                    ? new Date(user.cake_day).toLocaleDateString()
-                    : "Aug 12, 2023"}
+                  {user?.cake_day ? new Date(user.cake_day).toLocaleDateString() : 'Aug 12, 2023'}
                 </span>
                 <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold opacity-70 mt-0.5">
                   Cake day
@@ -217,7 +209,7 @@ export const ProfilePage: React.FC = () => {
           variant="line"
           className="px-4 sm:px-0 gap-6 sm:gap-10 mb-6 overflow-x-auto no-scrollbar justify-start"
         >
-          {["posts", "comments", "saved"].map((tab) => (
+          {['posts', 'comments', 'saved'].map(tab => (
             <TabsTrigger
               key={tab}
               value={tab}
@@ -229,31 +221,26 @@ export const ProfilePage: React.FC = () => {
         </TabsList>
 
         <TabsContent value="posts" className="mt-0 space-y-3 sm:space-y-6">
-          {userPosts.map((post) => (
+          {postsLoading && <div className="text-sm text-muted-foreground px-1">Loading posts...</div>}
+          {postsError && <div className="text-sm text-destructive px-1">Failed to load posts.</div>}
+          {userPosts.map(post => (
             <PostCard key={post.id} post={post} />
           ))}
-          {userPosts.length === 0 && (
+          {!postsLoading && !postsError && userPosts.length === 0 && (
             <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm">
-              <p className="text-lg font-bold text-foreground mb-1">
-                No posts yet
-              </p>
-              <p className="text-sm">
-                When {username} posts, they'll show up here.
-              </p>
+              <p className="text-lg font-bold text-foreground mb-1">No posts yet</p>
+              <p className="text-sm">When {username} posts, they'll show up here.</p>
             </div>
           )}
         </TabsContent>
 
-        <TabsContent
-          value="comments"
-          className="mt-0 space-y-3 sm:space-y-4 px-0"
-        >
-          {userComments.map((comment) => (
-            <Link
-              key={comment.id}
-              to={`/post/${comment.post_id}`}
-              className="block group"
-            >
+        <TabsContent value="comments" className="mt-0 space-y-3 sm:space-y-4 px-0">
+          {commentsLoading && (
+            <div className="text-sm text-muted-foreground px-1">Loading comments...</div>
+          )}
+          {commentsError && <div className="text-sm text-destructive px-1">Failed to load comments.</div>}
+          {userComments.map(comment => (
+            <Link key={comment.id} to={`/post/${comment.post_id}`} className="block group">
               <div className="bg-card border-y sm:border border-border sm:rounded-3xl p-5 sm:p-6 cursor-pointer hover:border-primary/30 hover:shadow-ios-subtle transition-all duration-300 active:scale-[0.99]">
                 <div className="flex items-center gap-2 mb-3">
                   <MessageSquare size={18} className="text-primary" />
@@ -267,26 +254,18 @@ export const ProfilePage: React.FC = () => {
               </div>
             </Link>
           ))}
-          {userComments.length === 0 && (
+          {!commentsLoading && !commentsError && userComments.length === 0 && (
             <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm">
-              <p className="text-lg font-bold text-foreground mb-1">
-                No comments yet
-              </p>
-              <p className="text-sm">
-                When {username} comments, they'll show up here.
-              </p>
+              <p className="text-lg font-bold text-foreground mb-1">No comments yet</p>
+              <p className="text-sm">When {username} comments, they'll show up here.</p>
             </div>
           )}
         </TabsContent>
 
         <TabsContent value="saved" className="mt-0 space-y-3 sm:space-y-6">
           <div className="p-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border shadow-sm">
-            <p className="text-lg font-bold text-foreground mb-1">
-              No saved posts
-            </p>
-            <p className="text-sm">
-              Saved posts are private and only visible to you.
-            </p>
+            <p className="text-lg font-bold text-foreground mb-1">No saved posts</p>
+            <p className="text-sm">Saved posts are private and only visible to you.</p>
           </div>
         </TabsContent>
       </Tabs>

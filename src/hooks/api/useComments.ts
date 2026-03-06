@@ -15,7 +15,7 @@ export function useComments(postId: string | undefined) {
   return useQuery({
     queryKey: queryKeys.comments.list(postId, userId),
     queryFn: () => commentsApi.getComments(postId, userId),
-    enabled: !!postId,
+    enabled: true,
     staleTime: 30000,
     gcTime: 1000 * 60 * 5,
     retry: 1,

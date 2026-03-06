@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { Search, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
+import { Search, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
 interface CommentControlsProps {
   className?: string;
@@ -20,7 +20,7 @@ export const CommentControls: React.FC<CommentControlsProps> = ({
   onSortChange,
   onSearchClick,
 }) => {
-  const [activeSort, setActiveSort] = useState("Best");
+  const [activeSort, setActiveSort] = useState('Best');
 
   const handleSort = (sort: string) => {
     setActiveSort(sort);
@@ -29,15 +29,10 @@ export const CommentControls: React.FC<CommentControlsProps> = ({
 
   return (
     <div
-      className={cn(
-        "flex items-center gap-4 px-4 sm:px-0 overflow-x-auto no-scrollbar",
-        className,
-      )}
+      className={cn('flex items-center gap-4 px-4 sm:px-0 overflow-x-auto no-scrollbar', className)}
     >
       <div className="flex items-center gap-1 shrink-0">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
-          Sort by:
-        </span>
+        <span className="text-xs text-muted-foreground whitespace-nowrap">Sort by:</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -49,20 +44,15 @@ export const CommentControls: React.FC<CommentControlsProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-40 rounded-xl">
-            {["Best", "Top", "New", "Controversial", "Old", "Q&A"].map(
-              (sort) => (
-                <DropdownMenuItem
-                  key={sort}
-                  className={cn(
-                    "cursor-pointer",
-                    activeSort === sort && "font-bold",
-                  )}
-                  onClick={() => handleSort(sort)}
-                >
-                  {sort}
-                </DropdownMenuItem>
-              ),
-            )}
+            {['Best', 'Top', 'New', 'Controversial', 'Old', 'Q&A'].map(sort => (
+              <DropdownMenuItem
+                key={sort}
+                className={cn('cursor-pointer', activeSort === sort && 'font-bold')}
+                onClick={() => handleSort(sort)}
+              >
+                {sort}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -11,9 +11,10 @@ export const postsApi = {
   /**
    * Fetch all posts with filtering
    */
-  async getPosts(sort: string = 'new', userId?: string): Promise<Post[]> {
+  async getPosts(sort: string = 'new', userId?: string, subredditId?: string): Promise<Post[]> {
     const params = new URLSearchParams({ sort });
     if (userId) params.append('user_id', userId);
+    if (subredditId) params.append('subreddit_id', subredditId);
     const endpoint = `posts?${params.toString()}`;
     const data = await api.get<Record<string, unknown>[]>(endpoint);
     return data.map(normalizePost);
@@ -44,6 +45,18 @@ export const postsApi = {
    */
   async createPost(newPost: Partial<Post>): Promise<Post> {
     const data = await api.post<Record<string, unknown>>('posts', newPost);
+
+    if (!('title' in data)) {
+      return normalizePost({
+        ...newPost,
+        id: (data.id as string) || newPost.id || '',
+        upvotes: 0,
+        comment_count: 0,
+        user_vote: 0,
+        created_at: new Date().toISOString(),
+      });
+    }
+
     return normalizePost(data);
   },
 
@@ -58,7 +71,7 @@ export const postsApi = {
   /**
    * Delete post
    */
-  async deletePost(id: string): Promise<void> {
-    await api.delete(`posts/${id}`);
+  async deletePost(id: string, userId: string): Promise<void> {
+    await api.delete(`posts/${id}?user_id=${encodeURIComponent(userId)}`);
   },
 };

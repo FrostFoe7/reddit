@@ -21,6 +21,7 @@ export function normalizeUser(data: Record<string, unknown>): User {
     cake_day: (data.cake_day as string) || (data.created_at as string) || '',
     is_premium: Boolean(data.is_premium),
     is_verified: Boolean(data.is_verified),
+    settings: (data.settings as Record<string, unknown> | string | undefined) || undefined,
     last_seen_at: (data.last_seen_at as string | undefined) || undefined,
     created_at: (data.created_at as string) || new Date().toISOString(),
   };
@@ -38,7 +39,7 @@ export function normalizePost(data: Record<string, unknown>): Post {
     content: (data.content as string | undefined) || undefined,
     image_url: (data.image_url || data.image) as string | undefined,
     link_url: (data.link_url as string | undefined) || undefined,
-    post_type: ((data.post_type || data.type) as "text" | "image" | "link" | "poll") || 'text',
+    post_type: ((data.post_type || data.type) as 'text' | 'image' | 'link' | 'poll') || 'text',
     is_oc: Boolean(data.is_oc),
     is_spoiler: Boolean(data.is_spoiler),
     is_nsfw: Boolean(data.is_nsfw),
@@ -77,12 +78,18 @@ export function normalizeComment(data: Record<string, unknown>): Comment {
 export function normalizeConversation(data: Record<string, unknown>): Conversation {
   return {
     id: data.id as string,
-    user1_id: data.user1_id as string,
-    user2_id: data.user2_id as string,
+    user1_id: (data.user1_id as string | undefined) || undefined,
+    user2_id: (data.user2_id as string | undefined) || undefined,
+    contact_id: (data.contact_id as string | undefined) || undefined,
     last_message_at: (data.last_message_at || data.time) as string,
-    other_user_name: ((data.other_user_name || data.contact_name) as string | undefined) || undefined,
-    other_user_avatar: ((data.other_user_avatar || data.contact_avatar) as string | undefined) || undefined,
-    last_msg: ((data.last_msg as string | undefined) || undefined),
+    other_user_name:
+      ((data.other_user_name || data.contact_name) as string | undefined) || undefined,
+    other_user_avatar:
+      ((data.other_user_avatar || data.contact_avatar) as string | undefined) || undefined,
+    contact_name: (data.contact_name as string | undefined) || undefined,
+    contact_avatar: (data.contact_avatar as string | undefined) || undefined,
+    last_msg: (data.last_msg as string | undefined) || undefined,
+    time: (data.time as string | undefined) || undefined,
   };
 }
 
@@ -96,12 +103,25 @@ export function normalizeCommunity(data: Record<string, unknown>): Community {
     description: (data.description || data.desc) as string | undefined,
     icon_url: (data.icon_url || data.icon) as string | undefined,
     banner_url: (data.banner_url as string | undefined) || undefined,
+    creator_id: (data.creator_id as string | undefined) || undefined,
     owner_id: (data.owner_id as string | undefined) || undefined,
+    current_user_role:
+      ((data.current_user_role as 'member' | 'moderator' | 'admin' | null | undefined) ??
+        null),
+    can_manage: Boolean(data.can_manage),
+    is_joined: Boolean(data.is_joined),
     is_verified: Boolean(data.is_verified),
     members: (data.members as number | string | undefined) || 0,
+    post_count: (data.post_count as number | undefined) || 0,
     created_at: (data.created_at as string) || new Date().toISOString(),
-    rules: (data.rules as Array<{ title: string; content?: string }> | undefined) || undefined,
-    moderators: (data.moderators as Array<{ id: string; username: string; avatar_url?: string }> | undefined) || undefined,
+    rules:
+      (data.rules as Array<{ title: string; content?: string; description?: string }> | undefined)
+        ?.map(rule => ({ title: rule.title, content: rule.content || rule.description })) ||
+      undefined,
+    moderators:
+      (data.moderators as
+        | Array<{ id: string; username: string; avatar_url?: string }>
+        | undefined) || undefined,
   };
 }
 
@@ -119,7 +139,14 @@ export function normalizeNotification(data: Record<string, unknown>): Notificati
     text: data.text as string,
     is_read: Boolean(data.is_read || data.isRead),
     created_at: (data.created_at as string) || new Date().toISOString(),
-    user: (data.user as string | undefined) || undefined,
+    user:
+      ((data.user || data.actor_name || data.type) as string | undefined) ||
+      undefined,
     sub: (data.sub as string | undefined) || undefined,
+    actor_name: (data.actor_name as string | undefined) || undefined,
+    actor_avatar: (data.actor_avatar as string | undefined) || undefined,
+    time:
+      (data.time as string | undefined) ||
+      ((data.created_at as string | undefined) ?? undefined),
   };
 }

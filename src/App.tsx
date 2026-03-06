@@ -7,12 +7,8 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 // Lazy load pages for better bundle splitting
-const Home = lazy(() =>
-  import('@/pages/Home').then(m => ({ default: m.Home })),
-);
-const PostPage = lazy(() =>
-  import('@/pages/PostPage').then(m => ({ default: m.PostPage })),
-);
+const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
+const PostPage = lazy(() => import('@/pages/PostPage').then(m => ({ default: m.PostPage })));
 const SubredditPage = lazy(() =>
   import('@/pages/SubredditPage').then(m => ({ default: m.SubredditPage })),
 );
@@ -22,9 +18,7 @@ const ProfilePage = lazy(() =>
 const CreatePostPage = lazy(() =>
   import('@/pages/CreatePostPage').then(m => ({ default: m.CreatePostPage })),
 );
-const SearchPage = lazy(() =>
-  import('@/pages/SearchPage').then(m => ({ default: m.SearchPage })),
-);
+const SearchPage = lazy(() => import('@/pages/SearchPage').then(m => ({ default: m.SearchPage })));
 const NotificationsPage = lazy(() =>
   import('@/pages/NotificationsPage').then(m => ({
     default: m.NotificationsPage,
@@ -36,15 +30,11 @@ const MessagesPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })),
 );
-const LoginPage = lazy(() =>
-  import('@/pages/(auth)/Login').then(m => ({ default: m.default })),
-);
+const LoginPage = lazy(() => import('@/pages/(auth)/Login').then(m => ({ default: m.default })));
 const RegisterPage = lazy(() =>
   import('@/pages/(auth)/Register').then(m => ({ default: m.default })),
 );
-const NotFound = lazy(() =>
-  import('@/pages/NotFound').then(m => ({ default: m.NotFound })),
-);
+const NotFound = lazy(() => import('@/pages/NotFound').then(m => ({ default: m.NotFound })));
 
 // Loading component
 const PageLoader = () => (
@@ -55,8 +45,7 @@ const PageLoader = () => (
 
 function AppContent() {
   const location = useLocation();
-  const isAuthPage =
-    location.pathname === '/login' || location.pathname === '/register';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   if (isAuthPage) {
     return (
@@ -107,4 +96,3 @@ function App() {
 }
 
 export default App;
-

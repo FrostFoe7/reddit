@@ -1,19 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type ApiError } from "@/api/client";
-import { normalizeCommunity } from "@/types/normalize";
-import { useAuthStore } from "@/store/useStore";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { communitiesApi } from '@/services/api/communities';
+import { queryKeys } from '@/services/query/keys';
+import { useAuthStore } from '@/store/useStore';
+import { toast } from 'sonner';
 
 /**
  * Fetch all communities
  */
 export function useCommunities() {
   return useQuery({
-    queryKey: ["communities"],
-    queryFn: async () => {
-      const data = await api.get<Record<string, unknown>[]>("communities");
-      return data.map(normalizeCommunity);
-    },
+    queryKey: queryKeys.communities.all,
+    queryFn: () => communitiesApi.getCommunities(),
     retry: 2,
     staleTime: 60000,
   });
@@ -24,35 +21,44 @@ export function useCommunities() {
  */
 export function useTopCommunities(limit: number = 5) {
   return useQuery({
-    queryKey: ["communities", "top", limit],
-    queryFn: async () => {
-      const data = await api.get<Record<string, unknown>[]>(`communities?top=${limit}`);
-      return data.map(normalizeCommunity);
-    },
+    queryKey: queryKeys.communities.top(limit),
+    queryFn: () => communitiesApi.getCommunities(),
     retry: 2,
     staleTime: 80000,
   });
 }
 
 /**
- * Fetch single community by name
+ * Fetch single community by ID or name
  */
-export function useCommunity(name: string | undefined) {
-  const user = useAuthStore((state) => state.user);
-  const userId = user?.id;
+export function useCommunity(idOrName: string | undefined) {
+  const user = useAuthStore(state => state.user);
 
   return useQuery({
-    queryKey: ["communities", name, userId],
-    queryFn: async () => {
-      if (!name) throw new Error("Community name required");
-      const params = new URLSearchParams({ name });
-      if (userId) params.append("user_id", userId);
-      const data = await api.get<Record<string, unknown>>(`communities?${params.toString()}`);
-      return normalizeCommunity(data);
+    queryKey: queryKeys.communities.detail(idOrName ? `${idOrName}:${user?.id || 'anon'}` : idOrName),
+    queryFn: () => {
+      if (!idOrName) throw new Error('Community ID or name required');
+      return communitiesApi.getCommunity(idOrName, user?.id);
     },
-    enabled: !!name,
+    enabled: !!idOrName,
     retry: 2,
     staleTime: 45000,
+  });
+}
+
+/**
+ * Search communities
+ */
+export function useSearchCommunities(query: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.communities.search(query || ''),
+    queryFn: () => {
+      if (!query) throw new Error('Search query required');
+      return communitiesApi.searchCommunities(query);
+    },
+    enabled: !!query && query.length > 0,
+    retry: 2,
+    staleTime: 30000,
   });
 }
 
@@ -61,24 +67,21 @@ export function useCommunity(name: string | undefined) {
  */
 export function useJoinCommunity() {
   const queryClient = useQueryClient();
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: async (subreddit_id: string) => {
-      if (!user) throw new Error("Must be logged in to join");
-      return api.post("communities/join", {
-        user_id: user.id,
-        subreddit_id,
-      }, { timeout: 15000 });
+    mutationFn: (communityId: string) => {
+      if (!user) throw new Error('Must be logged in to join');
+      return communitiesApi.joinCommunity(communityId, user.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["communities"] });
-      queryClient.invalidateQueries({ queryKey: ["memberships", user?.id] });
-      toast.success("Joined community!");
+      queryClient.invalidateQueries({ queryKey: queryKeys.communities.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.memberships.all });
+      toast.success('Joined community!');
     },
-    onError: (error: ApiError) => {
-      console.error("Join error:", error);
-      toast.error(error.message || "Failed to join community");
+    onError: (error: Error) => {
+      console.error('Join error:', error);
+      toast.error(error.message || 'Failed to join community');
     },
   });
 }
@@ -88,24 +91,70 @@ export function useJoinCommunity() {
  */
 export function useLeaveCommunity() {
   const queryClient = useQueryClient();
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: async (subreddit_id: string) => {
-      if (!user) throw new Error("Must be logged in to leave");
-      return api.post("communities/leave", {
-        user_id: user.id,
-        subreddit_id,
-      }, { timeout: 15000 });
+    mutationFn: (communityId: string) => {
+      if (!user) throw new Error('Must be logged in to leave');
+      return communitiesApi.leaveCommunity(communityId, user.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["communities"] });
-      queryClient.invalidateQueries({ queryKey: ["memberships", user?.id] });
-      toast.success("Left community");
+      queryClient.invalidateQueries({ queryKey: queryKeys.communities.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.memberships.all });
+      toast.success('Left community');
     },
-    onError: (error: ApiError) => {
-      console.error("Leave error:", error);
-      toast.error(error.message || "Failed to leave community");
+    onError: (error: Error) => {
+      console.error('Leave error:', error);
+      toast.error(error.message || 'Failed to leave community');
+    },
+  });
+}
+
+/**
+ * Create a community
+ */
+export function useCreateCommunity() {
+  const queryClient = useQueryClient();
+  const user = useAuthStore(state => state.user);
+
+  return useMutation({
+    mutationFn: (payload: { name: string; description?: string; icon_url?: string; banner_url?: string }) => {
+      if (!user) throw new Error('Must be logged in to create community');
+      return communitiesApi.createCommunity({ ...payload, user_id: user.id });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.communities.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.memberships.all });
+      toast.success('Community created');
+    },
+    onError: (error: Error) => {
+      console.error('Create community error:', error);
+      toast.error(error.message || 'Failed to create community');
+    },
+  });
+}
+
+/**
+ * Delete a community
+ */
+export function useDeleteCommunity() {
+  const queryClient = useQueryClient();
+  const user = useAuthStore(state => state.user);
+
+  return useMutation({
+    mutationFn: (communityId: string) => {
+      if (!user) throw new Error('Must be logged in to delete community');
+      return communitiesApi.deleteCommunity(communityId, user.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.communities.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.memberships.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
+      toast.success('Community deleted');
+    },
+    onError: (error: Error) => {
+      console.error('Delete community error:', error);
+      toast.error(error.message || 'Failed to delete community');
     },
   });
 }
@@ -114,15 +163,11 @@ export function useLeaveCommunity() {
  * Get user's community memberships
  */
 export function useUserMemberships() {
-  const user = useAuthStore((state) => state.user);
-  
+  const user = useAuthStore(state => state.user);
+
   return useQuery({
-    queryKey: ["memberships", user?.id],
-    queryFn: async () => {
-      if (!user?.id) throw new Error("User ID required");
-      const data = await api.get<string[]>(`users/memberships?user_id=${user.id}`);
-      return data;
-    },
+    queryKey: queryKeys.memberships.list(user?.id),
+    queryFn: () => communitiesApi.getUserMemberships(user!.id),
     enabled: !!user?.id,
     retry: 2,
     staleTime: 45000,

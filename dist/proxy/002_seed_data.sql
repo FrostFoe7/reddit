@@ -43,17 +43,17 @@ INSERT INTO users (id, username, password_hash, karma, avatar_url, is_verified, 
 ('u15-ai-hyp', 'ai_overlord', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 99000, 'https://api.dicebear.com/7.x/avataaars/svg?seed=ai', TRUE, 'Prompt engineering is a real job', TRUE);
 
 -- 2. Subreddits (10 communities)
-INSERT INTO subreddits (id, name, description, icon_url, owner_id, is_verified, wiki) VALUES 
-('s01-web-dev', 'webdev', 'A community dedicated to all things web development.', 'bg-[#007aff]', 'u02-fro-wiz', TRUE, 'Welcome to the webdev wiki!'),
-('s02-ui-des', 'UI_Design', 'Design, principles, and practice.', 'bg-[#ff4500]', 'u03-des-guy', TRUE, 'Principles of Good Design...'),
-('s03-jav-scr', 'javascript', 'All about JS!', 'bg-[#f7df1e]', 'u05-sta-gur', FALSE, NULL),
-('s04-rea-ctj', 'reactjs', 'The React library for building user interfaces.', 'bg-[#61dafb]', 'u04-rea-nin', TRUE, 'React Docs and Best Practices'),
-('s05-pro-gra', 'programming', 'Computer Programming.', 'bg-[#333333]', 'u07-sys-adm', TRUE, NULL),
-('s06-tec-h01', 'technology', 'Everything tech related.', 'bg-[#000000]', 'u15-ai-hyp', TRUE, NULL),
-('s07-fun-ny1', 'funny', 'The funniest sub on Reddit.', 'bg-[#ffcc00]', 'u01-usr-123', FALSE, NULL),
-('s08-app-le1', 'apple', 'All things Apple.', 'bg-[#555555]', 'u09-ios-fan', TRUE, NULL),
-('s09-and-roi', 'android', 'Android News and Discussion.', 'bg-[#3ddc84]', 'u10-and-roi', TRUE, NULL),
-('s10-rus-t01', 'rust', 'A safe, concurrent, practical language.', 'bg-[#dea584]', 'u12-rus-ace', FALSE, NULL);
+INSERT INTO subreddits (id, name, description, icon_url, creator_id, owner_id, is_verified, wiki) VALUES 
+('s01-web-dev', 'webdev', 'A community dedicated to all things web development.', 'bg-[#007aff]', 'u02-fro-wiz', 'u02-fro-wiz', TRUE, 'Welcome to the webdev wiki!'),
+('s02-ui-des', 'UI_Design', 'Design, principles, and practice.', 'bg-[#ff4500]', 'u03-des-guy', 'u03-des-guy', TRUE, 'Principles of Good Design...'),
+('s03-jav-scr', 'javascript', 'All about JS!', 'bg-[#f7df1e]', 'u05-sta-gur', 'u05-sta-gur', FALSE, NULL),
+('s04-rea-ctj', 'reactjs', 'The React library for building user interfaces.', 'bg-[#61dafb]', 'u04-rea-nin', 'u04-rea-nin', TRUE, 'React Docs and Best Practices'),
+('s05-pro-gra', 'programming', 'Computer Programming.', 'bg-[#333333]', 'u07-sys-adm', 'u07-sys-adm', TRUE, NULL),
+('s06-tec-h01', 'technology', 'Everything tech related.', 'bg-[#000000]', 'u15-ai-hyp', 'u15-ai-hyp', TRUE, NULL),
+('s07-fun-ny1', 'funny', 'The funniest sub on Reddit.', 'bg-[#ffcc00]', 'u01-usr-123', 'u01-usr-123', FALSE, NULL),
+('s08-app-le1', 'apple', 'All things Apple.', 'bg-[#555555]', 'u09-ios-fan', 'u09-ios-fan', TRUE, NULL),
+('s09-and-roi', 'android', 'Android News and Discussion.', 'bg-[#3ddc84]', 'u10-and-roi', 'u10-and-roi', TRUE, NULL),
+('s10-rus-t01', 'rust', 'A safe, concurrent, practical language.', 'bg-[#dea584]', 'u12-rus-ace', 'u12-rus-ace', FALSE, NULL);
 
 -- 3. Subreddit Rules
 INSERT INTO subreddit_rules (id, subreddit_id, title, description, priority) VALUES 

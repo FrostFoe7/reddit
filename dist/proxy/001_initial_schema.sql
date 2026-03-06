@@ -56,15 +56,18 @@ CREATE TABLE subreddits (
     description TEXT,
     icon_url TEXT,
     banner_url TEXT,
+    creator_id VARCHAR(11),
     owner_id VARCHAR(11),
     is_verified BOOLEAN DEFAULT FALSE,
     wiki TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE INDEX idx_subreddits_name ON subreddits (name);
+CREATE INDEX idx_subreddits_creator_id ON subreddits (creator_id);
 
 -- Subreddit Rules
 CREATE TABLE subreddit_rules (

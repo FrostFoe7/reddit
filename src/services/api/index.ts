@@ -9,4 +9,5 @@ export { usersApi } from './users';
 export { communitiesApi } from './communities';
 export { votesApi, type VoteRequest } from './votes';
 export { messagesApi } from './messages';
-export { notificationsApi, type Notification } from './notifications';
+export { notificationsApi } from './notifications';
+export type { Notification } from '@/types';

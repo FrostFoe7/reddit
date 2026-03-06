@@ -1,13 +1,13 @@
-import type { Comment } from "@/types";
-import React, { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { VoteControl } from "@/components/common/VoteControl";
-import { ActionButtons } from "@/components/common/ActionButtons";
-import { useVotes } from "@/hooks";
-import { useAuthStore } from "@/store/useStore";
-import { useNavigate } from "react-router-dom";
+import type { Comment } from '@/types';
+import React, { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { VoteControl } from '@/components/common/VoteControl';
+import { ActionButtons } from '@/components/common/ActionButtons';
+import { useVotes } from '@/hooks';
+import { useAuthStore } from '@/store/useStore';
+import { useNavigate } from 'react-router-dom';
 
 interface CommentThreadProps {
   comment: Comment;
@@ -22,11 +22,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { mutate: voteMutate } = useVotes();
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
 
   // Find replies to this comment
-  const childComments = allComments.filter((c) => c.parent_id === comment.id);
+  const childComments = allComments.filter(c => c.parent_id === comment.id);
 
   // Normalize data
   const authorName = comment.author_username || comment.author;
@@ -38,41 +38,38 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   const upvotes = comment.upvotes ?? 0;
   const time = comment.created_at || comment.time;
 
-  const handleVote = (voteType: "up" | "down" | null) => {
+  const handleVote = (voteType: 'up' | 'down' | null) => {
     if (!user) {
-        navigate("/login");
-        return;
+      navigate('/login');
+      return;
     }
-    const voteValue = voteType === "up" ? 1 : voteType === "down" ? -1 : 0;
+    const voteValue = voteType === 'up' ? 1 : voteType === 'down' ? -1 : 0;
     voteMutate({
-        type: "comment",
-        target_id: comment.id,
-        vote: voteValue
+      type: 'comment',
+      target_id: comment.id,
+      vote: voteValue,
     });
   };
 
   return (
     <div
       className={cn(
-        "thread-container flex gap-3 sm:gap-4",
-        isChild && "mt-5",
-        isCollapsed && "collapsed-thread",
+        'thread-container flex gap-3 sm:gap-4',
+        isChild && 'mt-5',
+        isCollapsed && 'collapsed-thread',
       )}
     >
       <div className="thread-col flex flex-col items-center">
         <Avatar
           className={cn(
-            "shrink-0 shadow-sm border border-border",
-            isChild ? "h-8 w-8" : "h-10 w-10",
+            'shrink-0 shadow-sm border border-border',
+            isChild ? 'h-8 w-8' : 'h-10 w-10',
           )}
         >
           <AvatarImage src={avatarUrl} />
           <AvatarFallback>{authorName?.[0]}</AvatarFallback>
         </Avatar>
-        <div
-          className="thread-line"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        />
+        <div className="thread-line" onClick={() => setIsCollapsed(!isCollapsed)} />
       </div>
 
       <div className="flex-1 pb-2 thread-content">
@@ -84,15 +81,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           )}
           <span
             className={cn(
-              "font-bold tracking-tight hover:underline cursor-pointer",
-              comment.isOp ? "text-primary" : "text-foreground",
+              'font-bold tracking-tight hover:underline cursor-pointer',
+              comment.isOp ? 'text-primary' : 'text-foreground',
             )}
           >
             {authorName}
           </span>
-          <span className="text-muted-foreground opacity-50 font-bold text-[10px]">
-            •
-          </span>
+          <span className="text-muted-foreground opacity-50 font-bold text-[10px]">•</span>
           <span className="text-muted-foreground font-medium">{time}</span>
           {isCollapsed && (
             <span
@@ -110,22 +105,19 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               {comment.content}
             </div>
             <div className="flex items-center gap-2 -ml-2">
-              <VoteControl 
-                initialScore={upvotes} 
-                initialVoteStatus={comment.user_vote === 1 ? "up" : comment.user_vote === -1 ? "down" : null}
+              <VoteControl
+                initialScore={upvotes}
+                initialVoteStatus={
+                  comment.user_vote === 1 ? 'up' : comment.user_vote === -1 ? 'down' : null
+                }
                 onVote={handleVote}
               />
               <ActionButtons id={comment.id} type="comment" />
             </div>
 
             <div className="reply-container">
-              {childComments.map((child) => (
-                <CommentThread
-                  key={child.id}
-                  comment={child}
-                  allComments={allComments}
-                  isChild
-                />
+              {childComments.map(child => (
+                <CommentThread key={child.id} comment={child} allComments={allComments} isChild />
               ))}
             </div>
           </>

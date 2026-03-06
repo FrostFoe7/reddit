@@ -1,45 +1,49 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Share2, Flag, Bell, Ban, Info } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { MoreHorizontal, Share2, Flag, Bell, Ban, Info } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useUIStore, useAuthStore } from "@/store/useStore";
-import { toast } from "sonner";
-import { useJoinCommunity, useLeaveCommunity, useUserMemberships } from "@/hooks";
-import { useNavigate } from "react-router-dom";
+} from '@/components/ui/dropdown-menu';
+import { useUIStore, useAuthStore } from '@/store/useStore';
+import { toast } from 'sonner';
+import { useDeleteCommunity, useJoinCommunity, useLeaveCommunity, useUserMemberships } from '@/hooks';
+import { useNavigate } from 'react-router-dom';
 
 interface CommunityHeaderProps {
   sub: {
     id: string;
     name: string;
     members?: string | number;
+    creator_id?: string;
     description?: string;
     desc?: string;
     icon_url?: string;
     icon?: string;
+    can_manage?: boolean;
+    current_user_role?: 'member' | 'moderator' | 'admin' | null;
   };
 }
 
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
   const navigate = useNavigate();
   const { openShare, openReport } = useUIStore();
-  const user = useAuthStore((state) => state.user);
-  
+  const user = useAuthStore(state => state.user);
+
   const { data: memberships = [] } = useUserMemberships();
   const { mutate: joinMutate } = useJoinCommunity();
   const { mutate: leaveMutate } = useLeaveCommunity();
+  const { mutate: deleteCommunity } = useDeleteCommunity();
 
   const isJoined = memberships.includes(sub.id);
 
   const toggleJoin = () => {
     if (!user) {
-      navigate("/login");
+      navigate('/login');
       return;
     }
     if (isJoined) {
@@ -52,10 +56,30 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
   const subIcon = sub.icon_url || sub.icon;
   const subDesc = sub.description || sub.desc;
   const subMembers = sub.members || 0;
+  const canManage = Boolean(sub.can_manage) || ['moderator', 'admin'].includes(sub.current_user_role || '');
+
+  const handleDelete = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const shouldDelete = window.confirm(`Delete r/${sub.name}? This action cannot be undone.`);
+    if (!shouldDelete) return;
+
+    deleteCommunity(sub.id, {
+      onSuccess: () => {
+        navigate('/');
+      },
+      onError: (error: Error) => {
+        toast.error(error.message || 'Failed to delete community');
+      },
+    });
+  };
 
   return (
     <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 shadow-ios-subtle relative">
-      <div className={cn("h-28 sm:h-36 opacity-90 relative bg-primary/20", subIcon)}>
+      <div className={cn('h-28 sm:h-36 opacity-90 relative bg-primary/20', subIcon)}>
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>
 
@@ -82,19 +106,17 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
             </DropdownMenuItem>
             <DropdownMenuItem
               className="rounded-xl p-2.5 font-medium flex justify-between"
-              onClick={() => toast.info("Notifications turned on")}
+              onClick={() => toast.info('Notifications turned on')}
             >
-              Mute Notifications{" "}
-              <Bell size={18} className="text-muted-foreground" />
+              Mute Notifications <Bell size={18} className="text-muted-foreground" />
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border my-1 mx-2" />
             <DropdownMenuItem className="rounded-xl p-2.5 font-medium flex justify-between">
-              Community Info{" "}
-              <Info size={18} className="text-muted-foreground" />
+              Community Info <Info size={18} className="text-muted-foreground" />
             </DropdownMenuItem>
             <DropdownMenuItem
               className="rounded-xl p-2.5 font-medium flex justify-between text-destructive focus:text-destructive"
-              onClick={() => toast.error("Community blocked")}
+              onClick={() => toast.error('Community blocked')}
             >
               Block Community <Ban size={18} />
             </DropdownMenuItem>
@@ -104,6 +126,17 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
             >
               Report <Flag size={18} />
             </DropdownMenuItem>
+            {canManage && (
+              <>
+                <DropdownMenuSeparator className="bg-border my-1 mx-2" />
+                <DropdownMenuItem
+                  className="rounded-xl p-2.5 font-medium flex justify-between text-destructive focus:text-destructive"
+                  onClick={handleDelete}
+                >
+                  Delete Community <Ban size={18} />
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -112,23 +145,23 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
         <div className="flex justify-between items-end mb-4">
           <div
             className={cn(
-              "w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-3xl font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter",
-              subIcon || "bg-primary",
+              'w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-3xl font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter',
+              subIcon || 'bg-primary',
             )}
           >
             r/
           </div>
           <Button
             onClick={toggleJoin}
-            variant={isJoined ? "outline" : "default"}
+            variant={isJoined ? 'outline' : 'default'}
             className={cn(
-              "h-11 px-6 rounded-full font-bold text-sm shadow-sm transition-all active:scale-95",
+              'h-11 px-6 rounded-full font-bold text-sm shadow-sm transition-all active:scale-95',
               isJoined
-                ? "border-border text-foreground hover:bg-muted"
-                : "bg-primary text-white hover:opacity-90",
+                ? 'border-border text-foreground hover:bg-muted'
+                : 'bg-primary text-white hover:opacity-90',
             )}
           >
-            {isJoined ? "Joined" : "Join"}
+            {isJoined ? 'Joined' : 'Join'}
           </Button>
         </div>
         <h1 className="text-3xl sm:text-3xl font-bold text-foreground leading-tight tracking-tight mb-1">
@@ -137,9 +170,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
         <p className="text-sm text-muted-foreground font-medium mb-4">
           r/{sub.name} • {subMembers} Members
         </p>
-        <p className="text-base text-foreground leading-relaxed max-w-2xl font-medium">
-          {subDesc}
-        </p>
+        <p className="text-base text-foreground leading-relaxed max-w-2xl font-medium">{subDesc}</p>
       </div>
     </div>
   );

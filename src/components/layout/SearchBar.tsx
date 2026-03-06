@@ -1,14 +1,14 @@
-import type { Post, Community, User as UserType } from "@/types";
-import { useState, useRef, useEffect, type FormEvent } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Search, X, MessageCircle, User, Users } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useCommunities, usePosts, useUsers } from "@/hooks";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import type { Post, Community, User as UserType } from '@/types';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Search, X, MessageCircle, User, Users } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useCommunities, usePosts, useUsers } from '@/hooks';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 export const SearchBar = () => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,12 +20,11 @@ export const SearchBar = () => {
 
   // Context detection (Subreddit or Profile)
   const isSubreddit =
-    location.pathname.startsWith("/r/") &&
-    !location.pathname.includes("/r/popular");
-  const subName = isSubreddit ? location.pathname.split("/")[2] : null;
+    location.pathname.startsWith('/r/') && !location.pathname.includes('/r/popular');
+  const subName = isSubreddit ? location.pathname.split('/')[2] : null;
 
-  const isProfile = location.pathname.startsWith("/u/");
-  const profileName = isProfile ? location.pathname.split("/")[2] : null;
+  const isProfile = location.pathname.startsWith('/u/');
+  const profileName = isProfile ? location.pathname.split('/')[2] : null;
 
   const [searchInContext, setSearchInContext] = useState(true);
   const [lastPathname, setLastPathname] = useState(location.pathname);
@@ -38,39 +37,29 @@ export const SearchBar = () => {
   // Filter logic
   const filteredQueries =
     query.length > 0
-      ? posts
-          .filter((p: Post) =>
-            p.title.toLowerCase().includes(query.toLowerCase()),
-          )
-          .slice(0, 4)
+      ? posts.filter((p: Post) => p.title.toLowerCase().includes(query.toLowerCase())).slice(0, 4)
       : [];
 
   const filteredCommunities =
     query.length > 0
       ? communities
-          .filter((c: Community) =>
-            c.name.toLowerCase().includes(query.toLowerCase()),
-          )
+          .filter((c: Community) => c.name.toLowerCase().includes(query.toLowerCase()))
           .slice(0, 3)
       : [];
 
   const filteredProfiles =
     query.length > 0
       ? profiles
-          .filter((p: UserType) =>
-            (p.username || "").toLowerCase().includes(query.toLowerCase()),
-          )
+          .filter((p: UserType) => (p.username || '').toLowerCase().includes(query.toLowerCase()))
           .slice(0, 4)
       : [];
 
   const hasResults =
-    filteredQueries.length > 0 ||
-    filteredCommunities.length > 0 ||
-    filteredProfiles.length > 0;
+    filteredQueries.length > 0 || filteredCommunities.length > 0 || filteredProfiles.length > 0;
 
   const highlightMatch = (text: string, match: string) => {
     if (!match) return text;
-    const parts = text.split(new RegExp(`(${match})`, "gi"));
+    const parts = text.split(new RegExp(`(${match})`, 'gi'));
     return (
       <span className="text-sm">
         {parts.map((part, i) =>
@@ -103,15 +92,12 @@ export const SearchBar = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsFocused(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const getPlaceholder = () => {
@@ -119,15 +105,15 @@ export const SearchBar = () => {
       if (subName) return `Search in r/${subName}`;
       if (profileName) return `Search in u/${profileName}`;
     }
-    return "Find anything";
+    return 'Find anything';
   };
 
   return (
     <div ref={containerRef} className="relative w-full max-w-3xl">
       <div
         className={cn(
-          "flex items-center w-full bg-secondary hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full h-10 px-4 transition-all duration-200 border border-transparent focus-within:bg-background focus-within:border-border focus-within:shadow-sm",
-          isFocused && hasResults && "rounded-b-none shadow-lg",
+          'flex items-center w-full bg-secondary hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full h-10 px-4 transition-all duration-200 border border-transparent focus-within:bg-background focus-within:border-border focus-within:shadow-sm',
+          isFocused && hasResults && 'rounded-b-none shadow-lg',
         )}
       >
         <Search size={18} className="text-muted-foreground mr-2 shrink-0" />
@@ -139,13 +125,13 @@ export const SearchBar = () => {
               className="mr-2 h-7 gap-1.5 pl-1 pr-1 font-semibold text-xs bg-background border-border shrink-0 animate-in fade-in zoom-in duration-200"
             >
               <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-[10px] text-white overflow-hidden">
-                {subName ? "r/" : "u/"}
+                {subName ? 'r/' : 'u/'}
               </div>
               <span className="max-w-[100px] truncate">
                 {subName ? `r/${subName}` : `u/${profileName}`}
               </span>
               <button
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setSearchInContext(false);
                 }}
@@ -161,7 +147,7 @@ export const SearchBar = () => {
               type="text"
               placeholder={getPlaceholder()}
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={e => setQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
               className="w-full h-full bg-transparent border-none outline-none text-sm font-medium placeholder:text-muted-foreground"
             />
@@ -171,7 +157,7 @@ export const SearchBar = () => {
         <div className="flex items-center gap-1 shrink-0">
           {query && (
             <button
-              onClick={() => setQuery("")}
+              onClick={() => setQuery('')}
               className="p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full transition-colors"
             >
               <X size={16} className="text-muted-foreground" />
@@ -182,9 +168,7 @@ export const SearchBar = () => {
 
           <button
             className="flex items-center gap-1.5 px-3 h-8 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-full transition-colors text-primary text-sm font-bold"
-            onClick={() =>
-              navigate(`/search?q=${encodeURIComponent(query)}&type=ask`)
-            }
+            onClick={() => navigate(`/search?q=${encodeURIComponent(query)}&type=ask`)}
           >
             <MessageCircle size={16} className="fill-current opacity-80" />
             <span>Ask</span>
@@ -228,16 +212,14 @@ export const SearchBar = () => {
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 relative",
+                        'w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 relative',
                         c.icon_url || c.icon,
                       )}
                     >
                       <Users size={20} />
                     </div>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-sm font-bold truncate">
-                        r/{c.name}
-                      </span>
+                      <span className="text-sm font-bold truncate">r/{c.name}</span>
                       <span className="text-xs text-muted-foreground">
                         {c.members || 0} members
                       </span>
@@ -268,12 +250,8 @@ export const SearchBar = () => {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-sm font-bold truncate">
-                        u/{p.username}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {p.karma || 0} karma
-                      </span>
+                      <span className="text-sm font-bold truncate">u/{p.username}</span>
+                      <span className="text-xs text-muted-foreground">{p.karma || 0} karma</span>
                     </div>
                   </div>
                 </button>

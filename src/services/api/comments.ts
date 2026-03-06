@@ -5,6 +5,7 @@
 
 import { api } from '@/api/client';
 import type { Comment } from '@/types';
+import { normalizeComment } from '@/types/normalize';
 
 export const commentsApi = {
   /**
@@ -12,10 +13,11 @@ export const commentsApi = {
    */
   async getComments(postId?: string, userId?: string): Promise<Comment[]> {
     const params = new URLSearchParams();
-    if (postId) params.append('post_id', postId);
+    if (postId) params.append('postId', postId);
     if (userId) params.append('user_id', userId);
-    const endpoint = `comments?${params.toString()}`;
-    return api.get<Comment[]>(endpoint);
+    const endpoint = params.toString() ? `comments?${params.toString()}` : 'comments';
+    const data = await api.get<Record<string, unknown>[]>(endpoint);
+    return data.map(normalizeComment);
   },
 
   /**
@@ -29,7 +31,20 @@ export const commentsApi = {
    * Create new comment
    */
   async createComment(comment: Partial<Comment>): Promise<Comment> {
-    return api.post<Comment>('comments', comment);
+    const data = await api.post<Record<string, unknown>>('comments', comment);
+
+    if ('content' in data) {
+      return normalizeComment(data);
+    }
+
+    // The backend may return only { success, id } for create operations.
+    return normalizeComment({
+      ...comment,
+      id: (data.id as string) || comment.id || '',
+      created_at: new Date().toISOString(),
+      upvotes: 0,
+      user_vote: 0,
+    });
   },
 
   /**

@@ -10,6 +10,7 @@ export interface User {
   cake_day: string;
   is_premium: boolean;
   is_verified: boolean;
+  settings?: Record<string, unknown> | string;
   last_seen_at?: string;
   created_at: string;
 }
@@ -22,9 +23,14 @@ export interface Community {
   icon_url?: string;
   icon?: string; // Fallback
   banner_url?: string;
+  creator_id?: string;
   owner_id?: string;
+  current_user_role?: 'member' | 'moderator' | 'admin' | null;
+  can_manage?: boolean;
+  is_joined?: boolean;
   is_verified: boolean;
   members?: number | string;
+  post_count?: number;
   created_at: string;
   rules?: { title: string; content?: string }[];
   moderators?: { id: string; username: string; avatar_url?: string }[];
@@ -43,8 +49,8 @@ export interface Post {
   image_url?: string;
   image?: string; // Fallback
   link_url?: string;
-  post_type: "text" | "image" | "link" | "poll";
-  type?: "text" | "image"; // Fallback
+  post_type: 'text' | 'image' | 'link' | 'poll';
+  type?: 'text' | 'image'; // Fallback
   is_oc: boolean;
   is_spoiler: boolean;
   is_nsfw: boolean;
@@ -94,8 +100,9 @@ export interface Message {
 
 export interface Conversation {
   id: string;
-  user1_id: string;
-  user2_id: string;
+  user1_id?: string;
+  user2_id?: string;
+  contact_id?: string;
   last_message_at: string;
   last_msg?: string;
   time?: string;
@@ -122,4 +129,6 @@ export interface Notification {
   // Helper for UI
   user?: string;
   sub?: string;
+  actor_name?: string;
+  actor_avatar?: string;
 }

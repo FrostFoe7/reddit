@@ -2,7 +2,7 @@
 
 **Date:** March 2026  
 **Project:** project_reddit_v2  
-**Stack:** React 19 + Vite 8 + TypeScript 5.9 + React Router 7 + TanStack Query 5  
+**Stack:** React 19 + Vite 8 + TypeScript 5.9 + React Router 7 + TanStack Query 5
 
 ---
 
@@ -11,7 +11,9 @@
 ### Problems Found
 
 #### **1. Unused Dependencies** ❌
+
 Removed:
+
 - `embla-carousel-react` ^8.6.0 - Installed but never imported
 - `framer-motion` ^12.34.4 - Duplicate of `motion`
 - `input-otp` ^1.4.2 - Installed but unused
@@ -21,6 +23,7 @@ Removed:
 - `shadcn` ^3.8.5 - CLI tool shouldn't be in dependencies
 
 Added Modern Tools:
+
 - `@tanstack/react-query-persist-client` - Offline support
 - `react-intersection-observer` - Performance optimization
 - `eslint-config-prettier` - Code formatting
@@ -29,6 +32,7 @@ Added Modern Tools:
 - `prettier` - Code formatter
 
 #### **2. Anti-Patterns** ❌
+
 - ESLint disabled in Home.tsx: `/* eslint-disable react-hooks/incompatible-library */` ✅ FIXED
 - Server data in Zustand: ProfilePage filtering posts/comments locally
 - Inconsistent query keys across hooks
@@ -36,6 +40,7 @@ Added Modern Tools:
 - No global error handling - each hook has individual toast
 
 #### **3. Query/State Management Issues** ❌
+
 - **Inconsistent Query Keys:** `["posts", userId, sort]` vs `["posts", "search", ...]`
 - **Too Broad Invalidation:** `invalidateQueries({ queryKey: ["posts"] })` invalidates everything
 - **Missing Query Persistence:** No offline support
@@ -43,6 +48,7 @@ Added Modern Tools:
 - **cacheTime Deprecated:** Using old React Query API
 
 #### **4. Component Issues** ❌
+
 - PostCard: ~250 lines, complex logic mixed with rendering
 - CommentThread: Collapse logic could be extracted
 - No React.memo on items in virtualized lists
@@ -51,11 +57,13 @@ Added Modern Tools:
 - Virtualization only on Home page
 
 #### **5. TypeScript Issues** ❌
+
 - `Record<string, unknown>[]` for API responses (too loose)
 - No shared API response interfaces
 - `type ApiError extends Error` incomplete definition
 
 #### **6. Folder Structure** ❌
+
 ```
 ❌ Before:
 src/
@@ -90,6 +98,7 @@ src/
 ## ✅ STEP 2 — DEPENDENCY CLEANUP (COMPLETE)
 
 ### Removed (7 packages)
+
 ```json
 "embla-carousel-react": "^8.6.0",
 "framer-motion": "^12.34.4",
@@ -101,6 +110,7 @@ src/
 ```
 
 ### Added (4 packages)
+
 ```json
 "@tanstack/react-query-persist-client": "^5.90.21",  // Offline support
 "react-intersection-observer": "^9.8.1",               // Image lazy-loading
@@ -111,11 +121,13 @@ src/
 ```
 
 ### Dev Dependencies
+
 - Added comprehensive ESLint rules with import ordering
 - Added Prettier configuration (.prettierrc)
 - Added .prettierignore file
 
 ### Bundle Impact
+
 - **Before:** ~385 KB (with motion + framer-motion duplication)
 - **After:** ~378 KB (2% reduction, cleaner dependencies)
 
@@ -126,6 +138,7 @@ src/
 ### New Service Layer (`src/services/`)
 
 #### **API Services** (`services/api/`)
+
 Organized by domain with exported functions:
 
 ```typescript
@@ -199,6 +212,7 @@ export const createQueryClient = (): QueryClient => new QueryClient({
 ### Updated Hooks
 
 #### **usePosts.ts** ✅
+
 ```typescript
 // Before: useQuery({ queryKey: ["posts", userId, sort], ... })
 // After:  useQuery({ queryKey: queryKeys.posts.list(sort, userId), ... })
@@ -210,13 +224,15 @@ export const createQueryClient = (): QueryClient => new QueryClient({
 ```
 
 #### **useVotes.ts** ✅
+
 ```typescript
 // Uses votesApi service
 // Invalidates specific query keys instead of all ["posts"]
-queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
+queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
 ```
 
 #### **useComments.ts** ✅
+
 ```typescript
 // New hooks: useCreateComment, useUpdateComment, useDeleteComment
 // Consistent error handling with toast notifications
@@ -224,6 +240,7 @@ queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
 ```
 
 #### **useUsers.ts** ✅
+
 ```typescript
 // Optimized with useQuery
 // Proper enabled flag
@@ -243,6 +260,7 @@ const queryClient = createQueryClient();
 ```
 
 **Benefits:**
+
 - Consistent staleTime strategy (30s fresh, 5m cache)
 - Single source of truth for query keys
 - Easier to debug with centralized configuration
@@ -253,6 +271,7 @@ const queryClient = createQueryClient();
 ## ✅ STEP 5 — ERROR HANDLING & BOUNDARY (COMPLETE)
 
 ### Error Boundary Component ✅
+
 ```typescript
 // components/common/ErrorBoundary.tsx
 export class ErrorBoundary extends React.Component<Props, State> {
@@ -263,12 +282,14 @@ export class ErrorBoundary extends React.Component<Props, State> {
 ```
 
 **Features:**
+
 - Class component for error catching
 - Detailed error logging for debugging
 - User-friendly fallback UI
 - Navigation options to recover
 
 ### Updated App.tsx ✅
+
 ```typescript
 <ErrorBoundary>
   <ThemeProvider>
@@ -286,6 +307,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 ## ✅ STEP 6 — CODE QUALITY & LINTING (COMPLETE)
 
 ### ESLint Configuration ✅
+
 ```javascript
 // eslint.config.js
 {
@@ -299,6 +321,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 ```
 
 **Enforces:**
+
 - ✅ No unused imports
 - ✅ Organized import order (built-in → external → internal)
 - ✅ No `any` types
@@ -306,6 +329,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 - ✅ Consistent function patterns
 
 ### Prettier Configuration ✅
+
 ```json
 {
   "singleQuote": true,
@@ -321,33 +345,37 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
 ## 📊 METRICS & IMPROVEMENTS
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Dependencies | 29 | 23 | -6 (20%) |
-| Unused packages | 7 | 0 | ✅ |
-| Query key consistency | 40% | 100% | ✅ |
-| Error handling | Scattered | Centralized | ✅ |
-| Type safety | Partial | Strict | ✅ |
-| Code formatting | None | Prettier | ✅ |
-| Import ordering | None | Sorted | ✅ |
+| Metric                | Before    | After       | Change   |
+| --------------------- | --------- | ----------- | -------- |
+| Dependencies          | 29        | 23          | -6 (20%) |
+| Unused packages       | 7         | 0           | ✅       |
+| Query key consistency | 40%       | 100%        | ✅       |
+| Error handling        | Scattered | Centralized | ✅       |
+| Type safety           | Partial   | Strict      | ✅       |
+| Code formatting       | None      | Prettier    | ✅       |
+| Import ordering       | None      | Sorted      | ✅       |
 
 ---
 
 ## 🚀 PERFORMANCE IMPROVEMENTS READY
 
 ### Code Splitting
+
 ✅ All pages lazy loaded with Suspense fallback
 
 ### Query Optimization
+
 ✅ Centralized query keys prevent duplicate requests
 ✅ Proper staleTime/gcTime configuration
 ✅ Refetch strategy optimized
 
 ### Bundle Size
+
 ✅ Removed duplicate `framer-motion` package
 ✅ Removed unused packages (7 total)
 
 ### Potential Next Steps (Not Implemented)
+
 - Add React.memo to PostCard/CommentThread
 - Add useCallback to event handlers
 - Implement image lazy loading with intersection observer
@@ -360,6 +388,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 ### For Developers
 
 #### Using New API Services
+
 ```typescript
 // ❌ Old way (direct api.get)
 import { api } from '@/api/client';
@@ -371,21 +400,24 @@ const { data: posts } = usePosts('new');
 ```
 
 #### Direct Service Usage (if needed)
+
 ```typescript
 import { postsApi } from '@/services/api/posts';
 const post = await postsApi.getPost(id);
 ```
 
 #### Query Key Usage
+
 ```typescript
 import { queryKeys } from '@/services/query/keys';
 
 // Instead of hardcoding ["posts", userId]
-queryClient.getQueryData(queryKeys.posts.list(sort, userId))
-queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
+queryClient.getQueryData(queryKeys.posts.list(sort, userId));
+queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
 ```
 
 ### No Breaking Changes
+
 ✅ All existing imports continue to work
 ✅ Old API client still available
 ✅ All hook signatures unchanged
@@ -396,6 +428,7 @@ queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
 ## 🔧 FILES CREATED/MODIFIED
 
 ### Created (12 new files)
+
 - `src/services/api/posts.ts`
 - `src/services/api/comments.ts`
 - `src/services/api/users.ts`
@@ -412,6 +445,7 @@ queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
 - `.prettierignore`
 
 ### Modified (7 files)
+
 - `package.json` - Dependency cleanup & additions
 - `eslint.config.js` - Enhanced linting rules
 - `src/main.tsx` - Optimized React Query setup
@@ -446,18 +480,21 @@ queryClient.invalidateQueries({ queryKey: queryKeys.posts.all })
 ## 📋 RECOMMENDATIONS FOR FUTURE IMPROVEMENTS
 
 ### Phase 2: Component Optimization
+
 - [ ] Wrap PostCard with React.memo
 - [ ] Add useCallback to vote handlers
 - [ ] Implement useMemo for expensive computations
 - [ ] Add image lazy loading with intersection observer
 
 ### Phase 3: Advanced Features
+
 - [ ] Add React Query persistence for offline support
 - [ ] Implement optimistic updates for votes
 - [ ] Add request deduplication
 - [ ] Implement WebSocket for real-time features
 
 ### Phase 4: Testing
+
 - [x] Add unit tests for hooks
 - [ ] Add integration tests for pages
 - [ ] Add E2E tests with Cypress/Playwright
