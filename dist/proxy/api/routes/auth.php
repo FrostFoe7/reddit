@@ -4,6 +4,7 @@
  */
 
 $pdo = DB::connect();
+require_once __DIR__ . '/../lib/auth.php';
 
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -46,7 +47,12 @@ if ($method === 'POST') {
             $stmt->execute([$id]);
             $user = $stmt->fetch();
 
-            sendResponse(['success' => true, 'user' => $user], 201);
+            sendResponse([
+                'success' => true,
+                'user' => $user,
+                'token' => issueAuthToken((string)$user['id'], 86400),
+                'refresh_token' => issueAuthToken((string)$user['id'], 604800),
+            ], 201);
         } catch (\Exception $e) {
             sendResponse(['error' => 'Registration failed: ' . $e->getMessage()], 500);
         }
@@ -66,7 +72,12 @@ if ($method === 'POST') {
             if ($user && password_verify($input['password'], $user['password_hash'])) {
                 // Remove password hash from response
                 unset($user['password_hash']);
-                sendResponse(['success' => true, 'user' => $user]);
+                sendResponse([
+                    'success' => true,
+                    'user' => $user,
+                    'token' => issueAuthToken((string)$user['id'], 86400),
+                    'refresh_token' => issueAuthToken((string)$user['id'], 604800),
+                ]);
             } else {
                 sendResponse(['error' => 'Invalid username or password'], 401);
             }

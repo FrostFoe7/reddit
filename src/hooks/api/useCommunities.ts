@@ -118,7 +118,14 @@ export function useCreateCommunity() {
   const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: (payload: { name: string; description?: string; icon_url?: string; banner_url?: string }) => {
+    mutationFn: (payload: {
+      name: string;
+      description?: string;
+      icon_url?: string;
+      banner_url?: string;
+      iconFile?: File | null;
+      bannerFile?: File | null;
+    }) => {
       if (!user) throw new Error('Must be logged in to create community');
       return communitiesApi.createCommunity({ ...payload, user_id: user.id });
     },
@@ -144,7 +151,7 @@ export function useDeleteCommunity() {
   return useMutation({
     mutationFn: (communityId: string) => {
       if (!user) throw new Error('Must be logged in to delete community');
-      return communitiesApi.deleteCommunity(communityId, user.id);
+      return communitiesApi.deleteCommunity(communityId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.communities.all });
@@ -172,7 +179,13 @@ export function useUpdateCommunity() {
       updates,
     }: {
       id: string;
-      updates: { description?: string; icon_url?: string; banner_url?: string };
+      updates: {
+        description?: string;
+        icon_url?: string;
+        banner_url?: string;
+        iconFile?: File | null;
+        bannerFile?: File | null;
+      };
     }) => {
       if (!user) throw new Error('Must be logged in to update community');
       return communitiesApi.updateCommunity(id, { ...updates, user_id: user.id });
@@ -201,5 +214,50 @@ export function useUserMemberships() {
     enabled: !!user?.id,
     retry: 2,
     staleTime: 45000,
+  });
+}
+
+/**
+ * Remove a member from a community (moderator action)
+ */
+export function useRemoveCommunityMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ subredditId, targetUserId }: { subredditId: string; targetUserId: string }) =>
+      communitiesApi.removeMember(subredditId, targetUserId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.communities.all });
+      toast.success('Member removed');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to remove member');
+    },
+  });
+}
+
+/**
+ * Ban a member from a community (moderator action)
+ */
+export function useBanCommunityMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      subredditId,
+      targetUserId,
+      reason,
+    }: {
+      subredditId: string;
+      targetUserId: string;
+      reason?: string;
+    }) => communitiesApi.banMember(subredditId, targetUserId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.communities.all });
+      toast.success('Member banned');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to ban member');
+    },
   });
 }

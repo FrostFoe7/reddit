@@ -4,18 +4,24 @@
  */
 
 $pdo = DB::connect();
+require_once __DIR__ . '/../lib/auth.php';
 
 if ($method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $authUserId = requireAuthenticatedUserId($input);
     
-    if (empty($input['user_id']) || empty($input['vote']) || empty($input['target_id'])) {
+    if (empty($input['vote']) || empty($input['target_id'])) {
         sendResponse(['error' => 'Missing required fields'], 400);
     }
 
     $type = $input['type'] ?? 'post'; // 'post' or 'comment'
     $target_id = $input['target_id'];
     $vote = (int)$input['vote']; // 1, -1, or 0 (to remove)
-    $user_id = $input['user_id'];
+    if (isset($input['user_id']) && (string)$input['user_id'] !== $authUserId) {
+        sendResponse(['error' => 'Authenticated user mismatch'], 403);
+    }
+
+    $user_id = $authUserId;
 
     try {
         $table = ($type === 'post') ? 'post_votes' : 'comment_votes';

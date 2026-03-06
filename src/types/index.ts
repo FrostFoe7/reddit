@@ -34,6 +34,7 @@ export interface Community {
   created_at: string;
   rules?: { title: string; content?: string }[];
   moderators?: { id: string; username: string; avatar_url?: string }[];
+  members_list?: { id: string; username: string; avatar_url?: string; role?: string }[];
   wiki?: string;
 }
 

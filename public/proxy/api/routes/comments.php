@@ -4,6 +4,7 @@
  */
 
 $pdo = DB::connect();
+require_once __DIR__ . '/../lib/auth.php';
 
 if ($method === 'GET') {
     $post_id = $_GET['postId'] ?? $_GET['post_id'] ?? null;
@@ -36,7 +37,13 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $authUserId = requireAuthenticatedUserId($input);
+
+    if (isset($input['author_id']) && (string)$input['author_id'] !== $authUserId) {
+        sendResponse(['error' => 'Authenticated user mismatch'], 403);
+    }
+    $input['author_id'] = $authUserId;
     
     if (empty($input['id']) || empty($input['post_id']) || empty($input['author_id']) || empty($input['content'])) {
         sendResponse(['error' => 'Missing required fields'], 400);
@@ -113,12 +120,8 @@ if ($method === 'PUT' || $method === 'PATCH') {
 
     $commentId = $matches[1];
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
-    $userId = $input['user_id'] ?? $_GET['user_id'] ?? null;
+    $userId = requireAuthenticatedUserId($input);
     $content = trim((string)($input['content'] ?? ''));
-
-    if (!$userId) {
-        sendResponse(['error' => 'Missing user_id'], 400);
-    }
 
     if ($content === '') {
         sendResponse(['error' => 'Missing content'], 400);
@@ -156,11 +159,7 @@ if ($method === 'DELETE') {
     }
 
     $commentId = $matches[1];
-    $userId = $_GET['user_id'] ?? null;
-
-    if (!$userId) {
-        sendResponse(['error' => 'Missing user_id'], 400);
-    }
+    $userId = requireAuthenticatedUserId();
 
     try {
         $stmtComment = $pdo->prepare('SELECT id, author_id FROM comments WHERE id = ? LIMIT 1');

@@ -4,12 +4,14 @@
  */
 
 $pdo = DB::connect();
+require_once __DIR__ . '/../lib/auth.php';
 
 if ($method === 'GET') {
-    $user_id = $_GET['user_id'] ?? null;
-    
-    if (!$user_id) {
-        sendResponse(['error' => 'Missing user_id'], 400);
+    $authUserId = requireAuthenticatedUserId([], false);
+    $user_id = $_GET['user_id'] ?? $authUserId;
+
+    if ((string)$user_id !== $authUserId) {
+        sendResponse(['error' => 'Insufficient permissions'], 403);
     }
 
     try {
@@ -24,13 +26,9 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST' && strpos($route, 'notifications/mark-read') === 0) {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $user_id = $input['user_id'] ?? null;
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $user_id = requireAuthenticatedUserId($input);
     $notification_id = $input['notification_id'] ?? null;
-
-    if (!$user_id) {
-        sendResponse(['error' => 'Missing user_id'], 400);
-    }
 
     try {
         if ($notification_id) {

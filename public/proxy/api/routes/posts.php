@@ -4,6 +4,7 @@
  */
 
 $pdo = DB::connect();
+require_once __DIR__ . '/../lib/auth.php';
 
 function tableHasColumn(PDO $pdo, string $table, string $column): bool
 {
@@ -125,7 +126,13 @@ if ($method === 'GET') {
 
 // Handle POST requests (Create a new post)
 if ($method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $authUserId = requireAuthenticatedUserId($input);
+
+    if (isset($input['author_id']) && (string)$input['author_id'] !== $authUserId) {
+        sendResponse(['error' => 'Authenticated user mismatch'], 403);
+    }
+    $input['author_id'] = $authUserId;
     
     // Simple validation
     if (empty($input['id']) || empty($input['title']) || empty($input['author_id']) || empty($input['subreddit_id'])) {
@@ -166,11 +173,7 @@ if ($method === 'PUT' || $method === 'PATCH') {
 
     $postId = $matches[1];
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
-    $userId = $input['user_id'] ?? $_GET['user_id'] ?? null;
-
-    if (!$userId) {
-        sendResponse(['error' => 'Missing user_id'], 400);
-    }
+    $userId = requireAuthenticatedUserId($input);
 
     try {
         $postStmt = $pdo->prepare('SELECT id, author_id FROM posts WHERE id = ? LIMIT 1');
@@ -239,11 +242,7 @@ if ($method === 'DELETE') {
     }
 
     $postId = $matches[1];
-    $userId = $_GET['user_id'] ?? null;
-
-    if (!$userId) {
-        sendResponse(['error' => 'Missing user_id'], 400);
-    }
+    $userId = requireAuthenticatedUserId();
 
     try {
         $postStmt = $pdo->prepare('SELECT id, author_id, subreddit_id FROM posts WHERE id = ? LIMIT 1');

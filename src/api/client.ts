@@ -195,4 +195,18 @@ export const api = {
     });
     return handleResponse<T>(response);
   },
+
+  /**
+   * Multipart/form-data PUT request
+   */
+  async putForm<T>(endpoint: string, data: FormData, config?: RequestConfig): Promise<T> {
+    const url = `${BASE_URL}/${endpoint}`;
+    const response = await fetchWithTimeout(url, {
+      method: 'PUT',
+      headers: buildHeaders(config, false),
+      body: data,
+      timeout: config?.timeout,
+    });
+    return handleResponse<T>(response);
+  },
 };

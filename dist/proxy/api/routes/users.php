@@ -4,6 +4,7 @@
  */
 
 $pdo = DB::connect();
+require_once __DIR__ . '/../lib/auth.php';
 
 function usersTableHasColumn(PDO $pdo, string $column): bool
 {
@@ -67,7 +68,7 @@ if ($method === 'GET') {
     // Fetch user memberships
     if (strpos($route, 'users/memberships') === 0 || strpos($route, 'memberships') === 0) {
         if (!$user_id) {
-            sendResponse(['error' => 'Missing user_id'], 400);
+            $user_id = requireAuthenticatedUserId([], false);
         }
         $stmt = $pdo->prepare("SELECT subreddit_id FROM subreddit_members WHERE user_id = ?");
         $stmt->execute([$user_id]);
@@ -94,6 +95,7 @@ if ($method === 'GET') {
 
 if ($method === 'PUT' || $method === 'PATCH') {
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $authUserId = requireAuthenticatedUserId($input);
 
     $targetId = $input['user_id'] ?? null;
     if (preg_match('/^users\/([^\/]+)/', $route, $matches) && $matches[1] !== 'memberships') {
@@ -102,6 +104,10 @@ if ($method === 'PUT' || $method === 'PATCH') {
 
     if (!$targetId) {
         sendResponse(['error' => 'Missing target user id'], 400);
+    }
+
+    if ((string)$targetId !== $authUserId) {
+        sendResponse(['error' => 'Insufficient permissions'], 403);
     }
 
     $allowedFields = [

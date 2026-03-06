@@ -18,8 +18,28 @@ class ApiRouter
     public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->method = $_SERVER['REQUEST_METHOD'];
+        $this->method = $this->resolveMethod();
         $this->route = $this->extractRoute();
+    }
+
+    private function resolveMethod(): string
+    {
+        $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+        if ($method !== 'POST') {
+            return $method;
+        }
+
+        $override = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? ($_GET['_method'] ?? null);
+        if (!is_string($override) || $override === '') {
+            return $method;
+        }
+
+        $normalized = strtoupper(trim($override));
+        if (in_array($normalized, ['PUT', 'PATCH', 'DELETE'], true)) {
+            return $normalized;
+        }
+
+        return $method;
     }
 
     /**
@@ -95,7 +115,31 @@ class ApiRouter
         if (!function_exists('sendResponse')) {
             function sendResponse($data, $code = 200) {
                 http_response_code($code);
-                echo json_encode($data, JSON_UNESCAPED_SLASHES);
+                header('Content-Type: application/json');
+
+                if ($code >= 400) {
+                    $message = 'Request failed';
+                    if (is_array($data) && isset($data['error']) && is_string($data['error'])) {
+                        $message = $data['error'];
+                    } elseif (is_array($data) && isset($data['message']) && is_string($data['message'])) {
+                        $message = $data['message'];
+                    } elseif (is_string($data) && $data !== '') {
+                        $message = $data;
+                    }
+
+                    echo json_encode([
+                        'success' => false,
+                        'message' => $message,
+                        'error' => $message,
+                        'data' => null,
+                    ], JSON_UNESCAPED_SLASHES);
+                    exit;
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'data' => $data,
+                ], JSON_UNESCAPED_SLASHES);
                 exit;
             }
         }
@@ -106,26 +150,32 @@ class ApiRouter
     private function handleStatus(): void
     {
         http_response_code(200);
+        header('Content-Type: application/json');
         echo json_encode([
+            'success' => true,
             'data' => [
                 'status' => 'online',
-                'timestamp' => date('Y-m-d H:i:s')
-            ]
-        ]);
+                'timestamp' => date('Y-m-d H:i:s'),
+            ],
+        ], JSON_UNESCAPED_SLASHES);
         exit;
     }
 
     private function sendNotFound(): void
     {
-        http_response_code(404);
-        echo json_encode(['error' => 'Endpoint not found']);
-        exit;
+        $this->sendError('Endpoint not found', 404);
     }
 
     private function sendError(string $message, int $statusCode): void
     {
         http_response_code($statusCode);
-        echo json_encode(['error' => $message]);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => $message,
+            'error' => $message,
+            'data' => null,
+        ], JSON_UNESCAPED_SLASHES);
         exit;
     }
 }
@@ -137,11 +187,21 @@ try {
     $router->dispatch();
 } catch (\Throwable $e) {
     error_log("API bootstrap failed: " . $e->getMessage());
-    http_response_code(500);
+    header('Content-Type: application/json', true, 500);
     if (isset($_GET['debug']) && $_GET['debug'] === '1') {
-        echo json_encode(['error' => 'API bootstrap failed: ' . $e->getMessage()]);
+        echo json_encode([
+            'success' => false,
+            'message' => 'API bootstrap failed: ' . $e->getMessage(),
+            'error' => 'API bootstrap failed: ' . $e->getMessage(),
+            'data' => null,
+        ]);
     } else {
-        echo json_encode(['error' => 'Database connection failed']);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Database connection failed',
+            'error' => 'Database connection failed',
+            'data' => null,
+        ]);
     }
     exit;
 }

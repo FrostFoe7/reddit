@@ -4,13 +4,15 @@
  */
 
 $pdo = DB::connect();
+require_once __DIR__ . '/../lib/auth.php';
 
 if ($method === 'GET') {
-    $user_id = $_GET['user_id'] ?? null;
+    $authUserId = requireAuthenticatedUserId([], false);
+    $user_id = $_GET['user_id'] ?? $authUserId;
     $conversation_id = $_GET['conversation_id'] ?? null;
 
-    if (!$user_id) {
-        sendResponse(['error' => 'Missing user_id'], 400);
+    if ((string)$user_id !== $authUserId) {
+        sendResponse(['error' => 'Insufficient permissions'], 403);
     }
 
     try {
@@ -48,7 +50,13 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $authUserId = requireAuthenticatedUserId($input);
+
+    if (isset($input['sender_id']) && (string)$input['sender_id'] !== $authUserId) {
+        sendResponse(['error' => 'Authenticated user mismatch'], 403);
+    }
+    $input['sender_id'] = $authUserId;
     
     if (empty($input['sender_id']) || empty($input['conversation_id']) || empty($input['content'])) {
         sendResponse(['error' => 'Missing required fields'], 400);

@@ -11,12 +11,15 @@ import { MemberList } from '@/pages/community/components/MemberList';
 
 export const SubredditPage: React.FC = () => {
   const { name } = useParams<{ name: string }>();
+  const decodedName = name ? decodeURIComponent(name) : undefined;
 
-  const { data: sub, isLoading: subLoading, error: subError } = useCommunity(name);
+  const { data: sub, isLoading: subLoading, error: subError } = useCommunity(decodedName);
   const { data: subPosts = [], isLoading: postsLoading, error: postsError } = usePosts(
     'new',
     sub?.id,
   );
+
+  const isNotFound = (subError as { statusCode?: number } | null)?.statusCode === 404;
 
   if (subLoading) {
     return (
@@ -26,7 +29,7 @@ export const SubredditPage: React.FC = () => {
     );
   }
 
-  if (subError) {
+  if (subError && !isNotFound) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
         <h1 className="text-3xl font-bold text-foreground tracking-tight mb-3">Failed to load community</h1>
@@ -65,7 +68,7 @@ export const SubredditPage: React.FC = () => {
           Community not found
         </h1>
         <p className="text-base text-muted-foreground font-medium mb-10 max-w-72">
-          This community may have been banned or the name is incorrect.
+          This community may have been deleted, banned, or the URL is incorrect.
         </p>
         <Link
           to="/"
@@ -177,8 +180,8 @@ export const SubredditPage: React.FC = () => {
                 'Welcome to the community wiki. Our moderators are currently working on compiling the best resources and FAQs for you.'}
             </p>
             <div className="w-full max-w-md text-left">
-              <h3 className="font-bold text-base mb-3">Moderators</h3>
-              <MemberList members={sub.moderators || []} />
+              <h3 className="font-bold text-base mb-3">Members</h3>
+              <MemberList members={sub.members_list || sub.moderators || []} />
             </div>
           </div>
         </TabsContent>

@@ -122,6 +122,10 @@ export function normalizeCommunity(data: Record<string, unknown>): Community {
       (data.moderators as
         | Array<{ id: string; username: string; avatar_url?: string }>
         | undefined) || undefined,
+    members_list:
+      (data.members_list as
+        | Array<{ id: string; username: string; avatar_url?: string; role?: string }>
+        | undefined) || undefined,
   };
 }
 

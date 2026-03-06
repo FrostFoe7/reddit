@@ -227,6 +227,16 @@ function AppContent() {
               }
             />
             <Route
+              path="/settings/:communityName"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <CommunitySettingsPage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/r/mod/:subreddit"
               element={
                 <ProtectedRoute>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { motion } from 'motion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,10 +7,24 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuthStore } from '@/store/useStore';
 import { useCommunity, useUpdateCommunity } from '@/hooks';
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+function validateImageFile(file: File): string | null {
+  if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+    return 'Only JPEG, PNG, and WebP images are allowed.';
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    return 'Image must be 5MB or smaller.';
+  }
+  return null;
+}
+
 export const CommunitySettingsPage: React.FC = () => {
-  const { name } = useParams<{ name: string }>();
+  const params = useParams<{ subreddit?: string; communityName?: string }>();
+  const communityName = params.subreddit ?? params.communityName;
   const user = useAuthStore(state => state.user);
-  const { data: community, isLoading } = useCommunity(name);
+  const { data: community, isLoading, error } = useCommunity(communityName);
   const { mutate: updateCommunity, isPending } = useUpdateCommunity();
 
   if (!user) {
@@ -22,6 +37,10 @@ export const CommunitySettingsPage: React.FC = () => {
 
   if (isLoading) {
     return <div className="p-8 text-center text-muted-foreground">Loading community...</div>;
+  }
+
+  if (error) {
+    return <div className="p-8 text-center text-destructive">Failed to load community settings.</div>;
   }
 
   if (!community) {
@@ -45,24 +64,67 @@ const CommunitySettingsForm: React.FC<{
   onSubmit: ReturnType<typeof useUpdateCommunity>['mutate'];
 }> = ({ community, isPending, onSubmit }) => {
   const navigate = useNavigate();
-  const [description, setDescription] = useState(community.description || '');
-  const [iconUrl, setIconUrl] = useState(community.icon_url || '');
-  const [bannerUrl, setBannerUrl] = useState(community.banner_url || '');
+  const [description, setDescription] = React.useState(community.description || '');
+  const [iconUrl, setIconUrl] = React.useState(community.icon_url || '');
+  const [bannerUrl, setBannerUrl] = React.useState(community.banner_url || '');
+  const [iconFile, setIconFile] = React.useState<File | null>(null);
+  const [bannerFile, setBannerFile] = React.useState<File | null>(null);
+  const [iconPreview, setIconPreview] = React.useState<string | null>(community.icon_url || null);
+  const [bannerPreview, setBannerPreview] = React.useState<string | null>(community.banner_url || null);
+  const [fileError, setFileError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setDescription(community.description || '');
+    setIconUrl(community.icon_url || '');
+    setBannerUrl(community.banner_url || '');
+    setIconPreview(community.icon_url || null);
+    setBannerPreview(community.banner_url || null);
+    setIconFile(null);
+    setBannerFile(null);
+  }, [community]);
+
+  const handleLocalFile = (target: 'icon' | 'banner', file?: File) => {
+    if (!file) return;
+
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      setFileError(validationError);
+      return;
+    }
+
+    setFileError(null);
+    const previewUrl = URL.createObjectURL(file);
+
+    if (target === 'icon') {
+      setIconFile(file);
+      setIconPreview(previewUrl);
+      setIconUrl('');
+      return;
+    }
+
+    setBannerFile(file);
+    setBannerPreview(previewUrl);
+    setBannerUrl('');
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (fileError) return;
+
     onSubmit(
       {
         id: community.id,
         updates: {
           description,
-          icon_url: iconUrl,
-          banner_url: bannerUrl,
+          icon_url: iconUrl || undefined,
+          banner_url: bannerUrl || undefined,
+          iconFile,
+          bannerFile,
         },
       },
       {
         onSuccess: updated => {
-          navigate(`/r/${updated.name}`);
+          navigate(`/r/${encodeURIComponent(updated.name)}`);
         },
       },
     );
@@ -87,27 +149,61 @@ const CommunitySettingsForm: React.FC<{
 
         <div className="space-y-2">
           <label htmlFor="community-icon-url" className="text-sm font-semibold">
-            Icon CSS Class or URL
+            Icon URL (optional)
           </label>
           <Input
             id="community-icon-url"
             value={iconUrl}
             onChange={e => setIconUrl(e.target.value)}
-            placeholder="bg-primary or https://example.com/icon.png"
+            placeholder="https://example.com/icon.webp"
           />
+          <Input
+            id="community-icon-file"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={event => handleLocalFile('icon', event.target.files?.[0])}
+          />
+          {iconPreview && (
+            <motion.img
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+              src={iconPreview}
+              alt="Community icon preview"
+              className="w-20 h-20 rounded-full object-cover border border-border"
+            />
+          )}
         </div>
 
         <div className="space-y-2">
           <label htmlFor="community-banner-url" className="text-sm font-semibold">
-            Banner URL
+            Banner URL (optional)
           </label>
           <Input
             id="community-banner-url"
             value={bannerUrl}
             onChange={e => setBannerUrl(e.target.value)}
-            placeholder="https://example.com/banner.png"
+            placeholder="https://example.com/banner.webp"
           />
+          <Input
+            id="community-banner-file"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={event => handleLocalFile('banner', event.target.files?.[0])}
+          />
+          {bannerPreview && (
+            <motion.img
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              src={bannerPreview}
+              alt="Community banner preview"
+              className="w-full h-24 rounded-lg object-cover border border-border"
+            />
+          )}
         </div>
+
+        {fileError && <p className="text-xs text-destructive">{fileError}</p>}
 
         <div className="flex gap-3 justify-end">
           <Button type="button" variant="outline" onClick={() => navigate(-1)} className="rounded-full">

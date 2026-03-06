@@ -24,8 +24,10 @@ interface CommunityHeaderProps {
     desc?: string;
     icon_url?: string;
     icon?: string;
+    banner_url?: string;
     can_manage?: boolean;
     current_user_role?: 'member' | 'moderator' | 'admin' | null;
+    is_joined?: boolean;
   };
 }
 
@@ -39,7 +41,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
   const { mutate: leaveMutate } = useLeaveCommunity();
   const { mutate: deleteCommunity } = useDeleteCommunity();
 
-  const isJoined = memberships.includes(sub.id);
+  const isJoined = typeof sub.is_joined === 'boolean' ? sub.is_joined : memberships.includes(sub.id);
 
   const toggleJoin = () => {
     if (!user) {
@@ -57,6 +59,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
   const subDesc = sub.description || sub.desc;
   const subMembers = sub.members || 0;
   const canManage = Boolean(sub.can_manage) || ['moderator', 'admin'].includes(sub.current_user_role || '');
+  const bannerStyle = sub.banner_url ? { backgroundImage: `url(${sub.banner_url})` } : undefined;
 
   const handleDelete = () => {
     if (!user) {
@@ -79,7 +82,12 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
 
   return (
     <div className="bg-card border-b sm:border border-border sm:rounded-[32px] overflow-hidden mb-6 shadow-ios-subtle relative">
-      <div className={cn('h-28 sm:h-36 opacity-90 relative bg-primary/20', subIcon)}>
+      <div
+        className={cn(
+          'h-28 sm:h-36 opacity-90 relative bg-gradient-to-r from-primary/20 to-primary/40 bg-cover bg-center',
+        )}
+        style={bannerStyle}
+      >
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
       </div>
 
@@ -131,13 +139,13 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
                 <DropdownMenuSeparator className="bg-border my-1 mx-2" />
                 <DropdownMenuItem
                   className="rounded-xl p-2.5 font-medium"
-                  onClick={() => navigate(`/r/settings/${sub.name}`)}
+                  onClick={() => navigate(`/r/settings/${encodeURIComponent(sub.name)}`)}
                 >
                   Community Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="rounded-xl p-2.5 font-medium"
-                  onClick={() => navigate(`/r/mod/${sub.name}`)}
+                  onClick={() => navigate(`/r/mod/${encodeURIComponent(sub.name)}`)}
                 >
                   Moderator Tools
                 </DropdownMenuItem>
@@ -158,11 +166,14 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ sub }) => {
         <div className="flex justify-between items-end mb-4">
           <div
             className={cn(
-              'w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-3xl font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter',
-              subIcon || 'bg-primary',
+              'w-[88px] h-[88px] sm:w-[104px] sm:h-[104px] rounded-full border-4 border-card flex items-center justify-center text-white text-3xl font-bold -mt-[44px] sm:-mt-[52px] relative shadow-md tracking-tighter bg-primary overflow-hidden',
             )}
           >
-            r/
+            {subIcon ? (
+              <img src={subIcon} alt={`r/${sub.name} icon`} className="w-full h-full object-cover" />
+            ) : (
+              'r/'
+            )}
           </div>
           <Button
             onClick={toggleJoin}
