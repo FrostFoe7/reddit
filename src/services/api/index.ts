@@ -10,4 +10,5 @@ export { communitiesApi } from './communities';
 export { votesApi, type VoteRequest } from './votes';
 export { messagesApi } from './messages';
 export { notificationsApi } from './notifications';
+export { uploadsApi } from './uploads';
 export type { Notification } from '@/types';

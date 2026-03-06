@@ -14,7 +14,7 @@ import dayjs from '@/lib/dayjs';
 import type { Conversation, Message } from '@/types';
 import { ConversationList } from '@/pages/messages/components/ConversationList';
 import { MessageComposer } from '@/pages/messages/components/MessageComposer';
-import { ListSkeleton } from '@/components/common/ListSkeleton';
+import { ListSkeleton } from '@/components/common';
 
 export const MessagesPage: React.FC = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);

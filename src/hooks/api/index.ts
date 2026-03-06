@@ -11,3 +11,4 @@ export * from './useCommunities';
 export * from './useMessages';
 export * from './useNotifications';
 export * from './useAuth';
+export * from './useUploads';

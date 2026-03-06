@@ -6,7 +6,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, type ApiError } from '@/api/client';
 import { normalizeUser } from '@/types/normalize';
-import { useAuthStore } from '@/store/useStore';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 /**
@@ -14,18 +14,26 @@ import { toast } from 'sonner';
  */
 export function useRegister() {
   const queryClient = useQueryClient();
-  const login = useAuthStore(state => state.login);
+  const { login } = useAuth();
 
   return useMutation({
     mutationFn: async (credentials: { username: string; email: string; password: string }) => {
       const data = await api.post<Record<string, unknown>>('auth/register', credentials, {
         timeout: 15000,
       });
-      return normalizeUser((data as Record<string, unknown>).user as Record<string, unknown>);
+      const payload = data as Record<string, unknown>;
+      return {
+        user: normalizeUser(payload.user as Record<string, unknown>),
+        accessToken: (payload.token as string | undefined) ?? null,
+        refreshToken: (payload.refresh_token as string | undefined) ?? null,
+      };
     },
-    onSuccess: user => {
-      login(user);
-      queryClient.setQueryData(['auth', 'currentUser'], user);
+    onSuccess: result => {
+      login(result.user, {
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      });
+      queryClient.setQueryData(['auth', 'currentUser'], result.user);
       toast.success('Account created successfully!');
     },
     onError: (error: ApiError) => {
@@ -40,18 +48,26 @@ export function useRegister() {
  */
 export function useLogin() {
   const queryClient = useQueryClient();
-  const login = useAuthStore(state => state.login);
+  const { login } = useAuth();
 
   return useMutation({
     mutationFn: async (credentials: { username: string; password: string }) => {
       const data = await api.post<Record<string, unknown>>('auth/login', credentials, {
         timeout: 15000,
       });
-      return normalizeUser((data as Record<string, unknown>).user as Record<string, unknown>);
+      const payload = data as Record<string, unknown>;
+      return {
+        user: normalizeUser(payload.user as Record<string, unknown>),
+        accessToken: (payload.token as string | undefined) ?? null,
+        refreshToken: (payload.refresh_token as string | undefined) ?? null,
+      };
     },
-    onSuccess: user => {
-      login(user);
-      queryClient.setQueryData(['auth', 'currentUser'], user);
+    onSuccess: result => {
+      login(result.user, {
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      });
+      queryClient.setQueryData(['auth', 'currentUser'], result.user);
       toast.success('Logged in successfully!');
     },
     onError: (error: ApiError) => {

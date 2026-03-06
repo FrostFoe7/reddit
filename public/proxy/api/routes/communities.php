@@ -149,8 +149,8 @@ if ($method === 'POST') {
             sendResponse(['error' => 'Missing required fields'], 400);
         }
 
-        if (!preg_match('/^[A-Za-z0-9_]{3,21}$/', $name)) {
-            sendResponse(['error' => 'Community name must be 3-21 chars: letters, numbers, underscore'], 400);
+        if (!preg_match('/^[A-Za-z0-9_]{3,32}$/', $name)) {
+            sendResponse(['error' => 'Community name must be 3-32 chars: letters, numbers, underscore'], 400);
         }
 
         try {

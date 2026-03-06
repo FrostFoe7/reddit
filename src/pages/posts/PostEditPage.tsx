@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthStore } from '@/store/useStore';
-import { usePost, useUpdatePost } from '@/hooks';
+import { usePost, useUpdatePost, useUploadImage } from '@/hooks';
+import { toast } from 'sonner';
 
 export const PostEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,13 +13,17 @@ export const PostEditPage: React.FC = () => {
   const user = useAuthStore(state => state.user);
   const { data: post, isLoading } = usePost(id);
   const { mutate: updatePost, isPending } = useUpdatePost();
+  const { mutateAsync: uploadImage, isPending: isUploadingImage } = useUploadImage();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     setTitle(post?.title || '');
     setContent(post?.content || '');
+    setImageUrl(post?.image_url || '');
   }, [post]);
 
   if (!user) {
@@ -54,6 +59,7 @@ export const PostEditPage: React.FC = () => {
           user_id: user.id,
           title,
           content,
+          image_url: imageUrl,
         },
       },
       {
@@ -64,10 +70,35 @@ export const PostEditPage: React.FC = () => {
     );
   };
 
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    try {
+      const uploaded = await uploadImage(file);
+      setImageUrl(uploaded);
+      toast.success('Post image uploaded');
+    } catch {
+      // onError toast is already handled by hook.
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-0">
       <h1 className="text-3xl font-bold mb-6">Edit Post</h1>
       <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleUpload}
+        />
         <div className="space-y-2">
           <label htmlFor="edit-post-title" className="text-sm font-semibold">
             Title
@@ -78,6 +109,28 @@ export const PostEditPage: React.FC = () => {
             onChange={e => setTitle(e.target.value)}
             required
           />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="edit-post-image" className="text-sm font-semibold">
+            Image URL
+          </label>
+          <div className="flex gap-2">
+            <Input
+              id="edit-post-image"
+              value={imageUrl}
+              onChange={e => setImageUrl(e.target.value)}
+              placeholder="https://example.com/image.webp"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingImage}
+            >
+              Upload
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2">

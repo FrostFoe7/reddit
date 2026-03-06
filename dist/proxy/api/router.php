@@ -66,6 +66,7 @@ class ApiRouter
             'communities' => 'communities.php',
             'messages' => 'messages.php',
             'notifications' => 'notifications.php',
+            'uploads' => 'uploads.php',
         ];
 
         if (strpos($this->route, 'users/memberships') === 0 || strpos($this->route, 'memberships') === 0) {

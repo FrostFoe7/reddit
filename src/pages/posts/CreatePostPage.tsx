@@ -18,7 +18,7 @@ import {
   List,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCommunities, useCreatePost } from '@/hooks';
+import { useCommunities, useCreatePost, useUploadImage } from '@/hooks';
 import {
   Command,
   CommandEmpty,
@@ -49,7 +49,11 @@ export const CreatePostPage: React.FC = () => {
 
   const { data: communities, isLoading: communitiesLoading, error: communitiesError } = useCommunities();
   const createPostMutation = useCreatePost();
+  const { mutateAsync: uploadImage, isPending: isUploadingImage } = useUploadImage();
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
+  const [mediaUrl, setMediaUrl] = useState<string>('');
+  const [linkUrl, setLinkUrl] = useState<string>('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -109,6 +113,8 @@ export const CreatePostPage: React.FC = () => {
         subreddit_id: selectedCommunity.id,
         post_type: (activeTab === 'media' ? 'image' : activeTab) as Post['post_type'],
         author_id: user.id,
+        image_url: activeTab === 'media' ? mediaUrl || undefined : undefined,
+        link_url: activeTab === 'link' ? linkUrl || undefined : undefined,
       },
       {
         onSuccess: () => {
@@ -120,6 +126,24 @@ export const CreatePostPage: React.FC = () => {
         },
       },
     );
+  };
+
+  const handleMediaSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    try {
+      const uploaded = await uploadImage(file);
+      setMediaUrl(uploaded);
+      toast.success('Image uploaded');
+    } catch {
+      // onError toast is already handled by hook.
+    }
   };
 
   return (
@@ -333,6 +357,13 @@ export const CreatePostPage: React.FC = () => {
               </TabsContent>
 
               <TabsContent value="media" className="mt-0">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleMediaSelected}
+                />
                 <div className="border border-dashed border-border rounded-2xl min-h-[240px] sm:min-h-[300px] flex flex-col items-center justify-center p-6 sm:p-10 gap-4 bg-muted/10 hover:bg-muted/20 transition-all cursor-pointer group active:scale-[0.99]">
                   <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
                     <Plus size={28} className="text-muted-foreground" />
@@ -346,15 +377,28 @@ export const CreatePostPage: React.FC = () => {
                   <Button
                     variant="outline"
                     className="rounded-full border-primary text-primary hover:bg-primary/5 font-bold h-10 px-8 mt-2 shadow-sm"
+                    disabled={isUploadingImage}
+                    onClick={() => fileInputRef.current?.click()}
                   >
-                    Upload
+                    {isUploadingImage ? 'Uploading...' : 'Upload'}
                   </Button>
+                  {mediaUrl && (
+                    <div className="w-full max-w-sm">
+                      <img
+                        src={mediaUrl}
+                        alt="Uploaded preview"
+                        className="w-full h-44 object-cover rounded-xl border border-border"
+                      />
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
               <TabsContent value="link" className="mt-0">
                 <Textarea
                   placeholder="URL"
+                  value={linkUrl}
+                  onChange={e => setLinkUrl(e.target.value)}
                   className="w-full bg-card border border-border rounded-xl px-4 py-3.5 min-h-14 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary transition-all resize-none shadow-sm"
                   rows={1}
                 />

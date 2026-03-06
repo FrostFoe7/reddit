@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthStore } from '@/store/useStore';
-import { useUpdateUser, useUser } from '@/hooks';
+import { useUpdateUser, useUploadImage, useUser } from '@/hooks';
+import { toast } from 'sonner';
 
 export const UserEditProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export const UserEditProfilePage: React.FC = () => {
   const currentUser = useAuthStore(state => state.user);
   const { data: profile } = useUser(username);
   const { mutate: updateUser, isPending } = useUpdateUser();
+  const { mutateAsync: uploadImage, isPending: isUploadingImage } = useUploadImage();
 
   const targetUser = profile || currentUser;
   const canEdit = Boolean(currentUser && targetUser && currentUser.id === targetUser.id);
@@ -30,6 +32,8 @@ export const UserEditProfilePage: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = useState(initial.avatar_url);
   const [bannerUrl, setBannerUrl] = useState(initial.banner_url);
   const [bio, setBio] = useState(initial.bio);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
+  const bannerInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     setEmail(initial.email);
@@ -71,6 +75,32 @@ export const UserEditProfilePage: React.FC = () => {
     );
   };
 
+  const handleUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    target: 'avatar' | 'banner',
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    try {
+      const uploaded = await uploadImage(file);
+      if (target === 'avatar') {
+        setAvatarUrl(uploaded);
+        toast.success('Avatar uploaded');
+      } else {
+        setBannerUrl(uploaded);
+        toast.success('Banner uploaded');
+      }
+    } catch {
+      // onError toast is already handled by hook.
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-0">
       <h1 className="text-3xl font-bold mb-6">Edit Profile</h1>
@@ -89,27 +119,61 @@ export const UserEditProfilePage: React.FC = () => {
         </div>
 
         <div className="space-y-2">
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={event => handleUpload(event, 'avatar')}
+          />
           <label htmlFor="profile-avatar" className="text-sm font-semibold">
             Avatar URL
           </label>
-          <Input
-            id="profile-avatar"
-            value={avatarUrl}
-            onChange={e => setAvatarUrl(e.target.value)}
-            placeholder="https://example.com/avatar.jpg"
-          />
+          <div className="flex gap-2">
+            <Input
+              id="profile-avatar"
+              value={avatarUrl}
+              onChange={e => setAvatarUrl(e.target.value)}
+              placeholder="https://example.com/avatar.jpg"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={isUploadingImage}
+            >
+              Upload
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2">
+          <input
+            ref={bannerInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={event => handleUpload(event, 'banner')}
+          />
           <label htmlFor="profile-banner" className="text-sm font-semibold">
             Banner URL
           </label>
-          <Input
-            id="profile-banner"
-            value={bannerUrl}
-            onChange={e => setBannerUrl(e.target.value)}
-            placeholder="https://example.com/banner.jpg"
-          />
+          <div className="flex gap-2">
+            <Input
+              id="profile-banner"
+              value={bannerUrl}
+              onChange={e => setBannerUrl(e.target.value)}
+              placeholder="https://example.com/banner.jpg"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => bannerInputRef.current?.click()}
+              disabled={isUploadingImage}
+            >
+              Upload
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2">

@@ -25,6 +25,31 @@ interface RequestConfig {
   signal?: AbortSignal;
 }
 
+function getAccessToken(): string | null {
+  try {
+    const raw = localStorage.getItem('auth-storage');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { state?: { accessToken?: string | null } };
+    return parsed?.state?.accessToken ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function buildHeaders(config?: RequestConfig, includeJsonContentType: boolean = true): Record<string, string> {
+  const headers: Record<string, string> = {
+    ...(includeJsonContentType ? { 'Content-Type': 'application/json' } : {}),
+    ...(config?.headers ?? {}),
+  };
+
+  const token = getAccessToken();
+  if (token && !headers.Authorization) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return headers;
+}
+
 /**
  * Normalize error response from API
  */
@@ -110,10 +135,7 @@ export const api = {
     const url = `${BASE_URL}/${endpoint}`;
     const response = await fetchWithTimeout(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: buildHeaders(config),
       timeout: config?.timeout,
     });
     return handleResponse<T>(response);
@@ -126,10 +148,7 @@ export const api = {
     const url = `${BASE_URL}/${endpoint}`;
     const response = await fetchWithTimeout(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: buildHeaders(config),
       body: JSON.stringify(data),
       timeout: config?.timeout,
     });
@@ -143,10 +162,7 @@ export const api = {
     const url = `${BASE_URL}/${endpoint}`;
     const response = await fetchWithTimeout(url, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: buildHeaders(config),
       body: JSON.stringify(data),
       timeout: config?.timeout,
     });
@@ -160,10 +176,21 @@ export const api = {
     const url = `${BASE_URL}/${endpoint}`;
     const response = await fetchWithTimeout(url, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        ...config?.headers,
-      },
+      headers: buildHeaders(config),
+      timeout: config?.timeout,
+    });
+    return handleResponse<T>(response);
+  },
+
+  /**
+   * Multipart/form-data POST request (for media uploads)
+   */
+  async postForm<T>(endpoint: string, data: FormData, config?: RequestConfig): Promise<T> {
+    const url = `${BASE_URL}/${endpoint}`;
+    const response = await fetchWithTimeout(url, {
+      method: 'POST',
+      headers: buildHeaders(config, false),
+      body: data,
       timeout: config?.timeout,
     });
     return handleResponse<T>(response);

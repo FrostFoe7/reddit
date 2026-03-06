@@ -26,17 +26,18 @@ import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useMarkNotificationRead, useMarkNotificationsRead, useNotifications } from '@/hooks';
+import { useAuth } from '@/hooks';
 import type { Notification } from '@/types';
 import { useTheme } from 'next-themes';
 import { SearchBar } from './SearchBar';
-import { useUIStore, useAuthStore } from '@/store/useStore';
+import { useUIStore } from '@/store/useStore';
 import { toast } from 'sonner';
 
 export const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const { toggleSidebar } = useUIStore();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuth();
   const { data: notifications = [] } = useNotifications();
   const { mutate: markAllNotificationsRead } = useMarkNotificationsRead();
   const { mutate: markNotificationRead } = useMarkNotificationRead();

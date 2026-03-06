@@ -1,11 +1,12 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'motion/react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Toaster } from '@/components/ui/sonner';
-import { ThemeProvider } from 'next-themes';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { useAuthStore } from '@/store/useStore';
+import { ErrorBoundary, PageTransition } from '@/components/common';
+import { useAuth } from '@/hooks';
+import { AuthProvider, ThemeProvider } from '@/providers';
 
 // Lazy load pages for better bundle splitting
 const Home = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })));
@@ -67,10 +68,26 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-background">
         <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/auth/login" element={<LoginPage />} />
-            <Route path="/auth/register" element={<RegisterPage />} />
-          </Routes>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route
+                path="/auth/login"
+                element={
+                  <PageTransition>
+                    <LoginPage />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/auth/register"
+                element={
+                  <PageTransition>
+                    <RegisterPage />
+                  </PageTransition>
+                }
+              />
+            </Routes>
+          </AnimatePresence>
         </Suspense>
       </div>
     );
@@ -79,94 +96,163 @@ function AppContent() {
   return (
     <MainLayout>
       <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/posts/:id" element={<PostPage />} />
-          <Route path="/r/:name" element={<SubredditPage />} />
-          <Route path="/profile/:username" element={<ProfilePage />} />
-          <Route
-            path="/posts/create"
-            element={
-              <ProtectedRoute>
-                <CreatePostPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/r/create"
-            element={
-              <ProtectedRoute>
-                <CommunityCreatePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/explore" element={<SearchPage />} />
-          <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute>
-                <NotificationsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/messages"
-            element={
-              <ProtectedRoute>
-                <MessagesPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile/edit"
-            element={
-              <ProtectedRoute>
-                <UserEditProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/posts/edit/:id"
-            element={
-              <ProtectedRoute>
-                <PostEditPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/r/settings/:subreddit"
-            element={
-              <ProtectedRoute>
-                <CommunitySettingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/r/mod/:subreddit"
-            element={
-              <ProtectedRoute>
-                <ModeratorPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route
+              path="/"
+              element={
+                <PageTransition>
+                  <Home />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/posts/:id"
+              element={
+                <PageTransition>
+                  <PostPage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/r/:name"
+              element={
+                <PageTransition>
+                  <SubredditPage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/profile/:username"
+              element={
+                <PageTransition>
+                  <ProfilePage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/posts/create"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <CreatePostPage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/r/create"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <CommunityCreatePage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <PageTransition>
+                  <SearchPage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/explore"
+              element={
+                <PageTransition>
+                  <SearchPage />
+                </PageTransition>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <NotificationsPage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/messages"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <MessagesPage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <SettingsPage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile/edit"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <UserEditProfilePage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/posts/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <PostEditPage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/r/settings/:subreddit"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <CommunitySettingsPage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/r/mod/:subreddit"
+              element={
+                <ProtectedRoute>
+                  <PageTransition>
+                    <ModeratorPage />
+                  </PageTransition>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <PageTransition>
+                  <NotFound />
+                </PageTransition>
+              }
+            />
+          </Routes>
+        </AnimatePresence>
       </Suspense>
     </MainLayout>
   );
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const { isAuthenticated } = useAuth();
   if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
   }
@@ -176,10 +262,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <ThemeProvider>
         <TooltipProvider>
           <Router>
-            <AppContent />
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
           </Router>
           <Toaster position="top-center" richColors />
         </TooltipProvider>

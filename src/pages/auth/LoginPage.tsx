@@ -1,13 +1,22 @@
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { useLogin } from '@/hooks/api/useAuth';
+import { useAuth } from '@/hooks';
 import { toast } from 'sonner';
 import { AuthLayout } from '@/pages/auth/components/AuthLayout';
 import { LoginForm, type LoginFormValues } from '@/pages/auth/components/LoginForm';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { mutate: login, isPending: isLoading } = useLogin();
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (values: LoginFormValues) => {
     login(

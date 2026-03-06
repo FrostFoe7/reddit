@@ -3,7 +3,7 @@ import { useMarkNotificationRead, useMarkNotificationsRead, useNotifications } f
 import { Button } from '@/components/ui/button';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { NotificationItem } from '@/pages/notifications/components/NotificationItem';
-import { ListSkeleton } from '@/components/common/ListSkeleton';
+import { ListSkeleton } from '@/components/common';
 
 export const NotificationsPage: React.FC = () => {
   const { data: notifications = [], isLoading, error } = useNotifications();

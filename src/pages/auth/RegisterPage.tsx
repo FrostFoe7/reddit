@@ -1,13 +1,22 @@
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitButton } from '@/components/common/SubmitButton';
 import { useRegister } from '@/hooks/api/useAuth';
+import { useAuth } from '@/hooks';
 import { toast } from 'sonner';
 import { AuthLayout } from '@/pages/auth/components/AuthLayout';
 import { RegisterForm, type RegisterFormValues } from '@/pages/auth/components/RegisterForm';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { mutate: register, isPending: isLoading } = useRegister();
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = (values: RegisterFormValues) => {
     register(
