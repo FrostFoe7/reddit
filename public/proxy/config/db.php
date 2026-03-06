@@ -18,7 +18,7 @@
 define('DB_HOST', 'localhost'); // Local development
 define('DB_NAME', 'breach_frm');
 define('DB_USER', 'sysbdadm');
-define('DB_PASS', 'nJ$#6F%JQiKj');
+define('DB_PASS', 'sysbdadm1337');
 define('DB_CHARSET', 'utf8mb4');
 
 class DB {
