@@ -8,9 +8,12 @@ require_once __DIR__ . '/../config/db.php';
 
 class ApiRouter
 {
-    private \PDO $pdo;
-    private string $method;
-    private string $route;
+    /** @var \PDO */
+    private $pdo;
+    /** @var string */
+    private $method;
+    /** @var string */
+    private $route;
 
     public function __construct(\PDO $pdo)
     {
@@ -43,7 +46,11 @@ class ApiRouter
             }
 
             $this->dispatchLegacy($legacyRouteFile);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            error_log('API dispatch error: ' . $e->getMessage());
+            if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+                $this->sendError('Internal server error: ' . $e->getMessage(), 500);
+            }
             $this->sendError('Internal server error', 500);
         }
     }
@@ -127,9 +134,13 @@ try {
     $pdo = DB::connect();
     $router = new ApiRouter($pdo);
     $router->dispatch();
-} catch (\PDOException $e) {
-    error_log("Database connection failed: " . $e->getMessage());
+} catch (\Throwable $e) {
+    error_log("API bootstrap failed: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Database connection failed']);
+    if (isset($_GET['debug']) && $_GET['debug'] === '1') {
+        echo json_encode(['error' => 'API bootstrap failed: ' . $e->getMessage()]);
+    } else {
+        echo json_encode(['error' => 'Database connection failed']);
+    }
     exit;
 }

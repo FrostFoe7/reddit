@@ -2,6 +2,10 @@
 -- Optimized for production and cPanel hosting environments (MySQL 5.7+ / 8.0+)
 -- Using custom ID format: xxx-xxx-xxx (11 characters total)
 
+-- npfo2xokhne8@sg2plzcpnl508569 [~/public_html/news.breachtimes.com]$ mysql --version
+-- mysql  Ver 15.1 Distrib 10.6.24-MariaDB, for Linux (x86_64) using readline 5.1
+-- npfo2xokhne8@sg2plzcpnl508569 [~/public_html/news.breachtimes.com]$
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

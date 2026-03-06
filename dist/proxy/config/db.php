@@ -8,20 +8,18 @@
 // On cPanel, your database name and user usually look like: 'cpaneluser_reddit_v2'
 // Use '127.0.0.1' as DB_HOST if 'localhost' gives socket errors.
 
-define('DB_HOST', '127.0.0.1'); // Local development
-define('DB_NAME', 'reddit_v2');
-define('DB_USER', 'frostfoe');
-define('DB_PASS', 'frostfoe');
-define('DB_CHARSET', 'utf8mb4');
+// define('DB_HOST', '127.0.0.1'); // Local development
+// define('DB_NAME', 'reddit_v2');
+// define('DB_USER', 'frostfoe');
+// define('DB_PASS', 'frostfoe');
+// define('DB_CHARSET', 'utf8mb4');
 
 // --- CPANEL EXAMPLE (COMMENTED OUT) ---
-/*
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'myuser_reddit_v2');
-define('DB_USER', 'myuser_reddit_admin');
-define('DB_PASS', 'my_very_secure_password');
+define('DB_HOST', 'localhost'); // Local development
+define('DB_NAME', 'breach_frm');
+define('DB_USER', 'sysbdadm');
+define('DB_PASS', 'nJ$#6F%JQiKj');
 define('DB_CHARSET', 'utf8mb4');
-*/
 
 class DB {
     private static $instance = null;
