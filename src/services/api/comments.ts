@@ -31,7 +31,15 @@ export const commentsApi = {
    * Create new comment
    */
   async createComment(comment: Partial<Comment>): Promise<Comment> {
-    const data = await api.post<Record<string, unknown>>('comments', comment);
+    const payload: Record<string, unknown> = {
+      ...comment,
+    };
+
+    if (!('user_id' in payload) && typeof payload.author_id === 'string') {
+      payload.user_id = payload.author_id;
+    }
+
+    const data = await api.post<Record<string, unknown>>('comments', payload);
 
     if ('content' in data) {
       return normalizeComment(data);

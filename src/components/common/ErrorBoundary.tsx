@@ -1,7 +1,6 @@
 import React, { type ErrorInfo, type ReactNode } from 'react';
 import { AlertCircle, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
   children: ReactNode;
@@ -53,7 +52,9 @@ interface ErrorFallbackProps {
  * Error Fallback Component
  */
 function ErrorFallback({ error, onReset }: ErrorFallbackProps) {
-  const navigate = useNavigate();
+  const goHome = () => {
+    window.location.assign('/');
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4">
@@ -85,7 +86,7 @@ function ErrorFallback({ error, onReset }: ErrorFallbackProps) {
           <Button variant="outline" className="flex-1" onClick={onReset}>
             Try Again
           </Button>
-          <Button className="flex-1 gap-2" onClick={() => navigate('/')}>
+          <Button className="flex-1 gap-2" onClick={goHome}>
             <Home className="h-4 w-4" />
             Go Home
           </Button>

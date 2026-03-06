@@ -41,7 +41,13 @@ export function useCommunity(idOrName: string | undefined) {
       return communitiesApi.getCommunity(idOrName, user?.id);
     },
     enabled: !!idOrName,
-    retry: 2,
+    retry: (failureCount, error) => {
+      const statusCode = (error as { statusCode?: number } | null)?.statusCode;
+      if (statusCode === 404) {
+        return false;
+      }
+      return failureCount < 2;
+    },
     staleTime: 45000,
   });
 }

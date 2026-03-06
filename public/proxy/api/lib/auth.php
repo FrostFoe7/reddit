@@ -120,10 +120,32 @@ if (!function_exists('resolveTokenUserId')) {
 }
 
 if (!function_exists('requireAuthenticatedUserId')) {
+    function extractLegacyUserId(array $input = []): ?string
+    {
+        $candidates = [
+            $input['user_id'] ?? null,
+            $input['author_id'] ?? null,
+            $input['sender_id'] ?? null,
+            $input['actor_id'] ?? null,
+            $_GET['user_id'] ?? null,
+            $_GET['author_id'] ?? null,
+            $_GET['sender_id'] ?? null,
+            $_GET['actor_id'] ?? null,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && $candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
     function requireAuthenticatedUserId(array $input = [], bool $allowLegacyFallback = true): string
     {
         $tokenUserId = resolveTokenUserId(getBearerToken());
-        $legacyUserId = $input['user_id'] ?? $_GET['user_id'] ?? null;
+        $legacyUserId = extractLegacyUserId($input);
 
         if ($tokenUserId) {
             if ($legacyUserId && $legacyUserId !== $tokenUserId) {
