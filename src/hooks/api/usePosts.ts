@@ -62,7 +62,7 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newPost: Partial<Post>) => postsApi.createPost(newPost),
+    mutationFn: (newPost: Partial<Post> & { user_id?: string }) => postsApi.createPost(newPost),
     onSuccess: () => {
       // Invalidate all post queries to refetch
       queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });

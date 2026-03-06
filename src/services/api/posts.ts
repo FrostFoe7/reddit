@@ -43,7 +43,7 @@ export const postsApi = {
   /**
    * Create new post
    */
-  async createPost(newPost: Partial<Post>): Promise<Post> {
+  async createPost(newPost: Partial<Post> & { user_id?: string }): Promise<Post> {
     const data = await api.post<Record<string, unknown>>('posts', newPost);
 
     if (!('title' in data)) {

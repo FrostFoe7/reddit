@@ -127,6 +127,12 @@ if ($method === 'GET') {
 // Handle POST requests (Create a new post)
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
+
+    // Backward compatibility: older clients send author_id without bearer token.
+    if (!isset($input['user_id']) && isset($input['author_id'])) {
+        $input['user_id'] = $input['author_id'];
+    }
+
     $authUserId = requireAuthenticatedUserId($input);
 
     if (isset($input['author_id']) && (string)$input['author_id'] !== $authUserId) {

@@ -113,6 +113,7 @@ export const CreatePostPage: React.FC = () => {
         subreddit_id: selectedCommunity.id,
         post_type: (activeTab === 'media' ? 'image' : activeTab) as Post['post_type'],
         author_id: user.id,
+        user_id: user.id,
         image_url: activeTab === 'media' ? mediaUrl || undefined : undefined,
         link_url: activeTab === 'link' ? linkUrl || undefined : undefined,
       },
