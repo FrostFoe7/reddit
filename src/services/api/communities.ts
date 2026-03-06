@@ -8,6 +8,13 @@ import type { Community } from '@/types';
 import { normalizeCommunity } from '@/types/normalize';
 
 export const communitiesApi = {
+  async uploadCommunityAsset(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const data = await api.postForm<{ url: string }>('uploads', formData, { timeout: 60000 });
+    return data.url;
+  },
+
   /**
    * Fetch all communities
    */
@@ -53,16 +60,23 @@ export const communitiesApi = {
       user_id?: string;
     },
   ): Promise<Community> {
-    const formData = new FormData();
-    formData.append('name', community.name);
-    if (community.description) formData.append('description', community.description);
-    if (community.icon_url) formData.append('icon_url', community.icon_url);
-    if (community.banner_url) formData.append('banner_url', community.banner_url);
-    if (community.user_id) formData.append('user_id', community.user_id);
-    if (community.iconFile) formData.append('icon', community.iconFile);
-    if (community.bannerFile) formData.append('banner', community.bannerFile);
+    const payload: Record<string, unknown> = {
+      name: community.name,
+      description: community.description,
+      icon_url: community.icon_url,
+      banner_url: community.banner_url,
+      user_id: community.user_id,
+    };
 
-    const data = await api.postForm<Record<string, unknown>>('communities/create', formData, {
+    if (community.iconFile) {
+      payload.icon_url = await this.uploadCommunityAsset(community.iconFile);
+    }
+
+    if (community.bannerFile) {
+      payload.banner_url = await this.uploadCommunityAsset(community.bannerFile);
+    }
+
+    const data = await api.post<Record<string, unknown>>('communities/create', payload, {
       timeout: 60000,
     });
     return normalizeCommunity(data);
@@ -82,19 +96,23 @@ export const communitiesApi = {
       user_id?: string;
     },
   ): Promise<Community> {
-    const formData = new FormData();
-    if (typeof updates.description !== 'undefined') formData.append('description', updates.description);
-    if (typeof updates.icon_url !== 'undefined') formData.append('icon_url', updates.icon_url);
-    if (typeof updates.banner_url !== 'undefined') formData.append('banner_url', updates.banner_url);
-    if (updates.user_id) formData.append('user_id', updates.user_id);
-    if (updates.iconFile) formData.append('icon', updates.iconFile);
-    if (updates.bannerFile) formData.append('banner', updates.bannerFile);
+    const payload: Record<string, unknown> = {};
 
-    const data = await api.postForm<Record<string, unknown>>(`communities/${encodeURIComponent(id)}`, formData, {
+    if (typeof updates.description !== 'undefined') payload.description = updates.description;
+    if (typeof updates.icon_url !== 'undefined') payload.icon_url = updates.icon_url;
+    if (typeof updates.banner_url !== 'undefined') payload.banner_url = updates.banner_url;
+    if (updates.user_id) payload.user_id = updates.user_id;
+
+    if (updates.iconFile) {
+      payload.icon_url = await this.uploadCommunityAsset(updates.iconFile);
+    }
+
+    if (updates.bannerFile) {
+      payload.banner_url = await this.uploadCommunityAsset(updates.bannerFile);
+    }
+
+    const data = await api.put<Record<string, unknown>>(`communities/${encodeURIComponent(id)}`, payload, {
       timeout: 60000,
-      headers: {
-        'X-HTTP-Method-Override': 'PUT',
-      },
     });
     return normalizeCommunity(data);
   },

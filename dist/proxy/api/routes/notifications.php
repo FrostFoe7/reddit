@@ -7,7 +7,7 @@ $pdo = DB::connect();
 require_once __DIR__ . '/../lib/auth.php';
 
 if ($method === 'GET') {
-    $authUserId = requireAuthenticatedUserId([], false);
+    $authUserId = requireAuthenticatedUserId();
     $user_id = $_GET['user_id'] ?? $authUserId;
 
     if ((string)$user_id !== $authUserId) {

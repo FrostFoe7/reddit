@@ -95,6 +95,12 @@ async function fetchWithTimeout(
 async function parseResponseBody(response: Response): Promise<unknown> {
   const contentType = response.headers.get('content-type');
   if (!contentType?.includes('application/json')) {
+    const text = await response.text();
+    if (!response.ok) {
+      return {
+        error: text.slice(0, 240) || `Unexpected non-JSON response (${contentType || 'unknown'})`,
+      };
+    }
     throw new Error(`Invalid response type: ${contentType}`);
   }
   return response.json();

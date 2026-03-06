@@ -13,3 +13,7 @@
   # 3. Otherwise, route all requests to index.html (for React Router)
   RewriteRule ^ index.html [L]
 </IfModule>
+
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://img1.wsimg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-ancestors 'self'; base-uri 'self';"
+</IfModule>
