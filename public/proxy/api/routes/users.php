@@ -5,6 +5,54 @@
 
 $pdo = DB::connect();
 
+function usersTableHasColumn(PDO $pdo, string $column): bool
+{
+    static $cache = [];
+    if (array_key_exists($column, $cache)) {
+        return $cache[$column];
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?'
+    );
+    $stmt->execute(['users', $column]);
+    $cache[$column] = ((int)$stmt->fetchColumn()) > 0;
+
+    return $cache[$column];
+}
+
+function userSelectColumns(PDO $pdo): array
+{
+    $preferred = [
+        'id',
+        'username',
+        'email',
+        'avatar_url',
+        'banner_url',
+        'bio',
+        'karma',
+        'cake_day',
+        'is_premium',
+        'is_verified',
+        'settings',
+        'last_seen_at',
+        'created_at',
+    ];
+
+    $columns = [];
+    foreach ($preferred as $column) {
+        if (usersTableHasColumn($pdo, $column)) {
+            $columns[] = $column;
+        }
+    }
+
+    if (empty($columns)) {
+        $columns = ['id', 'username'];
+    }
+
+    return $columns;
+}
+
 if ($method === 'GET') {
     $username = $_GET['username'] ?? null;
     $user_id = $_GET['user_id'] ?? null;
@@ -27,7 +75,8 @@ if ($method === 'GET') {
     }
     
     if ($username) {
-        $stmt = $pdo->prepare("SELECT id, username, email, avatar_url, banner_url, bio, karma, cake_day, is_premium, is_verified, settings, last_seen_at, created_at FROM users WHERE username = ? OR id = ? LIMIT 1");
+        $select = implode(', ', userSelectColumns($pdo));
+        $stmt = $pdo->prepare("SELECT $select FROM users WHERE username = ? OR id = ? LIMIT 1");
         $stmt->execute([$username, $username]);
         $user = $stmt->fetch();
         
@@ -91,7 +140,8 @@ if ($method === 'PUT' || $method === 'PATCH') {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
 
-        $stmtUser = $pdo->prepare("SELECT id, username, email, avatar_url, banner_url, bio, karma, cake_day, is_premium, is_verified, settings, last_seen_at, created_at FROM users WHERE id = ? LIMIT 1");
+        $select = implode(', ', userSelectColumns($pdo));
+        $stmtUser = $pdo->prepare("SELECT $select FROM users WHERE id = ? LIMIT 1");
         $stmtUser->execute([$targetId]);
         $updated = $stmtUser->fetch();
 
