@@ -112,7 +112,7 @@ export const RightSidebar = () => {
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-xl">📝</span>
                 </div>
-                <h3 className="text-base font-bold text-foreground">Posting to Reddit</h3>
+                <h3 className="text-base font-bold text-foreground">Posting to TimesForum</h3>
               </div>
               <ol className="flex flex-col pt-2">
                 {[
@@ -438,7 +438,7 @@ export const RightSidebar = () => {
               </button>
             ))}
             <p className="text-[11px] font-bold text-muted-foreground mt-3 w-full opacity-50">
-              Reddit, Inc. © 2026. All rights reserved.
+              TimesForum, Inc. © 2026. All rights reserved.
             </p>
           </div>
         </div>
