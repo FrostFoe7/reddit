@@ -9,12 +9,37 @@ SET @col_exists := (
 );
 SET @sql := IF(
   @col_exists = 0,
-  'ALTER TABLE subreddits ADD COLUMN creator_id VARCHAR(20) NULL AFTER owner_id',
+  'ALTER TABLE subreddits ADD COLUMN creator_id VARCHAR(11) NULL AFTER owner_id',
   'SELECT 1'
 );
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+-- Drop the FK first if it already exists so ALTER/MODIFY does not fail in MariaDB.
+SET @fk_exists := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE()
+    AND CONSTRAINT_NAME = 'fk_subreddits_creator'
+    AND TABLE_NAME = 'subreddits'
+);
+SET @sql := IF(
+  @fk_exists = 1,
+  'ALTER TABLE subreddits DROP FOREIGN KEY fk_subreddits_creator',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Keep creator_id compatible with users.id from the base schema.
+ALTER TABLE subreddits
+MODIFY creator_id VARCHAR(11) NULL;
+
+UPDATE subreddits
+SET creator_id = owner_id
+WHERE creator_id IS NULL;
 
 SET @idx_exists := (
   SELECT COUNT(*)
@@ -32,10 +57,6 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
-UPDATE subreddits
-SET creator_id = owner_id
-WHERE creator_id IS NULL;
-
 SET @fk_exists := (
   SELECT COUNT(*)
   FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
@@ -45,12 +66,9 @@ SET @fk_exists := (
 );
 SET @sql := IF(
   @fk_exists = 0,
-  'ALTER TABLE subreddits ADD CONSTRAINT fk_subreddits_creator FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE',
+  'ALTER TABLE subreddits ADD CONSTRAINT fk_subreddits_creator FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE SET NULL',
   'SELECT 1'
 );
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
-
-ALTER TABLE subreddits
-MODIFY creator_id VARCHAR(20) NOT NULL;

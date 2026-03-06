@@ -3,25 +3,25 @@
 -- All IDs strictly follow the xxx-xxx-xxx (11 char) format
 
 SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE reports;
-TRUNCATE messages;
-TRUNCATE conversation_participants;
-TRUNCATE conversations;
-TRUNCATE notifications;
-TRUNCATE post_drafts;
-TRUNCATE saved_posts;
-TRUNCATE user_blocks;
-TRUNCATE user_follows;
-TRUNCATE comment_votes;
-TRUNCATE post_votes;
-TRUNCATE comments;
-TRUNCATE post_media;
-TRUNCATE posts;
-TRUNCATE subreddit_bans;
-TRUNCATE subreddit_members;
-TRUNCATE subreddit_rules;
-TRUNCATE subreddits;
-TRUNCATE users;
+DELETE FROM reports;
+DELETE FROM messages;
+DELETE FROM conversation_participants;
+DELETE FROM conversations;
+DELETE FROM notifications;
+DELETE FROM post_drafts;
+DELETE FROM saved_posts;
+DELETE FROM user_blocks;
+DELETE FROM user_follows;
+DELETE FROM comment_votes;
+DELETE FROM post_votes;
+DELETE FROM comments;
+DELETE FROM post_media;
+DELETE FROM posts;
+DELETE FROM subreddit_bans;
+DELETE FROM subreddit_members;
+DELETE FROM subreddit_rules;
+DELETE FROM subreddits;
+DELETE FROM users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 1. Users (15 users)
